@@ -97,7 +97,7 @@ types:
 
             # blending modes / render flags
             - id: materials
-              type: m2array(m2array_types::todo)
+              type: m2array(m2array_types::m2material)
 
             # alternate name "bone_lookup_table"
             - id: bone_combos

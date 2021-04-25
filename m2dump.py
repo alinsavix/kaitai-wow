@@ -162,7 +162,7 @@ def to_tree(obj, path=""):
                 # print(f"{path}.{k} == {v}")
                 # value = v
                 # value = to_tree(v, treepath(path, k))
-                if type(v) in [int, float, str]:
+                if type(v) in [int, float, str, bool]:
                     disp(f"{path}.{k}", f"final ({v})")
                     value = v
                 else:
@@ -191,7 +191,7 @@ if __name__ == "__main__":
 
     parsed = to_tree(target)
     if do_finaldump:
-        print(ppretty(parsed, depth=99, seq_length=10,))
+        print(ppretty(parsed, depth=99, seq_length=100,))
 
 
 # print("thing")
