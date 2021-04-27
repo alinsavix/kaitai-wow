@@ -89,3 +89,5 @@ blend.savesm2.py
 *.svg
 
 *-merged.ksy
+m2.py
+skin.py

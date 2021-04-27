@@ -1,7 +1,7 @@
 # This is a shitty makefile. Don't use it as a model for anything
 KSY_COMPILER ?= kaitai-struct-compiler
 KSY_MERGE=python3 ./ksy-merge.py
-TARGETS ?= m2.py   # also available: m2.svg
+TARGETS ?= m2.py skin.py   # also available: m2.svg
 
 all: $(TARGETS)
 
