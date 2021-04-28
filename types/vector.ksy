@@ -158,3 +158,18 @@ types:
               type: s4
             - id: maxx
               type: s4
+
+    fp_6_9:
+        seq:
+            # FIXME: Make sure this is the right number of bytes
+            # FIXME: This is actually a "fixed point" structure which
+            # needs further decoding
+            - id: value
+              type: u2
+
+    vector_2fp_6_9:
+        seq:
+            - id: x
+              type: fp_6_9
+            - id: y
+              type: fp_6_9

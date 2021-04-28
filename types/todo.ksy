@@ -1,5 +1,5 @@
 types:
   todo:
     seq:
-      - id: nothing
+      - id: todo_nothing
         type: u4

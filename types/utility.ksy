@@ -40,6 +40,17 @@ types:
             - id: a
               type: u1
 
+    cimvector:
+        seq:
+            - id: b
+              type: u1
+            - id: g
+              type: u1
+            - id: r
+              type: u1
+            - id: a
+              type: u1
+
     crect:
         seq:
             - id: top
@@ -77,3 +88,12 @@ types:
               type: s4
             - id: maxx
               type: s4
+
+    frgb:
+        seq:
+            - id: r
+              type: f4
+            - id: g
+              type: f4
+            - id: b
+              type: f4

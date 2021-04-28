@@ -148,7 +148,7 @@ types:
             - id: ribbon_emitters
               type: m2array(m2array_types::m2ribbon)
             - id: particle_emitters
-              type: m2array(m2array_types::todo)
+              type: m2array(m2array_types::m2particle)
             - id: texture_combiner_combos
               type: m2array(m2array_types::uint16)
               if: global_flags.flag_use_texture_combiner_combos

@@ -18,7 +18,7 @@ DEFAULT_TARGET = "testfiles/spectraltiger.m2"
 do_verbose = 0
 do_debug = 0
 showtree = 0
-do_disposition = 0
+do_disposition = 1
 do_finaldump = 1
 
 
