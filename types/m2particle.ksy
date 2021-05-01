@@ -293,3 +293,16 @@ types:
               repeat-expr: 4
             - id: unknown_reference
               type: m2array(m2array_types::todo)
+
+
+    # FIXME: Is this best defined here? Or somewhere else?
+    m2extended_particle:
+        seq:
+            - id: z_source
+              type: f4
+            - id: unknown1
+              type: u4
+            - id: unknown2
+              type: u4
+            - id: unknown3
+              type: m2parttrack(m2array_types::fixed16)

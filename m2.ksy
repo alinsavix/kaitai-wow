@@ -4,6 +4,9 @@ meta:
     bit-endian: le
     encoding: UTF-8
 
+    xref:
+        doc-ref: https://wowdev.wiki/M2
+
     # include is read by merge-yaml.py and then removed. It isn't legal
     # in normal kaitai-struct configurations
     include:
@@ -37,4 +40,10 @@ types:
                       '"MD21"': chunk_md21
                       '"LDV1"': chunk_ldv1
                       '"TXID"': chunk_txid
+                      '"TXAC"': chunk_txac
+                      '"EXP2"': chunk_exp2
+                      '"PGD1"': chunk_pgd1
+                      '"DETL"': chunk_detl
+                      '"SFID"': chunk_sfid
+                      '"AFID"': chunk_afid
                       _: noop

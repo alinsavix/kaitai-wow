@@ -89,6 +89,8 @@ types:
             - id: maxx
               type: s4
 
+    # RGB values expressed in floating point, as used by particle structs
+    # FIXME: This naming is absolutely awful
     frgb:
         seq:
             - id: r

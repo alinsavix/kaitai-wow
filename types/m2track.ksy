@@ -53,6 +53,20 @@ types:
               type: m2array(m2array_types::m2array_uint32)
 
 
+    m2parttrack:
+        params:
+            - id: m2array_type
+              type: s4
+              enum: m2array_types
+        seq:
+            - id: times
+              type: m2array(m2array_types::fixed16)
+            - id: values
+              type:
+                  switch-on: m2array_type
+                  cases:
+                      m2array_types::fixed16: m2array(m2array_types::fixed16)
+
     # Could also be "M2TrackNoHeader" maybe
     # FIXME: Can we just use this as part of the normal m2track data structure?
     # # I mean, we can, but it'd be more obtuse to access. Hrrm.

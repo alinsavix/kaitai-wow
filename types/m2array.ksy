@@ -35,6 +35,8 @@ enums:
         118: m2batch
         119: m2shadowbatch
         120: m2compquat
+        121: m2extended_particle
+        122: pgd1_entry
 
         201: m2array_uint32
         202: m2array_m2compquat
@@ -97,6 +99,8 @@ types:
                         m2array_types::m2shadowbatch: m2shadowbatch
                         m2array_types::c4quaternion: c4quaternion
                         m2array_types::m2compquat: m2compquat
+                        m2array_types::m2extended_particle: m2extended_particle
+                        m2array_types::pgd1_entry: pgd1_entry
 
                         m2array_types::m2array_uint32: m2array(m2array_types::uint32)
                         m2array_types::m2array_c2vector: m2array(m2array_types::c2vector)

@@ -39,7 +39,7 @@ def merge_file(yaml_data, file):
 
     with open(file, "r") as f:
         data = yaml.safe_load(f)
-        if "meta" in data and "include" in data["meta"]:
+        if data and "meta" in data and "include" in data["meta"]:
             for incl in data["meta"]["include"]:
                 log(f"processing include '{incl}' from '{file}'")
                 recurse_merge(yaml_data, incl)
@@ -96,7 +96,9 @@ def main():
     for f in args.files:
         recurse_merge(data, f)
 
-    print(yaml.dump(data))
+    # The kaitai IDE can't cope with yaml multiline strings, so width=9999
+    # will stop it from wrapping those lines when processing long heredocs
+    print(yaml.dump(data, width=9999))
 
 
 if __name__ == "__main__":
