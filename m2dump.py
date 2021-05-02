@@ -197,6 +197,9 @@ if __name__ == "__main__":
     elif ext == ".skel":
         from output.skel import *
         target = Skel.from_file(targetfile)
+    elif ext == ".blp":
+        from output.blp import *
+        target = Blp.from_file(targetfile)
 
     parsed = to_tree(target)
     if do_finaldump:
