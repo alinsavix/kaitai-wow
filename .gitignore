@@ -82,14 +82,10 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
-# misc
-blend.savesm2.py
 
 *.dot
 *.svg
 
+
+output/
 *-merged.ksy
-m2.py
-anim.py
-skel.py
-skin.py

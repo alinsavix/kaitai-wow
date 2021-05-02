@@ -1,31 +1,37 @@
-# This is a shitty makefile. Don't use it as a model for anything
+# This makefile probably requires GNU make. Sorry.
 KSY_COMPILER ?= kaitai-struct-compiler
 KSY_MERGE=python3 ./ksy-merge.py
-TARGETS ?= m2.py skel.py skel.py skin.py   # also available: m2.svg
+FILETYPES = $(basename $(notdir $(wildcard filetypes/*.ksy)))
+TARGETS ?= $(addprefix $(OUTDIR)/, $(addsuffix .py, $(FILETYPES)))
 
-all: $(TARGETS)
+OUTDIR=output
+
+all: $(OUTDIR) $(TARGETS)
 
 test: $(TARGETS)
-	./test.py
+	python3 ./m2dump.py
 
 # We're just going to force it to rebuild everything every time, so we don't
 # have to deal with the complexity of having a way to dynamically track
 # included files as dependencies
-.PRECIOUS: %-merged.ksy
-%-merged.ksy: %.ksy FORCE
+
+$(OUTDIR):
+	@mkdir -p $(OUTDIR)
+
+.PRECIOUS: $(OUTDIR)/%.ksy
+$(OUTDIR)/%.ksy: filetypes/%.ksy FORCE
 	$(KSY_MERGE) $< >$@
 
-%.py: %-merged.ksy
-	$(KSY_COMPILER) --target python $<
+$(OUTDIR)/%.py: $(OUTDIR)/%.ksy
+	$(KSY_COMPILER) --outdir $(OUTDIR) --target python $<
 
-%.svg: %.dot
+$(OUTDIR)/%.svg: $(OUTDIR)/%.dot
 	dot -Tsvg $< >$@
 
-%.dot: %-merged.ksy
-	$(KSY_COMPILER) --target graphviz $<
+$(OUTDIR)/%.dot: $(OUTDIR)/%.ksy
+	$(KSY_COMPILER)  --outdir $(OUTDIR) --target graphviz $<
 
 clean: FORCE
-	rm $(TARGETS)
-	rm *-merged.ksy
+	rm -f $(OUTDIR)/*.ksy $(TARGETS)
 
 FORCE:

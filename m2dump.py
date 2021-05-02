@@ -11,7 +11,8 @@ import inspect
 #
 # Also, did I mention it's garbage?
 
-DEFAULT_TARGET = "testfiles/spectraltiger.m2"
+# DEFAULT_TARGET = "testfiles/spectraltiger.m2"
+DEFAULT_TARGET = "testfiles/staff_2h_draenorcrafted_d_02_c.m2"
 
 # FIXME: Turn these into proper verbosity flags
 do_verbose = 0
@@ -188,13 +189,13 @@ if __name__ == "__main__":
 
     name, ext = os.path.splitext(targetfile)
     if ext == ".m2":
-        from m2 import *
+        from output.m2 import *
         target = M2.from_file(targetfile)
     elif ext == ".skin":
-        from skin import *
+        from output.skin import *
         target = Skin.from_file(targetfile)
     elif ext == ".skel":
-        from skel import *
+        from output.skel import *
         target = Skel.from_file(targetfile)
 
     parsed = to_tree(target)
