@@ -8,6 +8,8 @@ enums:
         4: fixed16
         5: float
         6: ubyte4
+        7: int8
+        8: int16
 
         21: c2vector
         22: c3vector
@@ -67,6 +69,7 @@ types:
                     switch-on: m2array_type
                     cases:
                         m2array_types::todo: m2array_todo
+
                         m2array_types::uint8: u1
                         m2array_types::uint16: u2
                         m2array_types::uint32: u4
@@ -77,6 +80,8 @@ types:
                         m2array_types::c3vector: c3vector
                         m2array_types::c4vector: c4vector
                         m2array_types::frgb: frgb
+                        m2array_types::int8: s1
+                        m2array_types::int16: s2
 
                         m2array_types::m2sequencefallback: m2sequencefallback
                         m2array_types::m2compbone: m2compbone

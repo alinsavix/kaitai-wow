@@ -44,4 +44,6 @@
 *.bls filter=lfs diff=lfs merge=lfs -text
 
 *.m2 filter=lfs diff=lfs merge=lfs -text
+*.anim filter=lfs diff=lfs merge=lfs -text
+*.skel filter=lfs diff=lfs merge=lfs -text
 *.skin filter=lfs diff=lfs merge=lfs -text

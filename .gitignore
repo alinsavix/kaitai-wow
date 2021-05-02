@@ -90,4 +90,6 @@ blend.savesm2.py
 
 *-merged.ksy
 m2.py
+anim.py
+skel.py
 skin.py

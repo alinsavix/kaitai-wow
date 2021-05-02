@@ -3,7 +3,6 @@ import os
 import sys
 from ppretty import ppretty
 import inspect
-from m2 import *
 
 # This script is what's known as "awful". It's brute force. It does
 # everything wrong. It probably doesn't even taste like chocolate.
@@ -187,7 +186,16 @@ if __name__ == "__main__":
         targetfile = DEFAULT_TARGET
         print(f"WARNING: Using default target file {targetfile}", flush=True)
 
-    target = M2.from_file(targetfile)
+    name, ext = os.path.splitext(targetfile)
+    if ext == ".m2":
+        from m2 import *
+        target = M2.from_file(targetfile)
+    elif ext == ".skin":
+        from skin import *
+        target = Skin.from_file(targetfile)
+    elif ext == ".skel":
+        from skel import *
+        target = Skel.from_file(targetfile)
 
     parsed = to_tree(target)
     if do_finaldump:
