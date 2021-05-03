@@ -200,6 +200,9 @@ if __name__ == "__main__":
     elif ext == ".blp":
         from output.blp import *
         target = Blp.from_file(targetfile)
+    elif ext == ".bls":
+        from output.bls import *
+        target = Bls.from_file(targetfile)
 
     parsed = to_tree(target)
     if do_finaldump:
