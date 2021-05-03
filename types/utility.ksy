@@ -9,7 +9,7 @@ types:
     cirange:
         seq:
             - id: min
-              type: s4 # FIXME: verify these are 4 bytes
+              type: s4  # FIXME: verify these are 4 bytes
             - id: max
               type: s4
 

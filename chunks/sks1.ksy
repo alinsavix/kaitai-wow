@@ -1,4 +1,3 @@
-
 types:
     chunk_sks1:
         doc: "Skeleton Sequence Data"

@@ -1,4 +1,3 @@
-
 types:
     chunk_afid:
         doc: "Animation File IDs"

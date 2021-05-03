@@ -59,7 +59,7 @@ types:
               doc: "should be globally unique"
             - id: global_flags
               type: md20_global_flags
-              size: 4 # FIXME: Is this right?
+              size: 4  # FIXME: Is this right?
             - id: global_loops
               type: m2array(m2array_types::m2loop)
 

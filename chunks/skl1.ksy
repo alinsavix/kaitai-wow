@@ -1,4 +1,3 @@
-
 types:
     chunk_skl1:
         doc: "Skeleton Data"

@@ -1,4 +1,3 @@
-
 types:
     chunk_bfid:
         doc: "Bone File IDs"

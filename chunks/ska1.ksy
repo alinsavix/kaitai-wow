@@ -1,4 +1,3 @@
-
 types:
     chunk_ska1:
         doc: "Skeleton Attachment Data"

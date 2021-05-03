@@ -2,7 +2,7 @@ types:
     m2light:
         seq:
             - id: type
-              type: u2 # FIXME: actually an enum
+              type: u2  # FIXME: actually an enum
             - id: bone
               type: s2
               doc: "-1 if not attached to a bone"

@@ -11,6 +11,8 @@ all: $(OUTDIR) $(TARGETS)
 test: $(TARGETS)
 	python3 ./m2dump.py
 
+lint: FORCE
+	yamllint --config-file .yamllint.yaml chunks enums filetypes types
 # We're just going to force it to rebuild everything every time, so we don't
 # have to deal with the complexity of having a way to dynamically track
 # included files as dependencies

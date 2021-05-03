@@ -3,7 +3,7 @@ types:
         seq:
             - id: key_bone_id
               type: s4
-            - id: flags # FIXME
+            - id: flags  # FIXME
               type: u4
             - id: parent_bone
               type: s2

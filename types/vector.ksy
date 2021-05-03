@@ -9,7 +9,7 @@ types:
     c2ivector:
         seq:
             - id: x
-              type: s4 # FIXME: check type ("int" in docs)
+              type: s4  # FIXME: check type ("int" in docs)
             - id: y
               type: s4
 

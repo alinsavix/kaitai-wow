@@ -83,13 +83,21 @@ types:
               doc: "0x010000"
             - id: outward
               type: b1
-              doc: "0x020000 - Style: Outward - particles move away from origin. When not set, particles start at `origin+(speed * life)` and move towards the origin"
+              doc: |
+                0x020000 - Style: Outward - particles move away from origin.
+                When not set, particles start at `origin+(speed * life)`
+                and move towards the origin"
             - id: inward_maybe
               type: b1
-              doc: "0x040000 - Style: Unknown - In a large proportion of particles this seems to be simply the opposite of the above flag, but in some (e.g. voidgod.m2 or wingedlionmount.m2) both flags are true."
+              doc: |
+                0x040000 - Style: Unknown - In a large proportion of particles
+                this seems to be simply the opposite of the above flag, but in
+                some (e.g. voidgod.m2 or wingedlionmount.m2) both flags are true.
             - id: scale_vary_separately
               type: b1
-              doc: "0x080000 - If set, scale_vary affects x and y separately, otherwise scale_vary.x is used and scale_vary.y is ignored"
+              doc: |
+                0x080000 - If set, scale_vary affects x and y separately,
+                otherwise scale_vary.x is used and scale_vary.y is ignored
             - id: unknown7
               type: b1
               doc: "0x100000"

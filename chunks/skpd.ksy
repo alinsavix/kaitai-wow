@@ -1,4 +1,3 @@
-
 types:
     chunk_skpd:
         doc: |

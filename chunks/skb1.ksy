@@ -1,4 +1,3 @@
-
 types:
     chunk_skb1:
         doc: "Skeleton Bone Data"

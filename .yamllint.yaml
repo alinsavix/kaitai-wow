@@ -1,0 +1,30 @@
+---
+extends: default
+
+yaml-files:
+    - '*.ksy'
+
+ignore: |
+    outputs/
+
+rules:
+    # The ksy style guide, for whatever reason, says don't use this.
+    # Dunno why. Seems silly.
+    document-start: disable
+
+    # it's 2021, can't we at least use -wide- dumb terminals as a
+    # default for screen width?
+    line-length:
+        max: 132
+        level: warning
+
+    # spacing inside brackets and braces is good, yo
+    brackets:
+        max-spaces-inside: 1
+
+    braces:
+        max-spaces-inside: 1
+
+    # Sometimes a tiny extra bit of spacing is useful
+    empty-lines:
+        max: 2

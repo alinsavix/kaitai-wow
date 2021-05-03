@@ -115,7 +115,7 @@ types:
                         m2array_types::m2array_fixed16: m2array(m2array_types::fixed16)
                         m2array_types::m2array_float: m2array(m2array_types::float)
                         m2array_types::m2array_uint8: m2array(m2array_types::uint8)
-                        m2array_types::m2array_uint8: m2array(m2array_types::uint16)
+                        m2array_types::m2array_uint16: m2array(m2array_types::uint16)
                         m2array_types::m2array_m2compquat: m2array(m2array_types::m2compquat)
 
                 repeat: expr
@@ -125,10 +125,7 @@ types:
     # them
     m2array_todo:
         seq: []
-            # - id: num
-            #   type: u4
-            # - id: offset
-            #   type: u4
+
 
     m2array_str:
         seq:
