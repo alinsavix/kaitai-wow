@@ -15,11 +15,18 @@ meta:
         - chunks
 
 seq:
+    # FIXME: Not 100% certain we'll always see the MD21/MD20 pair
+    - id: md21magic
+      contents: "MD21"
+    - id: headersize
+      type: u4
+    - id: header
+      type: chunk_md20
+      size: headersize
     - id: chunks
       type: chunk
       repeat: until
       repeat-until: _io.eof
-
 
 types:
     noop: {}
@@ -32,12 +39,12 @@ types:
               encoding: UTF-8
             - id: chunk_size
               type: u4
-            - id: data
+            - id: chunk_data
               size: chunk_size
               type:
                   switch-on: chunk_type
                   cases:
-                      '"MD21"': chunk_md21
+                      #   '"MD21"': chunk_md21
                       '"LDV1"': chunk_ldv1
                       '"TXID"': chunk_txid
                       '"TXAC"': chunk_txac

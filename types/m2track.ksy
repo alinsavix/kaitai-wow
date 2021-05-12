@@ -25,7 +25,7 @@ types:
             - id: global_sequence
               type: s2
             - id: timestamps
-              type: m2array(m2array_types::m2array_uint32)
+              type: m2array<m2array<u4>>
             - id: values
               type:
                   switch-on: m2track_type
@@ -42,7 +42,6 @@ types:
                       m2track_types::c4quaternion: m2array(m2array_types::m2array_c4quaternion)
                       m2track_types::m2compquat: m2array(m2array_types::m2array_m2compquat)
 
-
     m2trackbase:
         seq:
             - id: interpolation_type
@@ -51,7 +50,6 @@ types:
               type: u2
             - id: timestamps
               type: m2array(m2array_types::m2array_uint32)
-
 
     m2parttrack:
         params:

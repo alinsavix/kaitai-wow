@@ -59,65 +59,71 @@ types:
               doc: "should be globally unique"
             - id: global_flags
               type: md20_global_flags
-              size: 4  # FIXME: Is this right?
+              size: 4 # FIXME: Is this right?
+            # - id: global_loops
+            #   type: m2array(m2array_types::m2loop)
             - id: global_loops
-              type: m2array(m2array_types::m2loop)
+              type: m2array<m2loop>
 
+            # - id: sequences
+            #   type: m2array(m2array_types::m2sequence)
+            # - id: sequence_idx_hash_by_id
+            #   type: m2array(m2array_types::uint16)
             - id: sequences
-              type: m2array(m2array_types::m2sequence)
+              type: m2array<m2sequence>
             - id: sequence_idx_hash_by_id
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
 
             - id: bones
-              type: m2array(m2array_types::m2compbone)
+              type: m2array<m2compbone>
             - id: bone_indices_by_id
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
 
             - id: vertices
-              type: m2array(m2array_types::m2vertex)
+              type: m2array<m2vertex>
 
             # used in .skin file, supposedly
             - id: num_skin_profiles
               type: u4
 
             - id: colors
-              type: m2array(m2array_types::m2color)
+              type: m2array<m2color>
               doc: "Color and alpha animations definitions"
             - id: textures
-              type: m2array(m2array_types::m2texture)
+              type: m2array<m2texture>
             - id: texture_weights
-              type: m2array(m2array_types::m2textureweight)
+              type: m2array<m2textureweight>
               doc: "Transparency of textures"
             - id: texture_transforms
-              type: m2array(m2array_types::m2texturetransform)
+              type: m2array<m2texturetransform>
 
             # alternate name "replaceable_texture_lookup"
             - id: texture_indices_by_id
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
 
             # blending modes / render flags
             - id: materials
-              type: m2array(m2array_types::m2material)
+              type: m2array<m2material>
 
             # alternate name "bone_lookup_table"
             - id: bone_combos
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
 
             # alternate name "texture_lookup_table"
             - id: texture_combos
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
 
             # alternate name "tex_unit_lookup_table"
             - id: texture_transform_bone_map
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
 
             # alternate name "transparency_lookup_table"
             - id: texture_weight_combos
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
 
             # alternate name "texture_transforms_lookup_table"
             - id: texture_transform_combos
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
 
             - id: bounding_box
               type: caabox
@@ -128,27 +134,27 @@ types:
             - id: collision_sphere_radius
               type: f4
             - id: collision_indices
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
             - id: collision_positions
-              type: m2array(m2array_types::c3vector)
+              type: m2array<c3vector>
             - id: collision_face_normals
-              type: m2array(m2array_types::c3vector)
+              type: m2array<c3vector>
             - id: attachments
-              type: m2array(m2array_types::m2attachment)
+              type: m2array<m2attachment>
             - id: attachment_indices_by_id
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
             - id: events
-              type: m2array(m2array_types::m2event)
+              type: m2array<m2event>
             - id: lights
-              type: m2array(m2array_types::m2light)
+              type: m2array<m2light>
             - id: cameras
-              type: m2array(m2array_types::m2camera)
+              type: m2array<m2camera>
             - id: camera_indices_by_id
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
             - id: ribbon_emitters
-              type: m2array(m2array_types::m2ribbon)
+              type: m2array<m2ribbon>
             - id: particle_emitters
-              type: m2array(m2array_types::m2particle)
+              type: m2array<m2particle>
             - id: texture_combiner_combos
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
               if: global_flags.flag_use_texture_combiner_combos

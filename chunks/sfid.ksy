@@ -17,7 +17,7 @@ types:
             - id: skin_file_data_ids
               type: u4
               repeat: expr
-              repeat-expr: _root.chunks[0].data.as<chunk_md21>.data.as<chunk_md20>.num_skin_profiles
+              repeat-expr: _root.header.num_skin_profiles
 
             # Doesn't seem to be a way to calculate how many of these there
             # are, so just run to end of chunk.

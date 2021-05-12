@@ -19,6 +19,7 @@ do_verbose = 0
 do_debug = 0
 showtree = 0
 do_disposition = 0
+do_rawdump = 0
 do_finaldump = 1
 
 
@@ -203,6 +204,9 @@ if __name__ == "__main__":
     elif ext == ".bls":
         from output.bls import *
         target = Bls.from_file(targetfile)
+
+    if do_rawdump:
+        print(ppretty(target, depth=99, seq_length=100,))
 
     parsed = to_tree(target)
     if do_finaldump:

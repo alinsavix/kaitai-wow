@@ -8,9 +8,9 @@ types:
             - id: position
               type: c3vector
             - id: texture_indices
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
             - id: material_indices
-              type: m2array(m2array_types::uint16)
+              type: m2array<u2>
             - id: color_track
               type: m2track(m2track_types::c3vector)
             - id: alpha_track

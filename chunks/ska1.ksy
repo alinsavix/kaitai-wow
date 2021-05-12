@@ -5,6 +5,6 @@ types:
         seq:
 
             - id: attachments
-              type: m2array(m2array_types::m2attachment)
+              type: m2array<m2attachment>
             - id: attachment_lookup_table
-              type: m2array(m2array_types::int16)
+              type: m2array<s2>

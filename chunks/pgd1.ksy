@@ -7,4 +7,4 @@ types:
         doc-ref: https://wowdev.wiki/M2#PGD1
         seq:
             - id: p_g_d_v1
-              type: m2array(m2array_types::pgd1_entry)
+              type: m2array<pgd1_entry>

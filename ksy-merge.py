@@ -1,31 +1,246 @@
 #!/usr/bin/env python3
 import argparse
 import os
+import re
 import sys
 import yaml
+from ppretty import ppretty
+
+from typing import Any, Dict, List, Set
 
 verbose = 0
 
-def log(text):
+def log(text: str):
     if verbose:
         print(text, file=sys.stderr)
 
 
-# deep merge some dicts (in essence merging some yaml)
-def merge_dict(y1, y2):
-    if isinstance(y1, dict) and isinstance(y2, dict):
-        for k, v in y2.items():
-            if k not in y1:
-                y1[k] = v
+# We'll find things like:   id: name, type m2array<type>
+# That needs to turn into, at the same level:
+#
+#   id: num_name
+#   type: uint32
+#   id: ofs_name
+#   type: uint32
+# instances:
+#   name:
+#     pos: ofs_name
+#     type: type
+#     repeat: expr
+#     repeat-expr: num_name
+# def massage_m2array(d):
+#     pass
+
+# dict_descent: accepts a dict (d), iterates the key:value sets, and if it
+# finds a type: m2array<something>, then create a replacement block. If this
+# returns a list, that list should be substituted in place of the thing that
+# was being iterated, since we need to add things one level 'up'.
+type_re = re.compile(r"^m2array<(.*)>$")
+def dict_descent(d: Dict[str, Any], array_parent: bool, top: Dict[str, Any]):
+    # if this dict has a 'type' key, we can (potentially) replace it.
+    # Otherwise, we need to recurse
+    log(f"check: {d}")
+    if array_parent and "type" in d and "id" in d and isinstance(d["type"], str):
+        log(f"thing: {array_parent}, {d['type']}, {d['id']}")
+        m = type_re.search(d['type'])
+        if m:
+            arraytype = m.group(1)
+            log(f"flagging for typereplace for type {arraytype}")
+            # We don't really want to be inserting things into the middle
+            # of the list while iterating, so generate a semaphore string
+            # to hand back for eventual replacement.
+            mm = type_re.search(arraytype)
+            if not mm:
+                replacetype = arraytype
             else:
-                y1[k] = merge_dict(y1[k], v)
+                nested_type = mm.group(1)
+                replacetype = f"{nested_type}_nested"
+
+            return {
+                "replarray": {
+                    "type": replacetype,
+                    "name": d['id'],   # might not need this, really
+                    "orig": d.copy(),
+                }
+            }
+
+        # FIXME: Are there conditions where we should keep searching here?
+        return None
+
+    # for k, v in d.items():
+    for k in list(d.keys()):
+        v = d[k]
+        # If it's not something we can descend into, skip it
+        if isinstance(v, dict):
+            log(f"dict descent to {k}")
+            dict_descent(v, False, top)
+        elif isinstance(v, list):
+            log(f"list descent to {k}")
+            list_descent(v, d, top)
+
+    return
+
+
+nested_re = re.compile(r"(.*)_nested$")
+def list_descent(d: List[Any], parent: Any, top: Dict[str, Any]):
+    replacements = 0
+    for i, v in enumerate(d):
+        if isinstance(v, dict):
+            log(f"dict descent to index {i}")
+            r = dict_descent(v, True, top)
+            log(f"r is {r}")
+            if r is not None:
+                log(f"r return, doing replacement string")
+                d[i] = r
+                replacements = 1
+        elif isinstance(v, list):
+            log(f"list descent to index {i}")
+            list_descent(v, d, top)
+
+    # If there were replacements, we want to rebuild the list in-place
+    # with the replacements taken care of. There's probably a far cleaner
+    # way to do this.
+    log(f"entering d: {d}")
+    if replacements:
+        old = d.copy()
+        del d[:]
+
+        for i, v in enumerate(old):
+            # For a normal m2array (e.g. m2array<u2> verts), this will
+            # return, e.g..
+            # {
+            #     "replarray": {
+            #         "type": "u2",
+            #         "name": "verts", # might not need this, really
+            #         "orig": {original defintiion},
+            #     }
+            # }
+            #
+            # For a nested m2array, this should return.. hmmm...
+            # ... "u2_nested" as the type?"
+            if isinstance(v, dict) and "replarray" in v:
+                r = v["replarray"]
+                # need to keep a conditional if there is one. Not sure the
+                # best way to manage having/not having it depending on if
+                # it exists, so instead we'll just have something always
+                # true if there's not already a conditional. This could
+                # probably be improved on!
+                if "if" in r["orig"]:
+                    conditional = r["orig"]["if"]
+                else:
+                    conditional = True
+
+                name = r["name"]
+                type = r["type"]
+                m2arr_meta = [
+                    {
+                        "id": f"num_{name}",
+                        "type": "u4",
+                        "if": conditional,
+                    },
+                    {
+                        "id": f"ofs_{name}",
+                        "type": "u4",
+                        "if": conditional,
+                    }
+                ]
+
+                m2arr_instance = {
+                    "id": name,
+                    "type": type,
+                    "pos": f"ofs_{name}",
+                    "repeat": "expr",
+                    "repeat-expr": f"num_{name}",
+                    "if": conditional,
+                }
+
+                # First, do the in-place replacement by providing our
+                # own version
+                d.extend(m2arr_meta)
+
+                # And now look at parent.instances (create it if it doesn't
+                # exist) and insert our actual instance there. (this is
+                # annoying)
+                if not isinstance(parent, dict):
+                    log("WARNING: Trying to make instance, but wrong parent")
+                    continue
+
+                if "instances" not in parent:
+                    parent["instances"] = {}
+
+                parent["instances"][name] = m2arr_instance
+
+                # and finally, if it's a nested m2array type, create a
+                # top-level type for the inner part, because kaitai
+                # can't currently do nested/multi-dimensional arrays
+                m = nested_re.search(type)
+                if not m:
+                    continue
+
+                # We have a nested m2array, handle it
+                arraytype = m.group(1)
+                if "types" not in top:
+                    top["types"] = {}
+
+                # Do we already have this type?
+                if type in top["types"]:
+                    log(f"inner type {type} already exists, not recreating")
+                    continue
+
+                top["types"][type] = {}
+                t = top["types"][type]
+                t["seq"] = [
+                    {
+                        "id": f"num_{name}",
+                        "type": "u4",
+                        "if": conditional,
+                    },
+                    {
+                        "id": f"ofs_{name}",
+                        "type": "u4",
+                        "if": conditional,
+                    }
+                ]
+
+                m2arr_inner_instance = {
+                    "id": type,
+                    "type": arraytype,
+                    "pos": f"ofs_{name}",
+                    "repeat": "expr",
+                    "repeat-expr": f"num_{name}",
+                    "if": conditional,
+                }
+
+                if "instances" not in t:
+                    t["instances"] = {}
+                t["instances"]["inner"] = m2arr_inner_instance
+            else:
+                log(f"appending v: {v}")
+                d.append(v)
+
+    log(f"returning d: {d}")
+    return
+
+
+# deep merge some dicts (in essence merging some yaml)
+# FIXME: Sanity check what we're doing with arrays
+def merge_dict(y1: Any, y2: Any):
+    if not isinstance(y1, dict) or not isinstance(y2, dict):
+        return y1
+
+    for k, v in y2.items():
+        if k not in y1:
+            y1[k] = v
+        else:
+            y1[k] = merge_dict(y1[k], v)
+
     return y1
 
 
 # wish I could just do this in the main loop, but apparently os.walk
 # just utterly ignores file arguments, so we have to split it off
-paths_handled = set()
-def merge_file(yaml_data, file):
+paths_handled: Set[str] = set()
+def merge_file(yaml_data: Dict[str, str], file: str):
     if file in paths_handled:
         log(f"already did '{file}'', skipping")
         return
@@ -50,7 +265,7 @@ def merge_file(yaml_data, file):
 
 
 # iterate down through the filesystem and find files to merge
-def recurse_merge(yaml_data, path):
+def recurse_merge(yaml_data: Dict[Any, Any], path: str):
     if os.path.isfile(path):
         return merge_file(yaml_data, path)
 
@@ -65,8 +280,8 @@ def recurse_merge(yaml_data, path):
 # nondeterministically.
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        prog = 'yaml-merge.py',
-        description = 'Merge some yaml files',
+        prog='yaml-merge.py',
+        description='Merge some yaml files',
     )
 
     # Not implemented yet
@@ -92,13 +307,15 @@ def main():
     verbose = args.verbose
 
     # start with nothing, then add everything
-    data = {}
+    data: Dict[Any, Any] = {}
     for f in args.files:
         recurse_merge(data, f)
 
+    dict_descent(data, False, data)
     # The kaitai IDE can't cope with yaml multiline strings, so width=9999
     # will stop it from wrapping those lines when processing long heredocs
     print(yaml.dump(data, width=9999))
+    # log(ppretty(data, depth=99, seq_length=50))
 
 
 if __name__ == "__main__":

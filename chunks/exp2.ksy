@@ -4,4 +4,4 @@ types:
         doc-ref: https://wowdev.wiki/M2#EXP2
         seq:
             - id: content
-              type: m2array(m2array_types::m2extended_particle)
+              type: m2array<m2extended_particle>
