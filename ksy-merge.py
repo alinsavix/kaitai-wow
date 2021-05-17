@@ -149,10 +149,19 @@ def list_descent(d: List[Any], parent: Any, top: Dict[str, Any]):
                     "id": name,
                     "type": type,
                     "pos": f"ofs_{name}",
-                    "repeat": "expr",
-                    "repeat-expr": f"num_{name}",
-                    "if": conditional,
                 }
+
+                if type == "str":
+                    m2arr_instance.update({
+                        "size": f"num_{name}",
+                    })
+                else:
+                    m2arr_instance.update({
+                        "repeat": "expr",
+                        "repeat-expr": f"num_{name}",
+                    })
+
+                m2arr_instance.update({"if": conditional, })
 
                 # First, do the in-place replacement by providing our
                 # own version

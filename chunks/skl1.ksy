@@ -7,7 +7,7 @@ types:
               type: u4
               doc: "Flags unknown, possibly always 0x100 currently"
             - id: name
-              type: m2array_str
+              type: m2array<str>
             - id: unknown1
               type: u1
               repeat: expr

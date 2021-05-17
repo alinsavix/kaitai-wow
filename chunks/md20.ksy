@@ -55,7 +55,7 @@ types:
               type: u4
               enum: wow_versions
             - id: name
-              type: m2array_str
+              type: m2array<str>
               doc: "should be globally unique"
             - id: global_flags
               type: md20_global_flags

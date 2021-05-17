@@ -7,4 +7,4 @@ types:
             - id: flags
               type: u4
             - id: filename
-              type: m2array_str
+              type: m2array<str>

@@ -189,9 +189,9 @@ types:
 
             # These may always be empty strings
             - id: geometry_model_filename
-              type: m2array_str
+              type: m2array<str>
             - id: recursion_model_filename
-              type: m2array_str
+              type: m2array<str>
 
             - id: blending_type
               type: u1
