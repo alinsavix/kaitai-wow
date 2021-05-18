@@ -340,6 +340,13 @@ def pathdump(d, path=""):
         workpath = f"{path}/{k}"
         thing = d[k]
 
+        # if we have ofs_xxx or num_xxx, and *also* just have xxx,
+        # we don't need the offset/size anymore
+        if args.hide_unneeded and isinstance(k, str) and (k.startswith("ofs_") or k.startswith("num_")):
+            s = k[len("ofs_"):]
+            if s in things:
+                continue
+
         s = check_simplify(workpath)
         if s:
             simplified = s(thing)
@@ -407,6 +414,16 @@ def parse_arguments():
         action=NegateAction,
         nargs=0,
         help="simplify some structures into more human readable forms"
+    )
+
+    parser.add_argument(
+        "--hide-unneeded"
+        "--no-hide-unneeded",
+        dest="hide_unneeded",
+        default=True,
+        action=NegateAction,
+        nargs=0,
+        help="hide unneeded info (e.g. array element counts)",
     )
 
     parser.add_argument(
