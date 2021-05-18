@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 import argparse
+import csv
 import json
 import os
 import re
@@ -22,8 +23,6 @@ do_verbose = 0
 do_debug = 0
 showtree = 0
 do_disposition = 0
-do_rawdump = 0
-do_finaldump = 1
 
 global args
 
@@ -249,8 +248,12 @@ verts_texcoords_re = re.compile(r'''
 ''', re.VERBOSE)
 
 # FIXME: Can we make these behave better straight out of kaitai?
-nested_xy = re.compile(r'''
+nested_xy_re = re.compile(r'''
     /model/particle_emitters/\d+/multi_texture_param\d/\d+$
+''', re.VERBOSE)
+
+fileid_re = re.compile(r'''
+    ^/chunks/\d+/chunk_data/([^/]+_)?file_data_ids/\d+$
 ''', re.VERBOSE)
 
 def simplify_xyz(d):
@@ -299,6 +302,20 @@ def simplify_flags(d):
     return ", ".join(flags)
 
 
+# FIXME: This gonna be slow until database or caching
+def resolve_fileid(id):
+    if id <= 0:
+        return f"{id}"
+
+    with open('listfile.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=';')
+        for row in reader:
+            if int(row[0]) == id:
+                return f"{id}  # {row[1]}"
+
+    return f"{id}  # unresolved"
+
+
 simplifications = [
     (attachment_pos_re, simplify_xyz),
     (bone_pivot_re, simplify_xyz),
@@ -307,7 +324,7 @@ simplifications = [
     (flags_re, simplify_flags),
     (bbox_re, simplify_xyz),
     (events_pos_re, simplify_xyz),
-    (nested_xy, simplify_nested_xy),
+    (nested_xy_re, simplify_nested_xy),
     (emitter_rgb_re, simplify_irgb),
     (emitter_rot_scale_xlate_re, simplify_xyz),
     (emitter_sizes_re, simplify_xy),
@@ -315,6 +332,7 @@ simplifications = [
     (seq_bbox_re, simplify_xyz),
     (verts_vec_re, simplify_xyz),
     (verts_texcoords_re, simplify_xy),
+    (fileid_re, resolve_fileid)
 ]
 
 def check_simplify(path):
