@@ -20,7 +20,7 @@ seq:
       contents: "MD21"
     - id: headersize
       type: u4
-    - id: header
+    - id: model
       type: chunk_md20
       size: headersize
     - id: chunks

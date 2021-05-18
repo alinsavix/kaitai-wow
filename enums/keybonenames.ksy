@@ -46,7 +46,7 @@ enums:
         44: tabard_child1 # unconfirmed
         45: tabard_child2 # unconfirmed
         46: unk_head_top # unconfirmed
-        47: unk_head_top # unconfirmed
+        47: unk_head_top2 # unconfirmed
         48: upper_body_parent # unconfirmed
         49: neck_parent # unconfirmed
         50: neck_child1 # unconfirmed

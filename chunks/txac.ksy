@@ -7,8 +7,8 @@ types:
             - id: txac_mesh
               type: u2
               repeat: expr
-              repeat-expr: _root.header.num_materials
+              repeat-expr: _root.model.num_materials
             - id: txac_m_particle
               type: u2
               repeat: expr
-              repeat-expr: _root.header.num_particle_emitters
+              repeat-expr: _root.model.num_particle_emitters
