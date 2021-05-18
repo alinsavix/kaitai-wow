@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import argparse
 import os
 import sys
 from ppretty import ppretty
@@ -180,36 +181,197 @@ def to_tree(obj, path=""):
     return r
 
 
+def pathdump(d, path=""):
+    # This is kind of a lame way to get a loop that handles both lists
+    # and dicts, but is there a better way?
+    if isinstance(d, dict):
+        things = sorted(d.keys())
+    elif isinstance(d, list):
+        things = range(0, len(d))
+
+    for k in things:
+        thing = d[k]
+
+        if isinstance(thing, dict) or isinstance(thing, list):
+            pathdump(thing, f"{path}/{k}")
+        else:
+            print(f"{path}/{k} = {thing}")
+
+    return
+    for k in dir(obj):
+        if k[0] == "_":
+            continue
+
+        debug(f"getattr {k} from obj type {type(obj)}")
+        v = getattr(obj, k)
+        # t = type(v)
+        # debug(f"processing attribute {k} type {t}")
+        # if inspect.isclass(v) or inspect.ismethod(v):
+
+        if inspect.isclass(v):
+            # debug(f"is class, skipping")
+            pass
+        elif inspect.ismethod(v) or inspect.isbuiltin(v):
+            # debug(f"is method or builtin, skipping")
+            pass
+        elif isinstance(v, type):
+            # debug(f"defines a datatype, skipping")
+            pass
+        else:
+            if type(v) == type([]):
+                # if isinstance(v, list):
+                # debug("processing array type")
+                # log(f"array is: {ppretty(v)}")
+                disp(f"{path}.{k}[]", f"array processing (len {len(v)})")
+                value = []
+                for i, el in enumerate(v):
+                    # debug(f"appending {el}")
+                    if type(el) in [int, float, str]:
+                        disp(f"{path}[{i}]", f"final ({el})")
+                        value.append(el)
+                    else:
+                        disp(f"{path}[{i}]", "array descent")
+                        value.append(to_tree(el, treepath(path, k + f"[{i}]")))
+            elif isinstance(v, KaitaiStruct):
+                if k == "data":
+                    disp(f"{path}", "kaitai data descent")
+                    value = to_tree(v, treepath(path, k))
+                else:
+                    disp(f"{path}.{k}", "kaitai descent")
+                    # debug(f"recursing kaitai value, type: {type(k)}")
+                    value = to_tree(v, treepath(path, k))
+            else:
+                # log(f"using plain value: {v} {whatis(v)}")
+                # debug(f"dir: {dir(v)}")
+                # print(ppretty(v))
+
+                # treepath(path, k, v)
+                # print(f"{path}.{k} == {v}")
+                # value = v
+                # value = to_tree(v, treepath(path, k))
+                if type(v) in [int, float, str, bool]:
+                    disp(f"{path}.{k}", f"final ({v})")
+                    value = v
+                else:
+                    if k == "m2array_type" or k == "m2track_type":
+                        disp(f"{path}.{k}", "ignored")
+                    else:
+                        disp(f"{path}.{k}", f"descend (type {type(v)}")
+                        value = to_tree(v, treepath(path, k))
+
+            if value is not None:
+                r[k] = value
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        prog="decimator",
+        description="A pipeline in a box for decimating lots of objects",
+    )
+
+    parser.add_argument(
+        "--verbose",
+        action='store_const',
+        const=True,
+        default=False,
+        # help="Read objects and prepare them for decimation",
+    )
+
+    parser.add_argument(
+        "--debug",
+        action='store_const',
+        const=True,
+        default=False,
+        # help="Read objects and prepare them for decimation",
+    )
+
+    parser.add_argument(
+        "--showtree",
+        action='store_const',
+        const=True,
+        default=False,
+        # help="Read objects and prepare them for decimation",
+    )
+
+    parser.add_argument(
+        "--disposition",
+        action='store_const',
+        const=True,
+        default=False,
+        # help="Read objects and prepare them for decimation",
+    )
+
+    parser.add_argument(
+        "--rawdump",
+        action='store_const',
+        const=True,
+        default=False,
+        # help="Read objects and prepare them for decimation",
+    )
+
+    parser.add_argument(
+        "--pathdump",
+        action='store_const',
+        const=True,
+        default=False,
+        # help="Read objects and prepare them for decimation",
+    )
+
+    parser.add_argument(
+        "--finaldump",
+        action='store_const',
+        const=True,
+        default=False,
+        # help="Read objects and prepare them for decimation",
+    )
+
+    parser.add_argument(
+        "file",
+        nargs='?',
+        help="input file to be processed",
+    )
+
+    args = parser.parse_args()
+
+    if not args.rawdump and not args.finaldump and not args.pathdump:
+        args.finaldump = True
+
+    return args
+
+
 if __name__ == "__main__":
-    try:
-        targetfile = sys.argv[1]
-        print(f"Using specified target file {targetfile}", flush=True)
-    except IndexError:
-        targetfile = DEFAULT_TARGET
-        print(f"WARNING: Using default target file {targetfile}", flush=True)
+    args = parse_arguments()
 
-    name, ext = os.path.splitext(targetfile)
+    if args.file is None:
+        args.file = DEFAULT_TARGET
+        print(f"WARNING: Using default target file {args.file}", flush=True)
+
+    name, ext = os.path.splitext(args.file)
     if ext == ".m2":
-        from output.m2 import *
-        target = M2.from_file(targetfile)
+        from output.m2 import M2, KaitaiStruct
+        target = M2.from_file(args.file)
     elif ext == ".skin":
-        from output.skin import *
-        target = Skin.from_file(targetfile)
+        from output.skin import Skin, KaitaiStruct
+        target = Skin.from_file(args.file)
     elif ext == ".skel":
-        from output.skel import *
-        target = Skel.from_file(targetfile)
+        from output.skel import Skel, KaitaiStruct
+        target = Skel.from_file(args.file)
     elif ext == ".blp":
-        from output.blp import *
-        target = Blp.from_file(targetfile)
+        from output.blp import Blp, KaitaiStruct
+        target = Blp.from_file(args.file)
     elif ext == ".bls":
-        from output.bls import *
-        target = Bls.from_file(targetfile)
+        from output.bls import Bls, KaitaiStruct
+        target = Bls.from_file(args.file)
 
-    if do_rawdump:
+    if args.pathdump:
+        parsed = to_tree(target)
+        pathdump(parsed)
+
+    if args.rawdump:
         print(ppretty(target, depth=99, seq_length=100,))
 
-    parsed = to_tree(target)
-    if do_finaldump:
+    if args.finaldump:
+        parsed = to_tree(target)
         print(ppretty(parsed, depth=99, seq_length=100,))
 
 
