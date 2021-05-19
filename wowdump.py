@@ -5,8 +5,15 @@ import json
 import os
 import re
 import sys
+import time
 from ppretty import ppretty
 import inspect
+
+# We can run without, we'll just be slow
+try:
+    import sqlite3
+except ImportError:
+    pass
 
 # This script is what's known as "awful". It's brute force. It does
 # everything wrong. It probably doesn't even taste like chocolate.
@@ -109,7 +116,7 @@ def whatis(obj):
     return objis
 
 
-def to_tree(obj, path=""):
+def to_tree(obj, path: str = ""):
     r = {}
     debug(f"in: path: {path}  type: {type(obj)} {whatis(obj)}")
 
@@ -256,30 +263,30 @@ fileid_re = re.compile(r'''
     ^/chunks/\d+/chunk_data/([^/]+_)?file_data_ids/\d+$
 ''', re.VERBOSE)
 
-def simplify_xyz(d):
+def simplify_xyz(d, _):
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     z = round(d["z"], args.precision)
     return f"xyz({x}, {y}, {z})"
 
-def simplify_wxyz(d):
+def simplify_wxyz(d, _):
     w = round(d["w"], args.precision)
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     z = round(d["z"], args.precision)
     return f"wxyz({w}, {x}, {y}, {z})"
 
-def simplify_xy(d):
+def simplify_xy(d, _):
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     return f"xy({x}, {y})"
 
-def simplify_nested_xy(d):
+def simplify_nested_xy(d, _):
     x = d["x"]["value"]
     y = d["y"]["value"]
     return f"xy({x}, {y})"
 
-def simplify_irgb(d):
+def simplify_irgb(d, _):
     r = int(d["r"])
     g = int(d["g"])
     b = int(d["b"])
@@ -301,19 +308,86 @@ def simplify_flags(d):
 
     return ", ".join(flags)
 
+def cache_open(dbfile):
+    if "sqlite3" not in sys.modules:
+        print("WARNING: sqlite not available, caching disabled", file=sys.stderr)
+        return
+
+    # FIXME: can we do better than a global variable?
+    cachecon = sqlite3.connect(dbfile)
+
+    return cachecon
+
+
+def cache_fileids(listfile, cachecon):
+    # Don't have the cache open, so can't cache anything
+    if not cachecon:
+        return
+
+    print("INFO: newer listfile available, updating fileid cache", file=sys.stderr)
+    started = time.time()
+
+    cur = cachecon.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS file_ids (
+            id INTEGER NOT NULL PRIMARY KEY,
+            name VARCHAR
+        );
+        """)
+
+    # Make sure it's empty -- it's probably faster to just reload everything
+    # rather than check if each indiviual row needs updating anyhow
+    cur.execute("DELETE FROM file_ids;")
+
+    with open(listfile, 'r') as csvfile:
+        reader = csv.reader(csvfile, delimiter=";")
+        to_db = [(row[0], row[1]) for row in reader]
+
+    cur.executemany("INSERT INTO file_ids (id, name) VALUES (?, ?);", to_db)
+    cachecon.commit()
+
+    runtime = time.time() - started
+    print(
+        f"INFO: fileid cache successfully rebuilt in {runtime:.2f}s", file=sys.stderr)
+
+
+def cache_getfileid(id, cachecon):
+    if not cachecon:
+        return None
+
+    cur = cachecon.cursor()
+    q = "SELECT name FROM file_ids WHERE id=?"
+
+    try:
+        res = cur.execute(q, [id]).fetchone()
+    except sqlite3.Error as e:
+        print(f"ERROR: Unexpected sqlite error: {e}", file=sys.stderr)
+        return False
+
+    # not in cache? Return false so that we know not to try to fall back to
+    # the listfile, since the cache should be authoritative
+    if res is None:
+        return False
+
+    return res[0]
+
 
 # FIXME: This gonna be slow until database or caching
-def resolve_fileid(id):
-    if id <= 0:
+def resolve_fileid(id, cachecon):
+    if not args.resolve or id <= 0:
         return f"{id}"
 
-    with open('listfile.csv', newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter=';')
-        for row in reader:
-            if int(row[0]) == id:
-                return f"{id}  # {row[1]}"
-
-    return f"{id}  # unresolved"
+    c = cache_getfileid(id, cachecon)
+    if c is None:
+        with open("listfile.csv", 'r', newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter=";")
+            for row in reader:
+                if int(row[0]) == id:
+                    return f"{id}  # {row[1]}"
+    elif c is False:
+        return f"{id}  # unresolved"
+    else:
+        return f"{id}  # {c}"
 
 
 simplifications = [
@@ -346,7 +420,8 @@ def check_simplify(path):
     return None
 
 
-def pathdump(d, path=""):
+# FIXME: Can we manage the cache better than jut passing cachecon around?
+def pathdump(d, path, cachecon):
     # This is kind of a lame way to get a loop that handles both lists
     # and dicts, but is there a better way?
     if isinstance(d, dict):
@@ -367,10 +442,10 @@ def pathdump(d, path=""):
 
         s = check_simplify(workpath)
         if s:
-            simplified = s(thing)
+            simplified = s(thing, cachecon)
             print(f"{workpath} = {simplified}")
         elif isinstance(thing, dict) or isinstance(thing, list):
-            pathdump(thing, workpath)
+            pathdump(thing, workpath, cachecon)
         else:
             # FIXME: Not sure if this is a kaitai bug or what, but we're
             # getting nulls at the end of strings right now. This cleans
@@ -388,8 +463,8 @@ class NegateAction(argparse.Action):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        prog="decimator",
-        description="A pipeline in a box for decimating lots of objects",
+        prog="wowdump",
+        description="A tool for dumping the information out of WoW files",
     )
 
     parser.add_argument(
@@ -413,7 +488,7 @@ def parse_arguments():
         action='store_const',
         const=True,
         default=False,
-        # help="Read objects and prepare them for decimation",
+        help=argparse.SUPPRESS,
     )
 
     parser.add_argument(
@@ -421,7 +496,7 @@ def parse_arguments():
         action='store_const',
         const=True,
         default=False,
-        # help="Read objects and prepare them for decimation",
+        help=argparse.SUPPRESS,
     )
 
     parser.add_argument(
@@ -442,6 +517,22 @@ def parse_arguments():
         action=NegateAction,
         nargs=0,
         help="hide unneeded info (e.g. array element counts)",
+    )
+
+    parser.add_argument(
+        "--resolve",
+        "--no-resolve",
+        dest="resolve",
+        default=True,
+        action=NegateAction,
+        nargs=0,
+        help="resolve fileids when possible (requires listfile)",
+    )
+
+    parser.add_argument(
+        "--listfile",
+        default="listfile.csv",
+        help="specify listfile to use for fileids (default: %(default)s",
     )
 
     parser.add_argument(
@@ -466,6 +557,7 @@ def parse_arguments():
         help="input file to be processed",
     )
 
+    global args
     args = parser.parse_args()
 
     return args
@@ -478,6 +570,21 @@ if __name__ == "__main__":
         args.file = DEFAULT_TARGET
         print(
             f"WARNING: Using default target file {args.file}", flush=True, file=sys.stderr)
+
+    cache_current = False
+    cachefile = f"{args.listfile}.cache"
+
+    # FIXME: This is a bit deeply nested for my tastes.
+    if not args.resolve:
+        print("INFO: not resolving, not initializing cache", file=sys.stderr)
+        cachecon = None
+    else:
+        if os.path.exists(cachefile) and (os.path.getmtime(args.listfile) <= os.path.getmtime(cachefile)):
+            print("INFO: fileid cache up to date, not updating", file=sys.stderr)
+            cachecon = cache_open(cachefile)
+        else:
+            cachecon = cache_open(cachefile)
+            cache_fileids(args.listfile, cachecon)
 
     name, ext = os.path.splitext(args.file)
     if ext == ".m2":
@@ -499,7 +606,7 @@ if __name__ == "__main__":
     parsed = to_tree(target)
 
     if args.output_type == "path":
-        pathdump(parsed)
+        pathdump(parsed, "", cachecon)
     elif args.output_type == "raw":
         print(ppretty(target, depth=99, seq_length=100,))
     elif args.output_type == "final":
