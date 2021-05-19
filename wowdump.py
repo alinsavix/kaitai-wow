@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import time
+from typing import Any, Optional, Dict, List, Callable
 from ppretty import ppretty
 import inspect
 
@@ -190,6 +191,46 @@ def to_tree(obj, path: str = ""):
     return r
 
 
+# rudamentary filtering
+#
+# behavior depends on whether keep or discard filters are provided,
+# or both.
+#
+# no filter -- allow all
+# only keep -- discard all but matching
+# only discard --  keep all but matching
+# both -- allow 'keep' matches, then discard all matching, then allow remaining
+def check_filtered(path: str) -> bool:
+    if len(args.filters_keep) == 0 and len(args.filters_discard) == 0:
+        return False
+
+    # Always do the 'keep' first, if they exist, since if there's a match, we
+    # don't care after that.
+    if len(args.filters_keep) > 0:
+        for filter in args.filters_keep:
+            # print(f"check filter {filter} vs {path}")
+            if path.startswith(filter):
+                return False
+
+    if len(args.filters_discard):
+        for filter in args.filters_discard:
+            if path.startswith(filter):
+                return True
+
+    # If we're here, we didn't match anything, so check which of the
+    # combinations of above exists
+    if len(args.filters_keep) > 0 and len(args.filters_discard) > 0:
+        # We survived both filters, keep it
+        return False
+
+    if len(args.filters_keep) > 0:
+        # we only wanted to keep some, so get rid of the rest
+        return True
+
+    # otherwise, we were discard-only, so don't filter anything remaining
+    return False
+
+
 # These next bits are an attempt to simplify certain structures into
 # a more human-readable form. This is ugly and stupid and needs to
 # be hand-maintained. We might be able to do better with some additional
@@ -263,35 +304,36 @@ fileid_re = re.compile(r'''
     ^/chunks/\d+/chunk_data/([^/]+_)?file_data_ids/\d+$
 ''', re.VERBOSE)
 
-def simplify_xyz(d, _):
+def simplify_xyz(d, _) -> str:
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     z = round(d["z"], args.precision)
     return f"xyz({x}, {y}, {z})"
 
-def simplify_wxyz(d, _):
+def simplify_wxyz(d, _) -> str:
     w = round(d["w"], args.precision)
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     z = round(d["z"], args.precision)
     return f"wxyz({w}, {x}, {y}, {z})"
 
-def simplify_xy(d, _):
+def simplify_xy(d, _) -> str:
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     return f"xy({x}, {y})"
 
-def simplify_nested_xy(d, _):
+def simplify_nested_xy(d, _) -> str:
     x = d["x"]["value"]
     y = d["y"]["value"]
     return f"xy({x}, {y})"
 
-def simplify_irgb(d, _):
+def simplify_irgb(d, _) -> str:
     r = int(d["r"])
     g = int(d["g"])
     b = int(d["b"])
 
     return f"rgb({r}, {g}, {b})  # {r:02x}{g:02x}{b:02x}"
+
 
 # FIXME: Should the output be inside { } or something?
 def simplify_flags(d):
@@ -308,10 +350,13 @@ def simplify_flags(d):
 
     return ", ".join(flags)
 
-def cache_open(dbfile):
+
+# Caching bits (yeah, they're ugly)
+# or maybe type of os.PathLike for cache_open
+def cache_open(dbfile: str):
     if "sqlite3" not in sys.modules:
         print("WARNING: sqlite not available, caching disabled", file=sys.stderr)
-        return
+        return None
 
     # FIXME: can we do better than a global variable?
     cachecon = sqlite3.connect(dbfile)
@@ -319,7 +364,7 @@ def cache_open(dbfile):
     return cachecon
 
 
-def cache_fileids(listfile, cachecon):
+def cache_fileids(listfile: str, cachecon) -> None:
     # Don't have the cache open, so can't cache anything
     if not cachecon:
         return
@@ -351,7 +396,7 @@ def cache_fileids(listfile, cachecon):
         f"INFO: fileid cache successfully rebuilt in {runtime:.2f}s", file=sys.stderr)
 
 
-def cache_getfileid(id, cachecon):
+def cache_getfileid(id: int, cachecon) -> Optional[str]:
     if not cachecon:
         return None
 
@@ -373,7 +418,7 @@ def cache_getfileid(id, cachecon):
 
 
 # FIXME: This gonna be slow until database or caching
-def resolve_fileid(id, cachecon):
+def resolve_fileid(id: id, cachecon) -> str:
     if not args.resolve or id <= 0:
         return f"{id}"
 
@@ -409,7 +454,7 @@ simplifications = [
     (fileid_re, resolve_fileid)
 ]
 
-def check_simplify(path):
+def check_simplify(path: str) -> Callable[Any, Any]:
     if not args.simplify:
         return None
 
@@ -421,7 +466,7 @@ def check_simplify(path):
 
 
 # FIXME: Can we manage the cache better than jut passing cachecon around?
-def pathdump(d, path, cachecon):
+def pathdump(d, path: str, cachecon) -> None:
     # This is kind of a lame way to get a loop that handles both lists
     # and dicts, but is there a better way?
     if isinstance(d, dict):
@@ -440,13 +485,23 @@ def pathdump(d, path, cachecon):
             if s in things:
                 continue
 
+        # if check_filtered(workpath):
+        #     continue
+
         s = check_simplify(workpath)
         if s:
+            # if it's simplified, we're at a 'final' path, so check filtering
+            if check_filtered(workpath):
+                continue
             simplified = s(thing, cachecon)
             print(f"{workpath} = {simplified}")
         elif isinstance(thing, dict) or isinstance(thing, list):
             pathdump(thing, workpath, cachecon)
         else:
+            # we're at a final path, so check filtering
+            if check_filtered(workpath):
+                continue
+
             # FIXME: Not sure if this is a kaitai bug or what, but we're
             # getting nulls at the end of strings right now. This cleans
             # that up for now.
@@ -536,6 +591,31 @@ def parse_arguments():
     )
 
     parser.add_argument(
+        "--filter",
+        dest="filters",
+        default=[],
+        action='append',
+        nargs="+",
+        help="filter results by path (can be used multiple times)"
+    )
+
+    # These next two aren't intended to be used by the user, just to make
+    # our lives easier later. There's probably a better way.
+    parser.add_argument(
+        "filters_keep",
+        default=[],
+        nargs="*",
+        help=argparse.SUPPRESS,
+    )
+
+    parser.add_argument(
+        "filters_discard",
+        default=[],
+        nargs="*",
+        help=argparse.SUPPRESS,
+    )
+
+    parser.add_argument(
         "--precision",
         action='store',
         type=int,
@@ -559,6 +639,14 @@ def parse_arguments():
 
     global args
     args = parser.parse_args()
+
+    # args.filters = [item for subl in args.filters for item in subl]
+    # prep our filters
+    for filter in [item for subl in args.filters for item in subl]:
+        if filter.startswith("!"):
+            args.filters_discard.append(filter.lstrip("!"))
+        else:
+            args.filters_keep.append(filter)
 
     return args
 
