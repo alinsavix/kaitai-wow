@@ -417,22 +417,33 @@ def cache_getfileid(id: int, cachecon) -> Optional[str]:
     return res[0]
 
 
+def csv_getfileid(id: int):
+    try:
+        with open("listfile.csv", 'r', newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter=";")
+            for row in reader:
+                if int(row[0]) == id:
+                    return f"{id}  # {row[1]}"
+    except:
+        pass
+
+    return False
+
 # FIXME: This gonna be slow until database or caching
 def resolve_fileid(id: id, cachecon) -> str:
     if not args.resolve or id <= 0:
         return f"{id}"
 
     c = cache_getfileid(id, cachecon)
-    if c is None and os.path.exists(args.listfile):
-        with open(args.listfile, 'r', newline="") as csvfile:
-            reader = csv.reader(csvfile, delimiter=";")
-            for row in reader:
-                if int(row[0]) == id:
-                    return f"{id}  # {row[1]}"
-    elif c is False:
-        return f"{id}  # {c}"
 
-    return f"{id}  # unresolved"
+    # if None, cache is not usable, so try the old fashioned way
+    if c is None:
+        c = csv_getfileid(id)
+
+    if c is False:
+        return f"{id}  # unresolved"
+    else:
+        return f"{id}  # {c}"
 
 
 simplifications = [
