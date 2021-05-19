@@ -423,16 +423,16 @@ def resolve_fileid(id: id, cachecon) -> str:
         return f"{id}"
 
     c = cache_getfileid(id, cachecon)
-    if c is None:
-        with open("listfile.csv", 'r', newline="") as csvfile:
+    if c is None and os.path.exists(args.listfile):
+        with open(args.listfile, 'r', newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=";")
             for row in reader:
                 if int(row[0]) == id:
                     return f"{id}  # {row[1]}"
     elif c is False:
-        return f"{id}  # unresolved"
-    else:
         return f"{id}  # {c}"
+
+    return f"{id}  # unresolved"
 
 
 simplifications = [
@@ -454,7 +454,7 @@ simplifications = [
     (fileid_re, resolve_fileid)
 ]
 
-def check_simplify(path: str) -> Callable[Any, Any]:
+def check_simplify(path: str):
     if not args.simplify:
         return None
 
@@ -665,6 +665,10 @@ if __name__ == "__main__":
     # FIXME: This is a bit deeply nested for my tastes.
     if not args.resolve:
         print("INFO: not resolving, not initializing cache", file=sys.stderr)
+        cachecon = None
+    elif not os.path.exists(args.listfile):
+        print(
+            f"WARNING: {args.listfile} does not exist, not resolving fileids")
         cachecon = None
     else:
         if os.path.exists(cachefile) and (os.path.getmtime(args.listfile) <= os.path.getmtime(cachefile)):
