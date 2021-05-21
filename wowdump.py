@@ -613,14 +613,14 @@ def parse_arguments():
     # These next two aren't intended to be used by the user, just to make
     # our lives easier later. There's probably a better way.
     parser.add_argument(
-        "filters_keep",
+        "--filters_keep",
         default=[],
         nargs="*",
         help=argparse.SUPPRESS,
     )
 
     parser.add_argument(
-        "filters_discard",
+        "--filters_discard",
         default=[],
         nargs="*",
         help=argparse.SUPPRESS,
@@ -643,12 +643,13 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "file",
-        nargs='?',
+        "files",
+        action='store',
+        nargs='*',
+        default=[],
         help="input file to be processed",
     )
 
-    global args
     args = parser.parse_args()
 
     # args.filters = [item for subl in args.filters for item in subl]
@@ -663,12 +664,13 @@ def parse_arguments():
 
 
 if __name__ == "__main__":
+    global args
     args = parse_arguments()
 
-    if args.file is None:
-        args.file = DEFAULT_TARGET
+    if len(args.files) == 0:
+        args.files =  [ DEFAULT_TARGET ]
         print(
-            f"WARNING: Using default target file {args.file}", flush=True, file=sys.stderr)
+            f"WARNING: Using default target file {DEFAULT_TARGET}", flush=True, file=sys.stderr)
 
     cache_current = False
     cachefile = f"{args.listfile}.cache"
@@ -689,22 +691,28 @@ if __name__ == "__main__":
             cachecon = cache_open(cachefile)
             cache_fileids(args.listfile, cachecon)
 
-    name, ext = os.path.splitext(args.file)
+    # FIXME: handle more than one file
+    file = args.files[0]
+
+    name, ext = os.path.splitext(file)
     if ext == ".m2":
         from output.m2 import M2, KaitaiStruct
-        target = M2.from_file(args.file)
+        target = M2.from_file(file)
     elif ext == ".skin":
         from output.skin import Skin, KaitaiStruct
-        target = Skin.from_file(args.file)
+        target = Skin.from_file(file)
     elif ext == ".skel":
         from output.skel import Skel, KaitaiStruct
-        target = Skel.from_file(args.file)
+        target = Skel.from_file(file)
     elif ext == ".blp":
         from output.blp import Blp, KaitaiStruct
-        target = Blp.from_file(args.file)
+        target = Blp.from_file(file)
     elif ext == ".bls":
         from output.bls import Bls, KaitaiStruct
-        target = Bls.from_file(args.file)
+        target = Bls.from_file(file)
+    else:
+        print(f"ERROR: don't know how to parse tile type {ext}")
+        sys.exit(1)
 
     parsed = to_tree(target)
 
