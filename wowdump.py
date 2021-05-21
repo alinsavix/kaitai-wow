@@ -191,6 +191,85 @@ def to_tree(obj, path: str = ""):
     return r
 
 
+# Caching bits (yeah, they're ugly)
+# or maybe type of os.PathLike for cache_open
+def cache_open(dbfile: str):
+    if "sqlite3" not in sys.modules:
+        print("WARNING: sqlite not available, caching disabled", file=sys.stderr)
+        return None
+
+    # FIXME: can we do better than a global variable?
+    cachecon = sqlite3.connect(dbfile)
+
+    return cachecon
+
+
+def cache_fileids(listfile: str, cachecon) -> None:
+    # Don't have the cache open, so can't cache anything
+    if not cachecon:
+        return
+
+    print("INFO: newer listfile available, updating fileid cache", file=sys.stderr)
+    started = time.time()
+
+    cur = cachecon.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS file_ids (
+            id INTEGER NOT NULL PRIMARY KEY,
+            name VARCHAR
+        );
+        """)
+
+    # Make sure it's empty -- it's probably faster to just reload everything
+    # rather than check if each indiviual row needs updating anyhow
+    cur.execute("DELETE FROM file_ids;")
+
+    with open(listfile, 'r') as csvfile:
+        reader = csv.reader(csvfile, delimiter=";")
+        to_db = [(row[0], row[1]) for row in reader]
+
+    cur.executemany("INSERT INTO file_ids (id, name) VALUES (?, ?);", to_db)
+    cachecon.commit()
+
+    runtime = time.time() - started
+    print(
+        f"INFO: fileid cache successfully rebuilt in {runtime:.2f}s", file=sys.stderr)
+
+
+def cache_getfileid(id: int, cachecon) -> Optional[str]:
+    if not cachecon:
+        return None
+
+    cur = cachecon.cursor()
+    q = "SELECT name FROM file_ids WHERE id=?"
+
+    try:
+        res = cur.execute(q, [id]).fetchone()
+    except sqlite3.Error as e:
+        print(f"ERROR: Unexpected sqlite error: {e}", file=sys.stderr)
+        return False
+
+    # not in cache? Return false so that we know not to try to fall back to
+    # the listfile, since the cache should be authoritative
+    if res is None:
+        return False
+
+    return res[0]
+
+
+def csv_getfileid(id: int):
+    try:
+        with open("listfile.csv", 'r', newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter=";")
+            for row in reader:
+                if int(row[0]) == id:
+                    return f"{id}  # {row[1]}"
+    except:
+        pass
+
+    return False
+
+
 # rudamentary filtering
 #
 # behavior depends on whether keep or discard filters are provided,
@@ -304,6 +383,10 @@ fileid_re = re.compile(r'''
     ^/chunks/\d+/chunk_data/([^/]+_)?file_data_ids/\d+$
 ''', re.VERBOSE)
 
+interpolation_type_re = re.compile(r'''
+    interpolation_type$
+''', re.VERBOSE)
+
 def simplify_xyz(d, _) -> str:
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
@@ -351,83 +434,16 @@ def simplify_flags(d, _):
     return ", ".join(flags)
 
 
-# Caching bits (yeah, they're ugly)
-# or maybe type of os.PathLike for cache_open
-def cache_open(dbfile: str):
-    if "sqlite3" not in sys.modules:
-        print("WARNING: sqlite not available, caching disabled", file=sys.stderr)
-        return None
+interpolation_types = {
+    0: "interpolate_const",
+    1: "interpolate_linear",
+    2: "interpolate_cubic_bezier_spline",
+    3: "interpolate_cubic_hermite_spline",
+}
 
-    # FIXME: can we do better than a global variable?
-    cachecon = sqlite3.connect(dbfile)
+def simplify_enum(d, _):
+    return f"{d['value']}  # {d['name']}"
 
-    return cachecon
-
-
-def cache_fileids(listfile: str, cachecon) -> None:
-    # Don't have the cache open, so can't cache anything
-    if not cachecon:
-        return
-
-    print("INFO: newer listfile available, updating fileid cache", file=sys.stderr)
-    started = time.time()
-
-    cur = cachecon.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS file_ids (
-            id INTEGER NOT NULL PRIMARY KEY,
-            name VARCHAR
-        );
-        """)
-
-    # Make sure it's empty -- it's probably faster to just reload everything
-    # rather than check if each indiviual row needs updating anyhow
-    cur.execute("DELETE FROM file_ids;")
-
-    with open(listfile, 'r') as csvfile:
-        reader = csv.reader(csvfile, delimiter=";")
-        to_db = [(row[0], row[1]) for row in reader]
-
-    cur.executemany("INSERT INTO file_ids (id, name) VALUES (?, ?);", to_db)
-    cachecon.commit()
-
-    runtime = time.time() - started
-    print(
-        f"INFO: fileid cache successfully rebuilt in {runtime:.2f}s", file=sys.stderr)
-
-
-def cache_getfileid(id: int, cachecon) -> Optional[str]:
-    if not cachecon:
-        return None
-
-    cur = cachecon.cursor()
-    q = "SELECT name FROM file_ids WHERE id=?"
-
-    try:
-        res = cur.execute(q, [id]).fetchone()
-    except sqlite3.Error as e:
-        print(f"ERROR: Unexpected sqlite error: {e}", file=sys.stderr)
-        return False
-
-    # not in cache? Return false so that we know not to try to fall back to
-    # the listfile, since the cache should be authoritative
-    if res is None:
-        return False
-
-    return res[0]
-
-
-def csv_getfileid(id: int):
-    try:
-        with open("listfile.csv", 'r', newline="") as csvfile:
-            reader = csv.reader(csvfile, delimiter=";")
-            for row in reader:
-                if int(row[0]) == id:
-                    return f"{id}  # {row[1]}"
-    except:
-        pass
-
-    return False
 
 # FIXME: This gonna be slow until database or caching
 def resolve_fileid(id: id, cachecon) -> str:
@@ -462,7 +478,8 @@ simplifications = [
     (seq_bbox_re, simplify_xyz),
     (verts_vec_re, simplify_xyz),
     (verts_texcoords_re, simplify_xy),
-    (fileid_re, resolve_fileid)
+    (fileid_re, resolve_fileid),
+    (interpolation_type_re, simplify_enum)
 ]
 
 def check_simplify(path: str):
@@ -668,7 +685,7 @@ if __name__ == "__main__":
     args = parse_arguments()
 
     if len(args.files) == 0:
-        args.files =  [ DEFAULT_TARGET ]
+        args.files = [DEFAULT_TARGET]
         print(
             f"WARNING: Using default target file {DEFAULT_TARGET}", flush=True, file=sys.stderr)
 
