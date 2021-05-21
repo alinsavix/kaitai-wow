@@ -517,6 +517,11 @@ def pathdump(d, path: str, cachecon) -> None:
         things = range(0, len(d))
 
     for k in things:
+        if isinstance(d, list) and args.arraylimit > 0 and k >= args.arraylimit:
+            remaining = len(d) - args.arraylimit
+            print(f"{path}/... = [{remaining} remaining of {len(d)} total]")
+            return
+
         workpath = f"{path}/{k}"
         thing = d[k]
 
@@ -663,6 +668,14 @@ def parse_arguments():
         type=int,
         default=6,
         help="decimal digits to include on simplified floats"
+    )
+
+    parser.add_argument(
+        "--arraylimit",
+        action='store',
+        type=int,
+        default=25,
+        help="elide array contents after this many entries (0 disables elision)",
     )
 
     parser.add_argument(
