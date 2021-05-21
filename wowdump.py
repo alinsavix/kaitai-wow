@@ -371,12 +371,12 @@ verts_vec_re = re.compile(r'''
 ''', re.VERBOSE)
 
 verts_texcoords_re = re.compile(r'''
-    /model/vertices/\d+/tex_coords/\d+$
+    ^/model/vertices/\d+/tex_coords/\d+$
 ''', re.VERBOSE)
 
 # FIXME: Can we make these behave better straight out of kaitai?
 nested_xy_re = re.compile(r'''
-    /model/particle_emitters/\d+/multi_texture_param\d/\d+$
+    ^/model/particle_emitters/\d+/multi_texture_param\d/\d+$
 ''', re.VERBOSE)
 
 fileid_re = re.compile(r'''
@@ -385,6 +385,11 @@ fileid_re = re.compile(r'''
 
 interpolation_type_re = re.compile(r'''
     interpolation_type$
+''', re.VERBOSE)
+
+# simplify_4bone
+fourbone_re = re.compile(r'''
+    ^/model/vertices/\d+/(bone_indices|bone_weights)$
 ''', re.VERBOSE)
 
 def simplify_xyz(d, _) -> str:
@@ -416,6 +421,9 @@ def simplify_irgb(d, _) -> str:
     b = int(d["b"])
 
     return f"rgb({r}, {g}, {b})  # {r:02x}{g:02x}{b:02x}"
+
+def simplify_fourbone(d, _) -> str:
+    return f"[ {d[0]}, {d[1]}, {d[2]}, {d[3]} ]"
 
 
 # FIXME: Should the output be inside { } or something?
@@ -479,7 +487,8 @@ simplifications = [
     (verts_vec_re, simplify_xyz),
     (verts_texcoords_re, simplify_xy),
     (fileid_re, resolve_fileid),
-    (interpolation_type_re, simplify_enum)
+    (interpolation_type_re, simplify_enum),
+    (fourbone_re, simplify_fourbone),
 ]
 
 def check_simplify(path: str):
