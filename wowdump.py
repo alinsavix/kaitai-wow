@@ -383,6 +383,10 @@ fileid_re = re.compile(r'''
     ^/chunks/\d+/chunk_data/([^/]+_)?file_data_ids/\d+$
 ''', re.VERBOSE)
 
+version_re = re.compile(r'''
+    ^/model/version$
+''', re.VERBOSE)
+
 interpolation_type_re = re.compile(r'''
     interpolation_type$
 ''', re.VERBOSE)
@@ -489,6 +493,7 @@ simplifications = [
     (fileid_re, resolve_fileid),
     (interpolation_type_re, simplify_enum),
     (fourbone_re, simplify_fourbone),
+    (version_re, simplify_enum)
 ]
 
 def check_simplify(path: str):
