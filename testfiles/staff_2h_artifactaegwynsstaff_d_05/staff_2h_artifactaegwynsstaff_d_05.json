@@ -1,0 +1,983 @@
+{
+  "model": {
+    "version": 274,
+    "physFileID": 0,
+    "skelFileID": 0,
+    "boneFileDataIDs": null,
+    "skinFileDataIDs": [
+      1119694
+    ],
+    "lod_skinFileDataIDs": null,
+    "animFileDataIDs": null,
+    "textureFileDataIDs": [
+      0,
+      775194,
+      144328,
+      1119661,
+      1115781,
+      1119692,
+      775526,
+      1119693
+    ],
+    "recursiveParticleModelFileIDs": null,
+    "geometryParticleModelFileIDs": null,
+    "filename": null,
+    "name": "Staff_2h_ArtifactAegwynsStaff_D_05",
+    "flags": 8336,
+    "sequences": [
+      {
+        "timestamp": 18833
+      },
+      {
+        "timestamp": 16767
+      },
+      {
+        "timestamp": 4933
+      }
+    ],
+    "animations": [
+      {
+        "animationID": 0,
+        "subAnimationID": 0,
+        "length": 6667,
+        "movingSpeed": 0.0,
+        "flags": 32,
+        "probability": 32767,
+        "unused": 0,
+        "unk1": 0,
+        "unk2": 0,
+        "playbackSpeed": 150,
+        "minimumExtent": {
+          "X": -1.4533982,
+          "Y": -0.12557338,
+          "Z": -0.62693095,
+          "Length": 1.5878216213212921,
+          "Angle": -3.0554068
+        },
+        "maximumExtent": {
+          "X": 1.5156249,
+          "Y": 0.12362741,
+          "Z": 0.5697324,
+          "Length": 1.6238834793997194,
+          "Angle": 0.08138842
+        },
+        "boundsRadius": 1.4864074,
+        "nextAnimation": -1,
+        "index": 0
+      }
+    ],
+    "animationlookup": [],
+    "bones": [
+      {
+        "boneId": -1,
+        "flags": 0,
+        "parentBone": -1,
+        "translation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scale": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "pivot": {
+          "X": 0.82118535,
+          "Y": -0.04621112,
+          "Z": -0.0048653865,
+          "Length": 0.8224989479112051,
+          "Angle": -0.05621439
+        }
+      },
+      {
+        "boneId": -1,
+        "flags": 8,
+        "parentBone": -1,
+        "translation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scale": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "pivot": {
+          "X": 0.8737066,
+          "Y": -0.0035488727,
+          "Z": -0.010958761,
+          "Length": 0.8737825104059257,
+          "Angle": -0.0040618363
+        }
+      },
+      {
+        "boneId": -1,
+        "flags": 0,
+        "parentBone": -1,
+        "translation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scale": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "pivot": {
+          "X": 0.97898513,
+          "Y": 0.0017107592,
+          "Z": -0.22631839,
+          "Length": 1.0048058649703637,
+          "Angle": 0.0017474806
+        }
+      },
+      {
+        "boneId": -1,
+        "flags": 0,
+        "parentBone": -1,
+        "translation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scale": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "pivot": {
+          "X": 1.0997388,
+          "Y": 0.00047050582,
+          "Z": -0.009118186,
+          "Length": 1.0997767367690552,
+          "Angle": 0.0004278341
+        }
+      },
+      {
+        "boneId": -1,
+        "flags": 0,
+        "parentBone": -1,
+        "translation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scale": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "pivot": {
+          "X": 0.9794033,
+          "Y": 0.0025667746,
+          "Z": 0.23225757,
+          "Length": 1.0065689378692608,
+          "Angle": 0.0026207475
+        }
+      },
+      {
+        "boneId": -1,
+        "flags": 0,
+        "parentBone": -1,
+        "translation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scale": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "pivot": {
+          "X": 0.557903,
+          "Y": 0.0012016296,
+          "Z": -0.011355877,
+          "Length": 0.5580198455989547,
+          "Angle": 0.0021538292
+        }
+      },
+      {
+        "boneId": -1,
+        "flags": 0,
+        "parentBone": -1,
+        "translation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scale": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "pivot": {
+          "X": 1.0539343,
+          "Y": -0.002405299,
+          "Z": -0.32047504,
+          "Length": 1.1015841420012213,
+          "Angle": -0.0022822057
+        }
+      },
+      {
+        "boneId": -1,
+        "flags": 0,
+        "parentBone": -1,
+        "translation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scale": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "pivot": {
+          "X": 0.24145058,
+          "Y": 0.00331174,
+          "Z": -0.009261661,
+          "Length": 0.2416508381825416,
+          "Angle": 0.013715156
+        }
+      },
+      {
+        "boneId": -1,
+        "flags": 0,
+        "parentBone": -1,
+        "translation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scale": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "pivot": {
+          "X": 1.3244514,
+          "Y": 0.00075224374,
+          "Z": -0.0017164019,
+          "Length": 1.3244527723290078,
+          "Angle": 0.0005679662
+        }
+      }
+    ],
+    "keybonelookup": [
+      {
+        "bone": 65535
+      }
+    ],
+    "vertices": [],
+    "nViews": 1,
+    "skins": null,
+    "colors": [],
+    "textures": [
+      {
+        "type": 2,
+        "flags": 0,
+        "filename": "dungeons\\textures\\testing\\color_01.blp"
+      },
+      {
+        "type": 0,
+        "flags": 0,
+        "filename": "dungeons\\textures\\testing\\color_01.blp"
+      },
+      {
+        "type": 0,
+        "flags": 0,
+        "filename": "dungeons\\textures\\testing\\color_01.blp"
+      },
+      {
+        "type": 0,
+        "flags": 3,
+        "filename": "dungeons\\textures\\testing\\color_01.blp"
+      },
+      {
+        "type": 0,
+        "flags": 0,
+        "filename": "dungeons\\textures\\testing\\color_01.blp"
+      },
+      {
+        "type": 0,
+        "flags": 3,
+        "filename": "dungeons\\textures\\testing\\color_01.blp"
+      },
+      {
+        "type": 0,
+        "flags": 3,
+        "filename": "dungeons\\textures\\testing\\color_01.blp"
+      },
+      {
+        "type": 0,
+        "flags": 3,
+        "filename": "dungeons\\textures\\testing\\color_01.blp"
+      }
+    ],
+    "transparency": [
+      {
+        "alpha": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 1
+          },
+          "Values": {
+            "Number": 1
+          }
+        }
+      },
+      {
+        "alpha": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 1
+          },
+          "Values": {
+            "Number": 1
+          }
+        }
+      },
+      {
+        "alpha": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 1
+          },
+          "Values": {
+            "Number": 1
+          }
+        }
+      }
+    ],
+    "uvanimations": [
+      {
+        "translation": {
+          "GlobalSequence": 1,
+          "InterpolationType": 0,
+          "Timestamps": {
+            "Number": 1
+          },
+          "Values": {
+            "Number": 1
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scaling": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        }
+      },
+      {
+        "translation": {
+          "GlobalSequence": 1,
+          "InterpolationType": 1,
+          "Timestamps": {
+            "Number": 1
+          },
+          "Values": {
+            "Number": 1
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scaling": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        }
+      },
+      {
+        "translation": {
+          "GlobalSequence": 1,
+          "InterpolationType": 2,
+          "Timestamps": {
+            "Number": 1
+          },
+          "Values": {
+            "Number": 1
+          }
+        },
+        "rotation": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        },
+        "scaling": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        }
+      }
+    ],
+    "texreplace": [
+      {
+        "textureID": 7
+      },
+      {
+        "textureID": -1
+      },
+      {
+        "textureID": 0
+      }
+    ],
+    "renderflags": [
+      {
+        "flags": 16,
+        "blendingMode": 2
+      },
+      {
+        "flags": 16,
+        "blendingMode": 4
+      },
+      {
+        "flags": 0,
+        "blendingMode": 0
+      },
+      {
+        "flags": 16,
+        "blendingMode": 2
+      },
+      {
+        "flags": 21,
+        "blendingMode": 4
+      },
+      {
+        "flags": 340,
+        "blendingMode": 4
+      },
+      {
+        "flags": 21,
+        "blendingMode": 7
+      },
+      {
+        "flags": 340,
+        "blendingMode": 4
+      },
+      {
+        "flags": 21,
+        "blendingMode": 4
+      },
+      {
+        "flags": 21,
+        "blendingMode": 7
+      }
+    ],
+    "bonelookuptable": [
+      {
+        "bone": 0
+      },
+      {
+        "bone": 1
+      },
+      {
+        "bone": 0
+      },
+      {
+        "bone": 1
+      },
+      {
+        "bone": 0
+      },
+      {
+        "bone": 1
+      },
+      {
+        "bone": 0
+      },
+      {
+        "bone": 1
+      }
+    ],
+    "texlookup": [
+      {
+        "textureID": 3
+      },
+      {
+        "textureID": 6
+      },
+      {
+        "textureID": 3
+      },
+      {
+        "textureID": 7
+      },
+      {
+        "textureID": 5
+      },
+      {
+        "textureID": 3
+      },
+      {
+        "textureID": 4
+      },
+      {
+        "textureID": 0
+      },
+      {
+        "textureID": 1
+      },
+      {
+        "textureID": 2
+      }
+    ],
+    "translookup": [
+      {
+        "transparencyID": 0
+      },
+      {
+        "transparencyID": 1
+      },
+      {
+        "transparencyID": 2
+      }
+    ],
+    "uvanimlookup": [
+      {
+        "animatedTextureID": 65535
+      },
+      {
+        "animatedTextureID": 2
+      },
+      {
+        "animatedTextureID": 65535
+      },
+      {
+        "animatedTextureID": 1
+      },
+      {
+        "animatedTextureID": 65535
+      },
+      {
+        "animatedTextureID": 65535
+      },
+      {
+        "animatedTextureID": 0
+      }
+    ],
+    "vertexbox": [
+      {
+        "X": -1.4533982,
+        "Y": -0.12557338,
+        "Z": -0.62693095,
+        "Length": 1.5878216213212921,
+        "Angle": -3.0554068
+      },
+      {
+        "X": 1.5156249,
+        "Y": 0.12362741,
+        "Z": 0.5697324,
+        "Length": 1.6238834793997194,
+        "Angle": 0.08138842
+      }
+    ],
+    "vertexradius": 1.4864074,
+    "boundingbox": [
+      {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0,
+        "Length": 0.0,
+        "Angle": 0.0
+      },
+      {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0,
+        "Length": 0.0,
+        "Angle": 0.0
+      }
+    ],
+    "boundingradius": 0.0,
+    "boundingtriangles": [],
+    "boundingvertices": [],
+    "boundingnormals": [],
+    "attachments": [
+      {
+        "id": 0,
+        "bone": 2,
+        "position": {
+          "X": 0.97898513,
+          "Y": 0.0017107592,
+          "Z": -0.22631839,
+          "Length": 1.0048058649703637,
+          "Angle": 0.0017474806
+        },
+        "data": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        }
+      },
+      {
+        "id": 1,
+        "bone": 3,
+        "position": {
+          "X": 1.0997388,
+          "Y": 0.00047050582,
+          "Z": -0.009118186,
+          "Length": 1.0997767367690552,
+          "Angle": 0.0004278341
+        },
+        "data": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        }
+      },
+      {
+        "id": 2,
+        "bone": 4,
+        "position": {
+          "X": 0.9794033,
+          "Y": 0.0025667746,
+          "Z": 0.23225757,
+          "Length": 1.0065689378692608,
+          "Angle": 0.0026207475
+        },
+        "data": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        }
+      },
+      {
+        "id": 3,
+        "bone": 5,
+        "position": {
+          "X": 0.557903,
+          "Y": 0.0012016296,
+          "Z": -0.011355877,
+          "Length": 0.5580198455989547,
+          "Angle": 0.0021538292
+        },
+        "data": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        }
+      },
+      {
+        "id": 4,
+        "bone": 6,
+        "position": {
+          "X": 1.0539343,
+          "Y": -0.002405299,
+          "Z": -0.32047504,
+          "Length": 1.1015841420012213,
+          "Angle": -0.0022822057
+        },
+        "data": {
+          "GlobalSequence": 0,
+          "InterpolationType": 65535,
+          "Timestamps": {
+            "Number": 0
+          },
+          "Values": {
+            "Number": 0
+          }
+        }
+      }
+    ],
+    "attachlookup": [
+      {
+        "attachment": 0
+      },
+      {
+        "attachment": 1
+      },
+      {
+        "attachment": 2
+      },
+      {
+        "attachment": 3
+      },
+      {
+        "attachment": 4
+      }
+    ],
+    "events": [
+      {
+        "identifier": "$WTB",
+        "data": 0,
+        "bone": 7,
+        "position": {
+          "X": 0.24145058,
+          "Y": 0.00331174,
+          "Z": -0.009261661,
+          "Length": 0.2416508381825416,
+          "Angle": 0.013715156
+        },
+        "interpolationType": 0,
+        "GlobalSequence": 65535,
+        "nTimestampEntries": 1,
+        "ofsTimestampList": 113008
+      },
+      {
+        "identifier": "$WTT",
+        "data": 0,
+        "bone": 8,
+        "position": {
+          "X": 1.3244514,
+          "Y": 0.00075224374,
+          "Z": -0.0017164019,
+          "Length": 1.3244527723290078,
+          "Angle": 0.0005679662
+        },
+        "interpolationType": 0,
+        "GlobalSequence": 65535,
+        "nTimestampEntries": 1,
+        "ofsTimestampList": 113024
+      }
+    ],
+    "lights": [],
+    "cameras": [],
+    "cameralookup": [],
+    "ribbonemitters": [],
+    "particleemitters": []
+  }
+}
