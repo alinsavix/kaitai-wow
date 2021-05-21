@@ -256,7 +256,7 @@ bone_xlate_re = re.compile(r'''
 ''', re.VERBOSE)
 
 flags_re = re.compile(r'''
-    ^/(global_)?flags$
+    /(global_)?flags$
 ''', re.VERBOSE)
 
 bbox_re = re.compile(r'''
@@ -336,7 +336,7 @@ def simplify_irgb(d, _) -> str:
 
 
 # FIXME: Should the output be inside { } or something?
-def simplify_flags(d):
+def simplify_flags(d, _):
     if not isinstance(d, dict):
         return d
 
