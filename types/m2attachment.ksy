@@ -5,7 +5,7 @@ types:
               type: u4
             - id: bone
               type: u2
-            - id: unknown
+            - id: unknown1
               type: u2
             - id: position
               type: c3vector

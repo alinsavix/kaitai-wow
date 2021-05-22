@@ -13,6 +13,34 @@ enums:
         24: c4quaternion
         25: m2compquat
 
+    m2track_interpolation_types:
+        0:
+            id: interpolate_const
+            doc: "Change instantly at timestamp"
+        1:
+            id: interpolate_linear
+            doc: "Linear interpolation between keyframe values (lerp for vectors/colours, nlerp for quaternions)"
+        2:
+            id: interpolate_cubic_bezier_spline
+            doc: |
+                Cubic bezier spline interpolation. Only valid for M2SplineKey tracks. The control
+                points are:
+
+                1st: first spline key's `value`
+                2nd: first spline key's `tanOut`
+                3rd: second spline key's `tanIn`
+                4th: second spline key's `value`
+        3:
+            id: interpolate_cubic_hermite_spline
+            doc: |
+                Cubic hermite spline interpolation. Only valid for M2SplineKey tracks. The control
+                points are:
+
+                starting point: first spline key's `value`
+                starting tangent: first spline key's `tanOut`
+                ending tangent: second spline key's `tanIn`
+                ending point: second spline key's `value`
+
 types:
     m2track:
         params:
@@ -21,7 +49,8 @@ types:
               enum: m2track_types
         seq:
             - id: interpolation_type
-              type: s2
+              type: u2
+              enum: m2track_interpolation_types
             - id: global_sequence
               type: s2
             - id: timestamps
@@ -46,8 +75,9 @@ types:
         seq:
             - id: interpolation_type
               type: u2
+              enum: m2track_interpolation_types
             - id: global_sequence
-              type: u2
+              type: s2
             - id: timestamps
               type: m2array(m2array_types::m2array_uint32)
 
