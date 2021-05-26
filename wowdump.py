@@ -516,11 +516,17 @@ def pathdump(d, path: str, cachecon) -> None:
     elif isinstance(d, list):
         things = range(0, len(d))
 
+    eject = False
     for k in things:
+        if eject:
+            return
+
         if isinstance(d, list) and args.arraylimit > 0 and k >= args.arraylimit:
             remaining = len(d) - args.arraylimit
-            print(f"{path}/... = [{remaining} remaining of {len(d)} total]")
-            return
+            print(f"{path}/... = [{remaining-1} elided of {len(d)} total]")
+            k = things[-1]
+            eject = True
+            # return
 
         workpath = f"{path}/{k}"
         thing = d[k]
@@ -758,15 +764,16 @@ if __name__ == "__main__":
         print(f"ERROR: don't know how to parse tile type {ext}")
         sys.exit(1)
 
-    parsed = to_tree(target)
-
     if args.output_type == "path":
+        parsed = to_tree(target)
         pathdump(parsed, "", cachecon)
     elif args.output_type == "raw":
         print(ppretty(target, depth=99, seq_length=100,))
     elif args.output_type == "final":
+        parsed = to_tree(target)
         print(ppretty(parsed, depth=99, seq_length=100,))
     elif args.output_type == "json":
+        parsed = to_tree(target)
         json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
         print()  # newline at end
 

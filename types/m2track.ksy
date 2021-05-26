@@ -26,20 +26,20 @@ enums:
                 Cubic bezier spline interpolation. Only valid for M2SplineKey tracks. The control
                 points are:
 
-                1st: first spline key's `value`
-                2nd: first spline key's `tanOut`
-                3rd: second spline key's `tanIn`
-                4th: second spline key's `value`
+                1st - first spline key value
+                2nd - first spline key tanOut
+                3rd - second spline key tanIn
+                4th - second spline key value
         3:
             id: interpolate_cubic_hermite_spline
             doc: |
                 Cubic hermite spline interpolation. Only valid for M2SplineKey tracks. The control
                 points are:
 
-                starting point: first spline key's `value`
-                starting tangent: first spline key's `tanOut`
-                ending tangent: second spline key's `tanIn`
-                ending point: second spline key's `value`
+                starting point - first spline key value
+                starting tangent - first spline key tanOut
+                ending tangent - second spline key tanIn
+                ending point - second spline key value
 
 types:
     m2track:
