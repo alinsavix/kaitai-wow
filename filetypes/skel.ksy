@@ -7,16 +7,20 @@ meta:
     # include is read by merge-yaml.py and then removed. It isn't legal
     # in normal kaitai-struct configurations
     include:
-        - chunks
         - enums
         - types
-
+        - chunks/skl1.ksy
+        - chunks/ska1.ksy
+        - chunks/skb1.ksy
+        - chunks/sks1.ksy
+        - chunks/skpd.ksy
+        - chunks/afid.ksy
+        - chunks/bfid.ksy
 seq:
     - id: chunks
       type: skel_chunk
       repeat: until
       repeat-until: _io.eof
-
 
 types:
     noop: {}
