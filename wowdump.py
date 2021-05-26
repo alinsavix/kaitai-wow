@@ -122,9 +122,21 @@ def whatis(obj):
 #   - next to original file
 #   - maybe some directory relative to original file
 #   - some configured CASC path
-# def find_related(filename, base):
-#     if os.path.isfile(base):
-#         base = os.path.dirname(base)
+def find_related(filepath, base):
+    if os.path.isfile(base):
+        base = os.path.dirname(base)
+
+    filename = os.path.basename(filepath)
+    check = os.path.join(base, filename)
+    if os.path.isfile(check):
+        return check
+
+    if CASCDIR:
+        check = os.path.join(CASCDIR, filepath)
+        if os.path.isfile(check):
+            return check
+
+    return None
 
 
 def to_tree(obj, path: str = ""):
@@ -786,36 +798,3 @@ if __name__ == "__main__":
         parsed = to_tree(target)
         json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
         print()  # newline at end
-
-# print("thing")
-# x = target.chunks[0].data
-# print("thing2")
-
-# x = target.chunks[0].data
-# print(type(x))
-
-# # x = target.chunks[0].data.data
-# # print(dir(x))
-# # print(x)
-# sys.exit(0)
-
-
-# print(f"root type {type(x)}")
-# for d in dir(x):
-#     if d.startswith("_"):
-#         continue
-
-#     v = getattr(x, d)
-#     if inspect.isbuiltin(v):
-#         continue
-
-#     if isinstance(v, type):
-#         continue
-
-#     print(f"{d} type {type(v).__name__}")
-#     print(f"builtin: {inspect.isbuiltin(v)}")
-#     print(f"method: {inspect.ismethod(v)}")
-
-# from ppretty import ppretty
-# print(ppretty(target, depth=99, seq_length=50))
-# print(ppretty(to_tree(target)))
