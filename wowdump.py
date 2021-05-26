@@ -25,6 +25,8 @@ except ImportError:
 
 # DEFAULT_TARGET = "testfiles/spectraltiger.m2"
 DEFAULT_TARGET = "testfiles/staff_2h_draenorcrafted_d_02_c.m2"
+#CASCDIR = None
+DATADIR = os.path.dirname(os.path.realpath(__file__))
 
 # FIXME: Turn these into proper verbosity flags
 do_verbose = 0
@@ -115,6 +117,14 @@ def whatis(obj):
         objis.append("kaitaistruct")
 
     return objis
+
+# places to look for file:
+#   - next to original file
+#   - maybe some directory relative to original file
+#   - some configured CASC path
+# def find_related(filename, base):
+#     if os.path.isfile(base):
+#         base = os.path.dirname(base)
 
 
 def to_tree(obj, path: str = ""):
@@ -639,7 +649,7 @@ def parse_arguments():
 
     parser.add_argument(
         "--listfile",
-        default="listfile.csv",
+        default=f"{DATADIR}/listfile.csv",
         help="specify listfile to use for fileids (default: %(default)s",
     )
 
