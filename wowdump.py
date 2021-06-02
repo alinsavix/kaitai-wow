@@ -788,6 +788,7 @@ if __name__ == "__main__":
 
     if args.output_type == "path":
         parsed = to_tree(target)
+        print(f"# {file}")
         pathdump(parsed, "", cachecon)
     elif args.output_type == "raw":
         print(ppretty(target, depth=99, seq_length=100,))
