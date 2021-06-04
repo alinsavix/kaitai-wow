@@ -16,6 +16,8 @@ lint: FORCE
 # We're just going to force it to rebuild everything every time, so we don't
 # have to deal with the complexity of having a way to dynamically track
 # included files as dependencies
+#
+# FIXME: Building everything every time has gotten kinda slow
 
 $(OUTDIR):
 	@mkdir -p $(OUTDIR)

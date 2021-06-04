@@ -1,2 +1,9 @@
 # not yet implemented
-# https://wowdev.wiki/WDL/v18
+meta:
+    id: wdl
+    endian: le
+    bit-endian: le
+    encoding: UTF-8
+
+    xref:
+        doc-ref: https://wowdev.wiki/WDL/v18

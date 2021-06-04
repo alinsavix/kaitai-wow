@@ -782,6 +782,9 @@ if __name__ == "__main__":
     elif ext == ".bls":
         from output.bls import Bls, KaitaiStruct
         target = Bls.from_file(file)
+    elif ext == ".wmo":
+        from output.wmo import Wmo, KaitaiStruct
+        target = Wmo.from_file(file)
     else:
         print(f"ERROR: don't know how to parse tile type {ext}")
         sys.exit(1)

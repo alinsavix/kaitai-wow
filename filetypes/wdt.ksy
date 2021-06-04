@@ -1,2 +1,9 @@
 # not yet implemented
-# see https://wowdev.wiki/WDT
+meta:
+    id: wdt
+    endian: le
+    bit-endian: le
+    encoding: UTF-8
+
+    xref:
+        doc-ref: https://wowdev.wiki/WDT

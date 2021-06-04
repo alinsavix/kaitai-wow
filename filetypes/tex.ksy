@@ -1,2 +1,9 @@
 # not yet implemented
-# see https://wowdev.wiki/TEX/v0
+meta:
+    id: tex
+    endian: le
+    bit-endian: le
+    encoding: UTF-8
+
+    xref:
+        doc-ref: https://wowdev.wiki/TEX/v0
