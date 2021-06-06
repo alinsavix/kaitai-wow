@@ -13,7 +13,7 @@ meta:
     include:
         - enums
         - types
-        - chunks
+        - chunks/wmo
 
 
 seq:
@@ -23,14 +23,12 @@ seq:
     - id: chunksize  # We know the size, no need to store it
       type: u4
 
-    # This is the only version we know right now, so assert that it's
-    # also the version we're reading
     - id: ver
-      contents: 0x00000011
+      type: u4
 
     # CHUNKEH
     - id: chunks
-      type: chunk
+      type: wmo_chunk
       repeat: until
       repeat-until: _io.eof
 
@@ -38,7 +36,7 @@ seq:
 types:
     noop: {}
 
-    chunk:
+    wmo_chunk:
         seq:
             - id: chunk_type
               type: str
@@ -51,18 +49,31 @@ types:
               type:
                   switch-on: chunk_type
                   cases:
-                      '"DHOM"': chunk_mohd
-                      '"TMOM"': chunk_momt
-                      '"NGOM"': chunk_mogn
-                      '"TLOM"': chunk_molt
-                      '"SDOM"': chunk_mods
-                      '"DDOM"': chunk_modd
-                      '"IDOM"': chunk_modi
-                      '"GOFM"': chunk_mfog
-                      '"DIFG"': chunk_gfid
-                      '"IDDM"': chunk_mddi
-                      '"GVAM"': chunk_mavg
-                      '"PGOM"': chunk_mogp
-                      '"YPOM"': chunk_mopy
-                      '"LADM"': chunk_madl
-                      _: noop
+                    '"DHOM"': chunk_mohd
+                    '"TMOM"': chunk_momt
+                    '"NGOM"': chunk_mogn
+                    '"IGOM"': chunk_mogi
+                    '"VPOM"': chunk_mopv
+                    '"TPOM"': chunk_mopt
+                    '"RPOM"': chunk_mopr
+                    '"TLOM"': chunk_molt
+                    '"SDOM"': chunk_mods
+                    '"IDOM"': chunk_modi
+                    '"DDOM"': chunk_modd
+                    '"GOFM"': chunk_mfog
+                    '"DIFG"': chunk_gfid
+                    '"PGOM"': chunk_mogp
+                    '"YPOM"': chunk_mopy
+                    '"IVOM"': chunk_movi
+                    '"TVOM"': chunk_movt
+                    '"RNOM"': chunk_monr
+                    '"VTOM"': chunk_motv
+                    '"ABOM"': chunk_moba
+                    '"SBOM"': chunk_mobs
+                    '"RDOM"': chunk_modr
+                    '"NBOM"': chunk_mobn
+                    '"RBOM"': chunk_mobr
+                    '"VCOM"': chunk_mocv
+                    '"LADM"': chunk_mdal
+
+                    _: noop

@@ -273,16 +273,22 @@ def merge_file(yaml_data: Dict[str, str], file: str):
         merge_dict(yaml_data, data)
 
 
-# iterate down through the filesystem and find files to merge
+# iterate down through the filesystem and find files to merge. This
+# originally descended through nested subdirectories, but now we just
+# have it doing the specific directory named, to get a bit more
+# granularity with our includes.
+#
+# FIXME: Eventually we want to filter this by types that are actually used!
 def recurse_merge(yaml_data: Dict[Any, Any], path: str):
     if os.path.isfile(path):
         return merge_file(yaml_data, path)
 
     # else
-    for dirpath, _, files in os.walk(path):
-        for name in files:
-            fp = os.path.join(dirpath, name)
-            merge_file(yaml_data, fp)
+    with os.scandir(path) as filepaths:
+        for fp in filepaths:
+            if not fp.is_file():
+                continue
+            merge_file(yaml_data, os.path.join(path, fp.name))
 
 
 # VERY simple yaml merge. Everything is a deep merge. Conflicts resolve
