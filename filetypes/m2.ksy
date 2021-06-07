@@ -12,7 +12,8 @@ meta:
     include:
         - enums
         - types
-        - chunks
+        - chunks/afid.ksy
+        - chunks/m2
 
 seq:
     # FIXME: Not 100% certain we'll always see the MD21/MD20 pair

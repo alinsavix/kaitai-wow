@@ -9,13 +9,9 @@ meta:
     include:
         - enums
         - types
-        - chunks/skl1.ksy
-        - chunks/ska1.ksy
-        - chunks/skb1.ksy
-        - chunks/sks1.ksy
-        - chunks/skpd.ksy
         - chunks/afid.ksy
-        - chunks/bfid.ksy
+        - chunks/skel
+
 seq:
     - id: chunks
       type: skel_chunk
