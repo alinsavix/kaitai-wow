@@ -414,8 +414,17 @@ nested_xy_re = re.compile(r'''
     ^/model/particle_emitters/\d+/multi_texture_param\d/\d+$
 ''', re.VERBOSE)
 
-fileid_re = re.compile(r'''
+fileids_re = re.compile(r'''
     ^/chunks/\d+/chunk_data/([^/]+_)?file_data_ids/\d+$
+''', re.VERBOSE)
+
+fileid_re = re.compile(r'''
+    ^/chunks/\d+/chunk_data/([^/]+_)?file_data_id$
+''', re.VERBOSE)
+
+# FIXME: try to combine with the above
+mapfileid_re = re.compile(r'''
+    ^/chunks/\d+/chunk_data/map_fileids/\d+/[^/]+_file_data_id$
 ''', re.VERBOSE)
 
 version_re = re.compile(r'''
@@ -526,6 +535,8 @@ simplifications = [
     (verts_vec_re, simplify_xyz),
     (verts_texcoords_re, simplify_xy),
     (fileid_re, resolve_fileid),
+    (fileids_re, resolve_fileid),
+    (mapfileid_re, resolve_fileid),
     (interpolation_type_re, simplify_enum),
     (fourbone_re, simplify_fourbone),
     (version_re, simplify_enum)
@@ -798,6 +809,9 @@ if __name__ == "__main__":
     elif ext == ".wmo":
         from output.wmo import Wmo, KaitaiStruct
         target = Wmo.from_file(file)
+    elif ext == ".wdt":
+        from output.wdt import Wdt, KaitaiStruct
+        target = Wdt.from_file(file)
     else:
         print(f"ERROR: don't know how to parse tile type {ext}")
         sys.exit(1)

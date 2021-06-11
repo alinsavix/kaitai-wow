@@ -1,4 +1,3 @@
-# not yet implemented
 meta:
     id: wmo
     endian: le
@@ -29,8 +28,8 @@ seq:
     # CHUNKEH
     - id: chunks
       type: wmo_chunk
-      repeat: until
-      repeat-until: _io.eof
+      repeat: eos
+
 
 
 types:
