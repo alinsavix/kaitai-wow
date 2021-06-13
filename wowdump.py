@@ -374,7 +374,7 @@ flags_re = re.compile(r'''
 ''', re.VERBOSE)
 
 bbox_re = re.compile(r'''
-    ^/model/(bounding_box|collision_box)/(min|max)$
+    /(bounding_box|collision_box)/(min|max)$
 ''', re.VERBOSE)
 
 events_pos_re = re.compile(r'''
@@ -397,12 +397,36 @@ emitter_position_re = re.compile(r'''
     ^/model/particle_emitters/\d+/old/position$
 ''', re.VERBOSE)
 
+ambient_rgba_re = re.compile(r'''
+    ^/chunks/\d+/chunk_data/amb_color$
+''', re.VERBOSE)
+
+wmomat_rgba_re = re.compile(r'''
+    ^/chunks/\d+/chunk_data/materials/\d+/(diff_color|sidn_color|frame_sidn_color)$
+''', re.VERBOSE)
+
+wmomat_vertex_rgba_re = re.compile(r'''
+    /chunks/\d+/chunk_data/vertex_colors/\d+$
+''', re.VERBOSE)
+
+wmomat_header_rgba_re = re.compile(r'''
+    /chunks/\d+/chunk_data/header_color_replacement$
+''', re.VERBOSE)
+
 seq_bbox_re = re.compile(r'''
     ^/model/sequences/\d+/bounds/extent/(min|max)$
 ''', re.VERBOSE)
 
 verts_vec_re = re.compile(r'''
     ^/model/vertices/\d+/(normal|pos)$
+''', re.VERBOSE)
+
+verts_wmo_re = re.compile(r'''
+    /chunks/\d+/chunk_data/(vertices|normals)/\d+$
+''', re.VERBOSE)
+
+verts_wmo_textcoords_re = re.compile(r'''
+    /chunks/\d+/chunk_data/(tex_coords)/\d+$
 ''', re.VERBOSE)
 
 verts_texcoords_re = re.compile(r'''
@@ -440,6 +464,14 @@ fourbone_re = re.compile(r'''
     ^/model/vertices/\d+/(bone_indices|bone_weights)$
 ''', re.VERBOSE)
 
+runtime_re = re.compile(r'''
+    /runtime_data$
+''', re.VERBOSE)
+
+
+def simplify_remove(d, _):
+    return None
+
 def simplify_xyz(d, _) -> str:
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
@@ -469,6 +501,14 @@ def simplify_irgb(d, _) -> str:
     b = int(d["b"])
 
     return f"rgb({r}, {g}, {b})  # {r:02x}{g:02x}{b:02x}"
+
+def simplify_irgba(d, _) -> str:
+    r = int(d["r"])
+    g = int(d["g"])
+    b = int(d["b"])
+    a = int(d["a"])
+
+    return f"rgba({r}, {g}, {b}, {a})  # {r:02x}{g:02x}{b:02x}{a:02x}"
 
 def simplify_fourbone(d, _) -> str:
     return f"[ {d[0]}, {d[1]}, {d[2]}, {d[3]} ]"
@@ -519,6 +559,7 @@ def resolve_fileid(id: id, cachecon) -> str:
 
 
 simplifications = [
+    (runtime_re, simplify_remove),
     (attachment_pos_re, simplify_xyz),
     (bone_pivot_re, simplify_xyz),
     (bone_rot_re, simplify_wxyz),
@@ -533,13 +574,19 @@ simplifications = [
     (emitter_position_re, simplify_xyz),
     (seq_bbox_re, simplify_xyz),
     (verts_vec_re, simplify_xyz),
+    (verts_wmo_re, simplify_xyz),
+    (verts_wmo_textcoords_re, simplify_xy),
     (verts_texcoords_re, simplify_xy),
     (fileid_re, resolve_fileid),
     (fileids_re, resolve_fileid),
     (mapfileid_re, resolve_fileid),
     (interpolation_type_re, simplify_enum),
     (fourbone_re, simplify_fourbone),
-    (version_re, simplify_enum)
+    (version_re, simplify_enum),
+    (ambient_rgba_re, simplify_irgba),
+    (wmomat_rgba_re, simplify_irgba),
+    (wmomat_vertex_rgba_re, simplify_irgba),
+    (wmomat_header_rgba_re, simplify_irgba),
 ]
 
 def check_simplify(path: str):
@@ -593,7 +640,8 @@ def pathdump(d, path: str, cachecon) -> None:
             if check_filtered(workpath):
                 continue
             simplified = s(thing, cachecon)
-            print(f"{workpath} = {simplified}")
+            if simplified is not None:
+                print(f"{workpath} = {simplified}")
         elif isinstance(thing, dict) or isinstance(thing, list):
             pathdump(thing, workpath, cachecon)
         else:

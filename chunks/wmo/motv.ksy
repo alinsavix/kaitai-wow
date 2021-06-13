@@ -4,6 +4,6 @@ types:
         doc-ref: https://wowdev.wiki/WMO#MOTV_chunk
 
         seq:
-            - id: texture_vertextes
+            - id: tex_coords
               type: c2vector
               repeat: eos
