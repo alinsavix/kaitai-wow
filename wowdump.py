@@ -605,7 +605,7 @@ def pathdump(d, path: str, cachecon) -> None:
     # This is kind of a lame way to get a loop that handles both lists
     # and dicts, but is there a better way?
     if isinstance(d, dict):
-        things = sorted(d.keys())
+        things = sorted(d.keys(), key=lambda x: (not (x == "chunk_size" or x == "chunk_type"), x))
     elif isinstance(d, list):
         things = range(0, len(d))
 
