@@ -11,7 +11,7 @@ types:
     group_info_list:
         seq:
             - id: flags
-              type: u4  # FIXME: expand flags per MOGP
+              type: mogp_group_flags
             - id: bounding_box
               type: caabox
             - id: name_offset

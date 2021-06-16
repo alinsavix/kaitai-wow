@@ -1,5 +1,5 @@
 types:
-    group_flags:
+    mogp_group_flags:
         seq:
             - id: has_bsp_tree
               type: b1  # 0x01
@@ -84,7 +84,7 @@ types:
               type: u4
               doc: "Offset into MOGN"
             - id: flags
-              type: group_flags
+              type: mogp_group_flags
             - id: bounding_box
               type: caabox
               doc: "Same as corresponding MOGI entry"
