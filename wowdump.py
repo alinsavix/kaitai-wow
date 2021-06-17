@@ -468,6 +468,9 @@ runtime_re = re.compile(r'''
     /runtime_data$
 ''', re.VERBOSE)
 
+unused_re = re.compile(r'''
+    unused\d*$
+''', re.VERBOSE)
 
 def simplify_remove(d, _):
     return None
@@ -560,6 +563,7 @@ def resolve_fileid(id: id, cachecon) -> str:
 
 simplifications = [
     (runtime_re, simplify_remove),
+    (unused_re, simplify_remove),
     (attachment_pos_re, simplify_xyz),
     (bone_pivot_re, simplify_xyz),
     (bone_rot_re, simplify_wxyz),
