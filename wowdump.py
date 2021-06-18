@@ -443,7 +443,7 @@ fileids_re = re.compile(r'''
 ''', re.VERBOSE)
 
 fileid_re = re.compile(r'''
-    ^/chunks/\d+/chunk_data/([^/]+_)?file_data_id$
+    /([^/]+_)?file_data_id$
 ''', re.VERBOSE)
 
 # FIXME: try to combine with the above

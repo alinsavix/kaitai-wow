@@ -11,8 +11,9 @@ types:
         seq:
             - id: anim_id
               type: u2
+              enum: anim_names
             - id: sub_anim_id
               type: u2
-            - id: file_id
+            - id: file_data_id
               type: u4
               doc: "Might be 0 for 'none'"

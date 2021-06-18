@@ -16,7 +16,7 @@ types:
               repeat: expr
               repeat-expr: 8
               doc: "May not be used"
-            - id: parent_skel_file_id
+            - id: parent_skel_file_data_id
               type: u4
             - id: unknown2
               type: u1
