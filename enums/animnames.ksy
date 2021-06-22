@@ -83,17 +83,17 @@ enums:
         77: emote_cry
         78: emote_chicken
         79: emote_beg
-        80: emote_applaud
+        80: emote_applaud  # Clap
         81: emote_shout
         82: emote_flex
         83: emote_shy
         84: emote_point
-        85: attack_1h_pierce
+        85: attack_1h_pierce  # Stab (Right)
         86: attack_2h_loose_pierce
-        87: attack_off
-        88: attack_off_pierce
-        89: sheath
-        90: hip_sheath
+        87: attack_off  # Attack (1H Left)
+        88: attack_off_pierce  # Stab (Left)
+        89: sheath  # Sheathe (Back)
+        90: hip_sheath  # Sheathe (Sides)
         91: mount
         92: run_right
         93: run_left
@@ -110,38 +110,38 @@ enums:
         104: sit_chair_high
         105: load_bow
         106: load_rifle
-        107: attack_thrown
-        108: ready_thrown
-        109: hold_bow
-        110: hold_rifle
-        111: hold_thrown
-        112: load_thrown
+        107: attack_thrown  # Shoot (Wand)
+        108: ready_thrown  # Ready (Wand)
+        109: hold_bow  # Aim (Bow)
+        110: hold_rifle  # Aim (Gun/Crossbow)
+        111: hold_thrown  # Ready (Thrown)
+        112: load_thrown  # Ready (Thrown)
         113: emote_salute
         114: kneel_start
         115: kneel_loop
         116: kneel_end
         117: attack_unarmed_off
-        118: special_unarmed
-        119: stealth_walk
-        120: stealth_stand
+        118: special_unarmed  # Critical (Unarmed)
+        119: stealth_walk  # Stealth (Walk)
+        120: stealth_stand  # Stealth (Idle)
         121: knockdown
         122: eating_loop
-        123: use_standing_loop
-        124: channel_cast_directed
-        125: channel_cast_omni
-        126: whirlwind
-        127: birth
-        128: use_standing_start
-        129: use_standing_end
+        123: use_standing_loop  # Craft
+        124: channel_cast_directed  # Channel 1
+        125: channel_cast_omni  # Channel 2
+        126: whirlwind  # Bladestorm
+        127: birth  # Emerge
+        128: use_standing_start  # Craft (Begin)
+        129: use_standing_end  # Craft (End)
         130: creature_special
         131: drown
         132: drowned
         133: fishing_cast
         134: fishing_loop
         135: fly
-        136: emote_work_no_sheathe
-        137: emote_stun_no_sheathe
-        138: emote_use_standing_no_sheathe
+        136: emote_work_no_sheathe  # Smith
+        137: emote_stun_no_sheathe  # Stun
+        138: emote_use_standing_no_sheathe  # Craft
         139: spell_sleep_down
         140: spell_kneel_start
         141: spell_kneel_loop
@@ -183,26 +183,26 @@ enums:
         177: druid_bear_bite
         178: druid_bear_maul
         179: druid_bear_bash
-        180: dragon_tail
-        181: dragon_stomp
+        180: dragon_tail  # Tail swipe
+        181: dragon_stomp  # Thunder Clap
         182: dragon_spit
         183: dragon_spit_hover
         184: dragon_spit_fly
         185: emote_yes
         186: emote_no
-        187: jump_land_run
+        187: jump_land_run  # Land & Run
         188: loot_hold
         189: loot_up
         190: stand_high
         191: impact
         192: lift_off
-        193: hover
+        193: hover  # Levitate
         194: succubus_entice
         195: emote_train
         196: emote_dead
         197: emote_dance_once
         198: deflect
-        199: emote_eat_no_sheathe
+        199: emote_eat_no_sheathe  # Eat/Drink
         200: land
         201: submerge
         202: submerged
@@ -211,19 +211,19 @@ enums:
         205: group_arrow_birth
         206: corpse_arrow_birth
         207: guide_arrow_birth
-        208: emote_talk_no_sheathe
-        209: emote_point_no_sheathe
-        210: emote_salute_no_sheathe
-        211: emote_dance_special
-        212: mutilate
-        213: custom_spell01
-        214: custom_spell02
-        215: custom_spell03
-        216: custom_spell04
-        217: custom_spell05
-        218: custom_spell06
-        219: custom_spell07
-        220: custom_spell08
+        208: emote_talk_no_sheathe  # Talk
+        209: emote_point_no_sheathe  # Point
+        210: emote_salute_no_sheathe  # Salute
+        211: emote_dance_special  # Dance Special (human only)
+        212: mutilate  # Stab
+        213: custom_spell01  # Boss Cast 1
+        214: custom_spell02  # Boss Channel 1
+        215: custom_spell03  # Suspended (Bolvar) (human only)
+        216: custom_spell04  # Knock on Door (human only)
+        217: custom_spell05  # Boss Precast
+        218: custom_spell06  # Boss Channel 2
+        219: custom_spell07  # Boss Channel End
+        220: custom_spell08  # Boss Cast 2
         221: custom_spell09
         222: custom_spell10
         223: stealth_run
@@ -232,7 +232,7 @@ enums:
         226: grab
         227: grab_closed
         228: grab_thrown
-        229: fly_stand
+        229: fly_stand  # Fly (Idle)
         230: fly_death
         231: fly_spell
         232: fly_stop
@@ -246,7 +246,7 @@ enums:
         240: fly_shuffle_left
         241: fly_shuffle_right
         242: fly_walk_backwards
-        243: fly_stun
+        243: fly_stun  # Fly (Backwards)
         244: fly_hands_closed
         245: fly_attack_unarmed
         246: fly_attack_1h
@@ -257,7 +257,7 @@ enums:
         251: fly_parry_2h
         252: fly_parry_2h_l
         253: fly_shield_block
-        254: fly_ready_unarmed
+        254: fly_ready_unarmed  # Fly (Idle)
         255: fly_ready_1h
         256: fly_ready_2h
         257: fly_ready_2h_l
@@ -458,9 +458,9 @@ enums:
         452: fly_stealth_run
         453: fly_emerge
         454: fly_cower
-        455: fly_grab
+        455: fly_grab  # Fly (Critcal)
         456: fly_grab_closed
-        457: fly_grab_thrown
+        457: fly_grab_thrown  # Fly (Attack with Hands)
         458: to_fly
         459: to_hover
         460: to_ground
@@ -473,23 +473,23 @@ enums:
         467: death_loop
         468: death_end
         469: fly_death_start
-        470: fly_death_loop
-        471: fly_death_end
+        470: fly_death_loop  # Fly (Fall)
+        471: fly_death_end  # Fly (Land Dead)
         472: death_end_hold
         473: fly_death_end_hold
         474: strangulate
         475: fly_strangulate
-        476: ready_joust
-        477: load_joust
-        478: hold_joust
+        476: ready_joust  # Joust (Idle)
+        477: load_joust  # Joust (Lower Lance)
+        478: hold_joust  # Joust (Lance Lowered)
         479: fly_ready_joust
         480: fly_load_joust
         481: fly_hold_joust
         482: attack_joust
         483: fly_attack_joust
-        484: reclined_mount
+        484: reclined_mount  # Mount (Car/Mech)
         485: fly_reclined_mount
-        486: to_altered
+        486: to_altered  # Worgen Transformation
         487: from_altered
         488: fly_to_altered
         489: fly_from_altered
@@ -503,29 +503,29 @@ enums:
         497: from_altered_post_swap
         498: fly_to_altered_post_swap
         499: fly_from_altered_post_swap
-        500: reclined_mount_passenger
+        500: reclined_mount_passenger  # Sit (Carriage Backseat)
         501: fly_reclined_mount_passenger
-        502: carry_2h
-        503: carried_2h
+        502: carry_2h  # Carrying (human only)
+        503: carried_2h  # Carried (human only)
         504: fly_carry_2h
         505: fly_carried_2h
         506: emote_sniff
         507: emote_fly_sniff
-        508: attack_fist_1h
+        508: attack_fist_1h  # Attack (Unarmed Right)
         509: fly_attack_fist_1h
-        510: attack_fist_1h_off
-        511: fly_attack_fist_1h_off
+        510: attack_fist_1h_off  # Attack (Unarmed Left)
+        511: fly_attack_fist_1h_off  # Block (Unarmed)
         512: parry_fist_1h
         513: fly_parry_fist_1h
         514: ready_fist_1h
         515: fly_ready_fist_1h
-        516: special_fist_1h
+        516: special_fist_1h  # Critcal (Unarmed)
         517: fly_special_fist_1h
-        518: emote_read_start
+        518: emote_read_start  # Map (Open)
         519: fly_emote_read_start
-        520: emote_read_loop
+        520: emote_read_loop  # Map
         521: fly_emote_read_loop
-        522: emote_read_end
+        522: emote_read_end  # Map (Close)
         523: fly_emote_read_end
         524: swim_run
         525: fly_swim_run
@@ -587,15 +587,15 @@ enums:
         581: fly_hold_blow_dart
         582: attack_blow_dart
         583: fly_attack_blow_dart
-        584: carriage_mount
+        584: carriage_mount  # Carriage (Sit)
         585: fly_carriage_mount
         586: carriage_passenger_mount
         587: fly_carriage_passenger_mount
-        588: carriage_mount_attack
+        588: carriage_mount_attack  # Carriage (Reins)
         589: fly_carriage_mount_attack
-        590: bar_tend_stand
+        590: bar_tend_stand  # Bartender (Idle)
         591: fly_bar_tend_stand
-        592: bar_server_walk
+        592: bar_server_walk  # Waiter (Walk)
         593: fly_bar_server_walk
         594: bar_server_run
         595: fly_bar_server_run
@@ -603,11 +603,11 @@ enums:
         597: fly_bar_server_shuffle_left
         598: bar_server_shuffle_right
         599: fly_bar_server_shuffle_right
-        600: bar_tend_emote_talk
+        600: bar_tend_emote_talk  # Bartender (Talk)
         601: fly_bar_tend_emote_talk
-        602: bar_tend_emote_point
+        602: bar_tend_emote_point  # Bartender (Point)
         603: fly_bar_tend_emote_point
-        604: bar_server_stand
+        604: bar_server_stand  # Waiter (Idle)
         605: fly_bar_server_stand
         606: bar_sweep_walk
         607: fly_bar_sweep_walk
@@ -621,7 +621,7 @@ enums:
         615: fly_bar_sweep_emote_talk
         616: bar_patron_sit_emote_point
         617: fly_bar_patron_sit_emote_point
-        618: mount_self_idle
+        618: mount_self_idle  # Running Wild (Idle) (human and worgen only)
         619: fly_mount_self_idle
         620: mount_self_walk
         621: fly_mount_self_walk
@@ -649,23 +649,23 @@ enums:
         643: fly_mount_self_jump_end
         644: mount_self_jump_land_run
         645: fly_mount_self_jump_land_run
-        646: mount_self_start
+        646: mount_self_start  # Running Wild (Start) (human and worgen only)
         647: fly_mount_self_start
         648: mount_self_fall
         649: fly_mount_self_fall
-        650: stormstrike
+        650: stormstrike  # Great Attack (Stab)
         651: fly_stormstrike
         652: ready_joust_no_sheathe
         653: fly_ready_joust_no_sheathe
-        654: slam
+        654: slam  # Great Attack 1 (1H)
         655: fly_slam
-        656: death_strike
+        656: death_strike  # Great Attack 1 (2H)
         657: fly_death_strike
         658: swim_attack_unarmed
         659: fly_swim_attack_unarmed
         660: spinning_kick
         661: fly_spinning_kick
-        662: round_house_kick
+        662: round_house_kick  # Kick (Monk)
         663: fly_round_house_kick
         664: roll_start
         665: fly_roll_start
@@ -673,43 +673,43 @@ enums:
         667: fly_roll
         668: roll_end
         669: fly_roll_end
-        670: palm_strike
+        670: palm_strike  # Attack 1 (Windwalker)
         671: fly_palm_strike
-        672: monk_offense_attack_unarmed
+        672: monk_offense_attack_unarmed  # Attack 2 (Windwalker)
         673: fly_monk_offense_attack_unarmed
-        674: monk_offense_attack_unarmed_off
+        674: monk_offense_attack_unarmed_off  # Attack 3 (Windwalker)
         675: fly_monk_offense_attack_unarmed_off
-        676: monk_offense_parry_unarmed
+        676: monk_offense_parry_unarmed  # Dodge (Windwalker)
         677: fly_monk_offense_parry_unarmed
-        678: monk_offense_ready_unarmed
+        678: monk_offense_ready_unarmed  # Ready (Windwalker)
         679: fly_monk_offense_ready_unarmed
-        680: monk_offense_special_unarmed
+        680: monk_offense_special_unarmed  # Chi Burst
         681: fly_monk_offense_special_unarmed
-        682: monk_defense_attack_unarmed
+        682: monk_defense_attack_unarmed  # Attack 1 (Brewmaster)
         683: fly_monk_defense_attack_unarmed
-        684: monk_defense_attack_unarmed_off
+        684: monk_defense_attack_unarmed_off  # Attack 2 (Brewmaster)
         685: fly_monk_defense_attack_unarmed_off
-        686: monk_defense_parry_unarmed
+        686: monk_defense_parry_unarmed  # Dodge (Brewmaster)
         687: fly_monk_defense_parry_unarmed
-        688: monk_defense_ready_unarmed
+        688: monk_defense_ready_unarmed  # Ready (Brewmaster)
         689: fly_monk_defense_ready_unarmed
-        690: monk_defense_special_unarmed
+        690: monk_defense_special_unarmed  # Attack 3 (Brewmaster)
         691: fly_monk_defense_special_unarmed
-        692: monk_heal_attack_unarmed
+        692: monk_heal_attack_unarmed  # Attack 1 (Mistweaver)
         693: fly_monk_heal_attack_unarmed
         694: monk_heal_attack_unarmed_off
         695: fly_monk_heal_attack_unarmed_off
-        696: monk_heal_parry_unarmed
+        696: monk_heal_parry_unarmed  # Attack 2 (Mistweaver)
         697: fly_monk_heal_parry_unarmed
-        698: monk_heal_ready_unarmed
+        698: monk_heal_ready_unarmed  # Ready (Mistweaver)
         699: fly_monk_heal_ready_unarmed
         700: monk_heal_special_unarmed
         701: fly_monk_heal_special_unarmed
-        702: flying_kick
+        702: flying_kick  # Flying Serpent Kick
         703: fly_flying_kick
-        704: flying_kick_start
+        704: flying_kick_start  # Flying Serpent Kick (Begin)
         705: fly_flying_kick_start
-        706: flying_kick_end
+        706: flying_kick_end  # Flying Serpent Kick (Land)
         707: fly_flying_kick_end
         708: crane_start
         709: fly_crane_start
@@ -719,27 +719,27 @@ enums:
         713: fly_crane_end
         714: despawned
         715: fly_despawned
-        716: thousand_fists
+        716: thousand_fists  # Fists of Fury
         717: fly_thousand_fists
-        718: monk_heal_ready_spell_directed
+        718: monk_heal_ready_spell_directed  # Ready (Mistweaver)
         719: fly_monk_heal_ready_spell_directed
-        720: monk_heal_ready_spell_omni
+        720: monk_heal_ready_spell_omni  # Ready (Mistweaver)
         721: fly_monk_heal_ready_spell_omni
-        722: monk_heal_spell_cast_directed
+        722: monk_heal_spell_cast_directed  # Cast 1 (Mistweaver)
         723: fly_monk_heal_spell_cast_directed
-        724: monk_heal_spell_cast_omni
+        724: monk_heal_spell_cast_omni  # Cast 2 (Mistweaver)
         725: fly_monk_heal_spell_cast_omni
-        726: monk_heal_channel_cast_directed
+        726: monk_heal_channel_cast_directed  # Channel 1 (Mistweaver)
         727: fly_monk_heal_channel_cast_directed
-        728: monk_heal_channel_cast_omni
+        728: monk_heal_channel_cast_omni  # Channel 2 (Mistweaver)
         729: fly_monk_heal_channel_cast_omni
-        730: torpedo
+        730: torpedo  # Chi Torpedo
         731: fly_torpedo
         732: meditate
         733: fly_meditate
         734: breath_of_fire
         735: fly_breath_of_fire
-        736: rising_sun_kick
+        736: rising_sun_kick  # Kick Flip
         737: fly_rising_sun_kick
         738: ground_kick
         739: fly_ground_kick
@@ -777,9 +777,9 @@ enums:
         771: fly_pet_battle_dead
         772: pet_battle_freeze
         773: fly_pet_battle_freeze
-        774: monk_offense_attack_weapon
+        774: monk_offense_attack_weapon  # Staff Attack (Monk)
         775: fly_monk_offense_attack_weapon
-        776: bar_tend_emote_wave
+        776: bar_tend_emote_wave  # Waiter (Talk)
         777: fly_bar_tend_emote_wave
         778: bar_server_emote_talk
         779: fly_bar_server_emote_talk
@@ -807,29 +807,29 @@ enums:
         801: fly_carrion_swarm
         802: wheel_loop
         803: fly_wheel_loop
-        804: stand_character_create
+        804: stand_character_create  # Idle
         805: fly_stand_character_create
-        806: mount_chopper
+        806: mount_chopper  # Mount (Motorcycle)
         807: fly_mount_chopper
-        808: face_pose
+        808: face_pose  # G-Pose
         809: fly_face_pose
-        810: combat_ablity_2h_big01
+        810: combat_ablity_2h_big01  # Great Attack 2 (2H)
         811: fly_combat_ablity_2h_big01
-        812: combat_ablity_2h_01
+        812: combat_ablity_2h_01  # Great Attack 3 (2H)
         813: fly_combat_ablity_2h_01
         814: combat_whirlwind
         815: fly_combat_whirlwind
         816: combat_charge_loop
         817: fly_combat_charge_loop
-        818: combat_ablity_1h_01
+        818: combat_ablity_1h_01  # Great Attack 2 (1H)
         819: fly_combat_ablity_1h_01
         820: combat_charge_end
         821: fly_combat_charge_end
-        822: combat_ablity_1h_02
+        822: combat_ablity_1h_02  # Great Attack 3 (1H)
         823: fly_combat_ablity_1h_02
-        824: combat_ablity_1h_big01
+        824: combat_ablity_1h_big01  # Great Attack 4 (1H)
         825: fly_combat_ablity_1h_big01
-        826: combat_ablity_2h_02
+        826: combat_ablity_2h_02  # Wake of Ashes
         827: fly_combat_ablity_2h_02
         828: sha_spell_precast_both
         829: fly_sha_spell_precast_both
@@ -845,7 +845,7 @@ enums:
         839: fly_load_crossbow
         840: attack_crossbow
         841: fly_attack_crossbow
-        842: hold_crossbow
+        842: hold_crossbow  # Aim (Gun/Crossbow)
         843: fly_hold_crossbow
         844: combat_ablity_2h_l01
         845: fly_combat_ablity_2h_l01
@@ -865,7 +865,7 @@ enums:
         859: fly_combat_leap_end
         860: sha_ready_spell_cast
         861: fly_sha_ready_spell_cast
-        862: sha_spell_precast_both_channel
+        862: sha_spell_precast_both_channel  # Shaman (Channel)
         863: fly_sha_spell_precast_both_channel
         864: sha_spell_cast_both_up
         865: fly_sha_spell_cast_both_up
@@ -877,7 +877,7 @@ enums:
         871: fly_sha_spell_cast_left_front_channel
         872: sha_spell_cast_right_front_channel
         873: fly_sha_spell_cast_right_front_channel
-        874: pri_ready_spell_cast
+        874: pri_ready_spell_cast  # Priest (Hover)
         875: fly_pri_ready_spell_cast
         876: pri_spell_precast_both
         877: fly_pri_spell_precast_both
@@ -923,7 +923,7 @@ enums:
         917: fly_mag_spell_cast_right_front_channel
         918: loc_ready_spell_cast
         919: fly_loc_ready_spell_cast
-        920: loc_spell_precast_both
+        920: loc_spell_precast_both  # Warlock (Ready)
         921: fly_loc_spell_precast_both
         922: loc_spell_precast_both_channel
         923: fly_loc_spell_precast_both_channel
@@ -965,17 +965,17 @@ enums:
         959: fly_dru_spell_cast_left_front_channel
         960: dru_spell_cast_right_front_channel
         961: fly_dru_spell_cast_right_front_channel
-        962: art_main_loop
+        962: art_main_loop  # Hold Artifact (Main Hand)
         963: fly_art_main_loop
-        964: art_dual_loop
+        964: art_dual_loop  # Hold Artifact (Dual)
         965: fly_art_dual_loop
-        966: art_fists_loop
+        966: art_fists_loop  # Hold Artifact (Fists)
         967: fly_art_fists_loop
-        968: art_bow_loop
+        968: art_bow_loop  # Hold Artifact (Bow)
         969: fly_art_bow_loop
-        970: combat_ablity_1h_01off
+        970: combat_ablity_1h_01off  # Great Attack 5 (1H)
         971: fly_combat_ablity_1h_01off
-        972: combat_ablity_1h_02off
+        972: combat_ablity_1h_02off  # Great Attack 6 (1H)
         973: fly_combat_ablity_1h_02off
         974: combat_furious_strike01
         975: fly_combat_furious_strike01
@@ -997,77 +997,77 @@ enums:
         991: fly_dh_combat_run
         992: combat_shield_bash
         993: fly_combat_shield_bash
-        994: combat_throw
+        994: combat_throw  # Rogue (Throw)
         995: fly_combat_throw
-        996: combat_ablity_1h_pierce
+        996: combat_ablity_1h_pierce  # Rogue (Stab Right)
         997: fly_combat_ablity_1h_pierce
-        998: combat_ablity_1h_off_pierce
+        998: combat_ablity_1h_off_pierce  # Rogue (Stab Left)
         999: fly_combat_ablity_1h_off_pierce
-        1000: combat_mutilate
+        1000: combat_mutilate  # Rogue (Stab Both)
         1001: fly_combat_mutilate
-        1002: combat_blade_storm
+        1002: combat_blade_storm  # Rogue (Fan of Blades)
         1003: fly_combat_blade_storm
-        1004: combat_finishing_move
+        1004: combat_finishing_move  # Heroic Leap (End)
         1005: fly_combat_finishing_move
-        1006: combat_leap_start
+        1006: combat_leap_start  # Heroic Leap (Begin)
         1007: fly_combat_leap_start
-        1008: glv_throw_main
+        1008: glv_throw_main  # Demon Hunter (Glaive Right)
         1009: fly_glv_throw_main
-        1010: glv_thrown_off
+        1010: glv_thrown_off  # Demon Hunter (Glaive Left)
         1011: fly_glv_thrown_off
-        1012: dh_combat_sprint
+        1012: dh_combat_sprint  # Demon Hunter (Ready Run)
         1013: fly_dh_combat_sprint
-        1014: combat_ability_glv01
+        1014: combat_ability_glv01  # Demon Hunter (Throw Glaive Right)
         1015: fly_combat_ability_glv01
         1016: combat_ability_glv02
         1017: fly_combat_ability_glv02
-        1018: combat_ability_glv_off01
+        1018: combat_ability_glv_off01  # Demon Hunter (Throw Glaive Left)
         1019: fly_combat_ability_glv_off01
         1020: combat_ability_glv_off02
         1021: fly_combat_ability_glv_off02
-        1022: combat_ability_glv_big01
+        1022: combat_ability_glv_big01  # Demon Hunter (Jump Slash Right 1)
         1023: fly_combat_ability_glv_big01
-        1024: combat_ability_glv_big02
+        1024: combat_ability_glv_big02  # Demon Hunter (Jump Slash Right 2)
         1025: fly_combat_ability_glv_big02
-        1026: ready_glv
+        1026: ready_glv  # Demon Hunter (Ready)
         1027: fly_ready_glv
-        1028: combat_ability_glv_big03
+        1028: combat_ability_glv_big03  # Demon Hunter (Jump and Pound)
         1029: fly_combat_ability_glv_big03
-        1030: double_jump_start
+        1030: double_jump_start  # Demon Hunter (Double Jump)
         1031: fly_double_jump_start
-        1032: double_jump
+        1032: double_jump  # Demon Hunter (Fall)
         1033: fly_double_jump
-        1034: combat_eviscerate
+        1034: combat_eviscerate  # Great Attack 1 (Dual)
         1035: fly_combat_eviscerate
         1036: double_jump_land_run
         1037: fly_double_jump_land_run
-        1038: back_flip_start
+        1038: back_flip_start  # Demon Hunter (Eye Beam Begin)
         1039: fly_back_flip_start
-        1040: back_flip_loop
+        1040: back_flip_loop  # Demon Hunter (Eye Beam)
         1041: fly_back_flip_loop
-        1042: fel_rush_loop
+        1042: fel_rush_loop  # Demon Hunter (Ready Run)
         1043: fly_fel_rush_loop
-        1044: fel_rush_end
+        1044: fel_rush_end  # Demon Hunter (Plant Sigil)
         1045: fly_fel_rush_end
         1046: dh_to_altered_start
         1047: fly_dh_to_altered_start
         1048: dh_to_altered_end
         1049: fly_dh_to_altered_end
-        1050: dh_glide
+        1050: dh_glide  # Demon Hunter (Glide)
         1051: fly_dh_glide
         1052: fan_of_knives
         1053: fly_fan_of_knives
-        1054: single_jump_start
+        1054: single_jump_start  # Demon Hunter (Jump Begin)
         1055: fly_single_jump_start
-        1056: dh_blade_dance1
+        1056: dh_blade_dance1  # Demon Hunter (Blade Dance 1)
         1057: fly_dh_blade_dance1
-        1058: dh_blade_dance2
+        1058: dh_blade_dance2  # Demon Hunter (Blade Dance 2)
         1059: fly_dh_blade_dance2
-        1060: dh_blade_dance3
+        1060: dh_blade_dance3  # Demon Hunter (Blade Dance 3)
         1061: fly_dh_blade_dance3
-        1062: dh_meteor_strike
+        1062: dh_meteor_strike  # Demon Hunter (Blade Dance 4)
         1063: fly_dh_meteor_strike
-        1064: combat_execute
+        1064: combat_execute  # Great Attack 2 (Dual)
         1065: fly_combat_execute
         1066: art_loop
         1067: fly_art_loop
@@ -1077,13 +1077,13 @@ enums:
         1071: fly_combat_unarmed02
         1072: combat_pistol_shot
         1073: fly_combat_pistol_shot
-        1074: combat_pistol_shot_off
+        1074: combat_pistol_shot_off  # Rogue (Pistol Shot)
         1075: fly_combat_pistol_shot_off
-        1076: monk_2h_l_idle
+        1076: monk_2h_l_idle  # Hold Staff on Shoulder (Fu Zan)
         1077: fly_monk_2h_l_idle
-        1078: art_shield_loop
+        1078: art_shield_loop  # Hold Artifact (Shield)
         1079: fly_art_shield_loop
-        1080: combat_ablity_2h_03
+        1080: combat_ablity_2h_03  # Spin Attack 1
         1081: fly_combat_ablity_2h_03
         1082: combat_stomp
         1083: fly_combat_stomp
@@ -1091,12 +1091,12 @@ enums:
         1085: fly_combat_roar
         1086: pal_ready_spell_cast
         1087: fly_pal_ready_spell_cast
-        1088: pal_spell_precast_right
+        1088: pal_spell_precast_right  # Paladin (Channel Book)
         1089: fly_pal_spell_precast_right
         1090: pal_spell_precast_right_channel
         1091: fly_pal_spell_precast_right_channel
         1092: pal_spell_cast_right_front
-        1093: fly_pal_spell_cast_right_front
+        1093: fly_pal_spell_cast_right_front  # Paladin (Cast Book)
         1094: sha_spell_cast_both_out
         1095: fly_sha_spell_cast_both_out
         1096: attack_weapon
@@ -1105,9 +1105,9 @@ enums:
         1099: fly_ready_weapon
         1100: attack_weapon_off
         1101: fly_attack_weapon_off
-        1102: special_dual
+        1102: special_dual  # Spin Attack 2
         1103: fly_special_dual
-        1104: dk_cast_1h_front
+        1104: dk_cast_1h_front  # Death Knight (Cast)
         1105: fly_dk_cast_1h_front
         1106: cast_strong_right
         1107: fly_cast_strong_right
@@ -1131,23 +1131,23 @@ enums:
         1125: fly_drum_loop
         1126: parry_weapon
         1127: fly_parry_weapon
-        1128: ready_fl
+        1128: ready_fl  # Ready (1H)
         1129: fly_ready_fl
-        1130: attack_fl
+        1130: attack_fl  # Attack Up (1H)
         1131: fly_attack_fl
-        1132: attack_floff
+        1132: attack_floff  # Attack Forward (1H)
         1133: fly_attack_floff
-        1134: parry_fl
+        1134: parry_fl  # Block (Shield)
         1135: fly_parry_fl
-        1136: special_fl
+        1136: special_fl  # Spin Attack 1
         1137: fly_special_fl
-        1138: pri_hover_forward
+        1138: pri_hover_forward  # Priest (Hover)
         1139: fly_pri_hover_forward
-        1140: pri_hover_backward
+        1140: pri_hover_backward  # Priest (Hover Backwards)
         1141: fly_pri_hover_backward
-        1142: pri_hover_right
+        1142: pri_hover_right  # Priest (Hover Right)
         1143: fly_pri_hover_right
-        1144: pri_hover_left
+        1144: pri_hover_left  # Priest (Hover Left)
         1145: fly_pri_hover_left
         1146: run_backwards
         1147: fly_run_backwards
@@ -1171,21 +1171,21 @@ enums:
         1165: fly_wa_drunk_wound
         1166: wa_drunk_talk
         1167: fly_wa_drunk_talk
-        1168: wa_trance01
+        1168: wa_trance01  # Chant Standing 1 (troll only)
         1169: fly_wa_trance01
         1170: wa_trance02
         1171: fly_wa_trance02
-        1172: wa_chant01
+        1172: wa_chant01  # Chant Kneeling (troll only)
         1173: fly_wa_chant01
-        1174: wa_chant02
+        1174: wa_chant02  # Chant Bowing (troll only)
         1175: fly_wa_chant02
-        1176: wa_chant03
+        1176: wa_chant03  # Chant (troll only)
         1177: fly_wa_chant03
-        1178: wa_hang01
+        1178: wa_hang01  # Hanging by Arms
         1179: fly_wa_hang01
-        1180: wa_hang02
+        1180: wa_hang02  # Hanging by Arms and Screaming (troll only)
         1181: fly_wa_hang02
-        1182: wa_summon01
+        1182: wa_summon01#  # Chant Standing 2 (troll only)
         1183: fly_wa_summon01
         1184: wa_summon02
         1185: fly_wa_summon02
@@ -1197,37 +1197,37 @@ enums:
         1191: fly_wa_beggar_point
         1192: wa_beggar_beg
         1193: fly_wa_beggar_beg
-        1194: wa_sit01
+        1194: wa_sit01  # Sit Special 1
         1195: fly_wa_sit01
-        1196: wa_sit02
+        1196: wa_sit02  # Sit Special 2
         1197: fly_wa_sit02
-        1198: wa_sit03
+        1198: wa_sit03  # Sit Special 3
         1199: fly_wa_sit03
-        1200: wa_crier_stand01
+        1200: wa_crier_stand01  # Crier (Idle)
         1201: fly_wa_crier_stand01
-        1202: wa_crier_stand02
+        1202: wa_crier_stand02  # Crier (Ring Bell)
         1203: fly_wa_crier_stand02
         1204: wa_crier_stand03
         1205: fly_wa_crier_stand03
-        1206: wa_crier_talk
+        1206: wa_crier_talk  # Crier (Read)
         1207: fly_wa_crier_talk
-        1208: wa_crate_hold
+        1208: wa_crate_hold  # Hold (Front)
         1209: fly_wa_crate_hold
-        1210: wa_barrel_hold
+        1210: wa_barrel_hold  # Hold (Shoulder)
         1211: fly_wa_barrel_hold
-        1212: wa_sack_hold
+        1212: wa_sack_hold  # Rest on Shoulder
         1213: fly_wa_sack_hold
-        1214: wa_wheel_barrow_stand
+        1214: wa_wheel_barrow_stand  # Wheelbarrow (Idle)
         1215: fly_wa_wheel_barrow_stand
-        1216: wa_wheel_barrow_walk
+        1216: wa_wheel_barrow_walk  # Wheelbarrow (Walk)
         1217: fly_wa_wheel_barrow_walk
         1218: wa_wheel_barrow_run
         1219: fly_wa_wheel_barrow_run
-        1220: wa_hammer_loop
+        1220: wa_hammer_loop  # Hammer on Wall
         1221: fly_wa_hammer_loop
-        1222: wa_crank_loop
+        1222: wa_crank_loop  # Row (Both)
         1223: fly_wa_crank_loop
-        1224: wa_pour_start
+        1224: wa_pour_start  # Pour (Begin)
         1225: fly_wa_pour_start
         1226: wa_pour_loop
         1227: fly_wa_pour_loop
@@ -1251,9 +1251,9 @@ enums:
         1245: fly_wa_guard_stand03
         1246: wa_guard_stand04
         1247: fly_wa_guard_stand04
-        1248: wa_freezing01
+        1248: wa_freezing01  # Carve
         1249: fly_wa_freezing01
-        1250: wa_freezing02
+        1250: wa_freezing02  # Stir
         1251: fly_wa_freezing02
         1252: wa_vendor_stand01
         1253: fly_wa_vendor_stand01
@@ -1265,7 +1265,7 @@ enums:
         1259: fly_wa_vendor_talk
         1260: wa_lean01
         1261: fly_wa_lean01
-        1262: wa_lean02
+        1262: wa_lean02  # Scrub
         1263: fly_wa_lean02
         1264: wa_lean03
         1265: fly_wa_lean03
@@ -1287,9 +1287,9 @@ enums:
         1281: fly_wa_perch02
         1282: hold_weapon
         1283: fly_hold_weapon
-        1284: wa_barrel_walk
+        1284: wa_barrel_walk  # Hold (Shoulder Walk)
         1285: fly_wa_barrel_walk
-        1286: wa_pour_hold
+        1286: wa_pour_hold  # Hold (Jug)
         1287: fly_wa_pour_hold
         1288: cast_strong
         1289: fly_cast_strong
@@ -1303,7 +1303,7 @@ enums:
         1297: fly_wa_boat_wheel_stand
         1298: wa_smith_stand
         1299: fly_wa_smith_stand
-        1300: wa_crank_stand
+        1300: wa_crank_stand  # Row (Both Idle)
         1301: fly_wa_crank_stand
 
         # starting with 7.3.0.24781
@@ -1333,17 +1333,17 @@ enums:
         1323: fly_combat_ability_dual_wield01
 
         # Starting with 8.0.1.25902
-        1324: wa_cradle01
+        1324: wa_cradle01  # Hold (Sack or Baby)
         1325: fly_wa_cradle01
 
         # Starting with 8.0.1.25976
-        1326: loc_summon
+        1326: loc_summon  # Warlock (Summon)
         1327: fly_loc_summon
         1328: load_weapon
         1329: fly_load_weapon
 
         # Starting with 8.0.1.26131
-        1330: art_off_loop
+        1330: art_off_loop  # Hold Artifact (Offhand) (Used for Heart of Azeroth)
         1331: fly_art_off_loop
 
         # Starting with 8.0.1.26476
@@ -1405,13 +1405,13 @@ enums:
         1385: fly_bar_patron_custom_spell02
         1386: bar_patron_custom_spell03
         1387: fly_bar_patron_custom_spell03
-        1388: hold_dart
+        1388: hold_dart  # Throw Weapon (Ready)
         1389: fly_hold_dart
         1390: ready_dart
         1391: fly_ready_dart
-        1392: attack_dart
+        1392: attack_dart  # Throw Weapon
         1393: fly_attack_dart
-        1394: load_dart
+        1394: load_dart  # Throw Weapon (Reload)
         1395: fly_load_dart
         1396: wa_dart_target_stand
         1397: fly_wa_dart_target_stand
@@ -1461,9 +1461,9 @@ enums:
         1441: fly_wa_scribe_end
         1442: wa_emote_scribe
         1443: fly_wa_emote_scribe
-        1444: haymaker
+        1444: haymaker  # Haymaker (Kul Tiran only)
         1445: fly_haymaker
-        1446: haymaker_precast
+        1446: haymaker_precast  # Haymaker (Windup) (Kul Tiran only)
         1447: fly_haymaker_precast
         1448: channel_cast_omni_up
 
