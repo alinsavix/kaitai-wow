@@ -1185,7 +1185,7 @@ enums:
         1179: fly_wa_hang01
         1180: wa_hang02  # Hanging by Arms and Screaming (troll only)
         1181: fly_wa_hang02
-        1182: wa_summon01#  # Chant Standing 2 (troll only)
+        1182: wa_summon01  # Chant Standing 2 (troll only)
         1183: fly_wa_summon01
         1184: wa_summon02
         1185: fly_wa_summon02

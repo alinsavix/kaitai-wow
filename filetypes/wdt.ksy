@@ -19,7 +19,7 @@ meta:
 seq:
     # This shooooould always be first
     - id: mvermagic
-      contents: "MVER"  # MVER backwards
+      contents: "REVM"  # MVER backwards
     - id: chunksize  # We know the size, no need to store it
       type: u4
 
@@ -60,7 +60,6 @@ types:
                     '"PVPD"': chunk_pvpd
                     '"MAOI"': chunk_maoi
                     '"MAOH"': chunk_maoh
-
 
                     _: noop
 
