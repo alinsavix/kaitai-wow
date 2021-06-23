@@ -19,7 +19,7 @@ meta:
 seq:
     # This shooooould always be first
     - id: mvermagic
-      contents: "REVM"  # MVER backwards
+      contents: "MVER"  # MVER backwards
     - id: chunksize  # We know the size, no need to store it
       type: u4
 
@@ -38,7 +38,7 @@ types:
 
     wdt_chunk:
         seq:
-            - id: chunk_type
+            - id: chunk_type_raw
               type: str
               size: 4
               encoding: UTF-8
@@ -47,42 +47,23 @@ types:
             - id: chunk_data
               size: chunk_size
               type:
-                  switch-on: chunk_type
+                  switch-on: chunk_type_raw.reverse
                   cases:
-                    '"DHPM"': chunk_mphd
-                    '"NIAM"': chunk_main
-                    '"DIAM"': chunk_maid
-                    '"3LPM"': chunk_mpl3
-                    '"TLSM"': chunk_mslt
-                    '"ATLM"': chunk_mlta
-                    '"IMVP"': chunk_pvmi
-                    '"DBVP"': chunk_pvbd
-                    '"DPVP"': chunk_pvpd
-                    '"IOAM"': chunk_maoi
-                    '"HOAM"': chunk_maoh
-                    # '"NGOM"': chunk_mogn
-                    # '"IGOM"': chunk_mogi
-                    # '"VPOM"': chunk_mopv
-                    # '"TPOM"': chunk_mopt
-                    # '"RPOM"': chunk_mopr
-                    # '"TLOM"': chunk_molt
-                    # '"SDOM"': chunk_mods
-                    # '"IDOM"': chunk_modi
-                    # '"DDOM"': chunk_modd
-                    # '"GOFM"': chunk_mfog
-                    # '"DIFG"': chunk_gfid
-                    # '"PGOM"': chunk_mogp
-                    # '"YPOM"': chunk_mopy
-                    # '"IVOM"': chunk_movi
-                    # '"TVOM"': chunk_movt
-                    # '"RNOM"': chunk_monr
-                    # '"VTOM"': chunk_motv
-                    # '"ABOM"': chunk_moba
-                    # '"SBOM"': chunk_mobs
-                    # '"RDOM"': chunk_modr
-                    # '"NBOM"': chunk_mobn
-                    # '"RBOM"': chunk_mobr
-                    # '"VCOM"': chunk_mocv
-                    # '"LADM"': chunk_mdal
+                    '"MPHD"': chunk_mphd
+                    '"MAIN"': chunk_main
+                    '"MAID"': chunk_maid
+                    '"MPL3"': chunk_mpl3
+                    '"MSLT"': chunk_mslt
+                    '"MLTA"': chunk_mlta
+                    '"PVMI"': chunk_pvmi
+                    '"PVBD"': chunk_pvbd
+                    '"PVPD"': chunk_pvpd
+                    '"MAOI"': chunk_maoi
+                    '"MAOH"': chunk_maoh
+
 
                     _: noop
+
+        instances:
+            chunk_type:
+                value: chunk_type_raw.reverse

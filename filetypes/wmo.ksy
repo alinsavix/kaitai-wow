@@ -18,7 +18,7 @@ meta:
 seq:
     # This shooooould always be first
     - id: mvermagic
-      contents: "REVM"  # MVER backwards
+      contents: "REVM" # MVER backwards
     - id: chunksize  # We know the size, no need to store it
       type: u4
 
@@ -37,7 +37,7 @@ types:
 
     wmo_chunk:
         seq:
-            - id: chunk_type
+            - id: chunk_type_raw
               type: str
               size: 4
               encoding: UTF-8
@@ -46,33 +46,37 @@ types:
             - id: chunk_data
               size: chunk_size
               type:
-                  switch-on: chunk_type
+                  switch-on: chunk_type_raw.reverse
                   cases:
-                    '"DHOM"': chunk_mohd
-                    '"TMOM"': chunk_momt
-                    '"NGOM"': chunk_mogn
-                    '"IGOM"': chunk_mogi
-                    '"VPOM"': chunk_mopv
-                    '"TPOM"': chunk_mopt
-                    '"RPOM"': chunk_mopr
-                    '"TLOM"': chunk_molt
-                    '"SDOM"': chunk_mods
-                    '"IDOM"': chunk_modi
-                    '"DDOM"': chunk_modd
-                    '"GOFM"': chunk_mfog
-                    '"DIFG"': chunk_gfid
-                    '"PGOM"': chunk_mogp
-                    '"YPOM"': chunk_mopy
-                    '"IVOM"': chunk_movi
-                    '"TVOM"': chunk_movt
-                    '"RNOM"': chunk_monr
-                    '"VTOM"': chunk_motv
-                    '"ABOM"': chunk_moba
-                    '"SBOM"': chunk_mobs
-                    '"RDOM"': chunk_modr
-                    '"NBOM"': chunk_mobn
-                    '"RBOM"': chunk_mobr
-                    '"VCOM"': chunk_mocv
-                    '"LADM"': chunk_mdal
+                    '"MOHD"': chunk_mohd
+                    '"MOMT"': chunk_momt
+                    '"MOGN"': chunk_mogn
+                    '"MOGI"': chunk_mogi
+                    '"MOPV"': chunk_mopv
+                    '"MOPT"': chunk_mopt
+                    '"MOPR"': chunk_mopr
+                    '"MOLT"': chunk_molt
+                    '"MODS"': chunk_mods
+                    '"MODI"': chunk_modi
+                    '"MODD"': chunk_modd
+                    '"MFOG"': chunk_mfog
+                    '"GFID"': chunk_gfid
+                    '"MOGP"': chunk_mogp
+                    '"MOPY"': chunk_mopy
+                    '"MOVI"': chunk_movi
+                    '"MOVT"': chunk_movt
+                    '"MONR"': chunk_monr
+                    '"MOTV"': chunk_motv
+                    '"MOBA"': chunk_moba
+                    '"MOBS"': chunk_mobs
+                    '"MODR"': chunk_modr
+                    '"MOBN"': chunk_mobn
+                    '"MOBR"': chunk_mobr
+                    '"MOCV"': chunk_mocv
+                    '"MDAL"': chunk_mdal
 
                     _: noop
+
+        instances:
+            chunk_type:
+                value: chunk_type_raw.reverse
