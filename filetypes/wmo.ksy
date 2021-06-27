@@ -31,9 +31,11 @@ seq:
       repeat: eos
 
 
-
 types:
-    noop: {}
+    noop:
+        instances:
+            unknown_chunk:
+                value: true
 
     wmo_chunk:
         seq:
@@ -74,6 +76,7 @@ types:
                     '"MOBR"': chunk_mobr
                     '"MOCV"': chunk_mocv
                     '"MDAL"': chunk_mdal
+                    '"MLIQ"': chunk_mliq
 
                     _: noop
 
