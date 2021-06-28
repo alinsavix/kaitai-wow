@@ -1,3 +1,57 @@
+enums:
+    momt_shaders:
+        0:
+            id: diffuse
+        1:
+            id: specular
+        2:
+            id: metal
+        3:
+            id: env
+        4:
+            id: opaque
+        5:
+            id: env_metal
+        6:
+            id: two_layer_diffuse
+        7:
+            id: two_layer_env_metal
+        8:
+            id: two_layer_terrain
+            doc: "automatically adds _s in the filename of second texture"
+        9:
+            id: diffuse_emissive
+        10:
+            id: water_window
+            doc: "FFX instead of normal material. SH_WATERWINDOW automatically generates MOTA"
+        11:
+            id: masked_env_metal
+        12:
+            id: env_metal_emissive
+        13:
+            id: two_layer_diffuse_opaque
+        14:
+            id: submarine_window
+            doc: "FFX instead of normal material. SH_SUBMARINEWINDOW automatically generates MOTA"
+        15:
+            id: two_layer_diffuse_emissive
+        16:
+            id: diffuse_terrain
+            doc: "SH_DIFFUSE_TERRAIN -- blend material -- used for blending WMO with terrain (dynamic blend batches)"
+        17:
+            id: additive_masked_env_metal
+        18:
+            id: two_layer_diffuse_mod_2x
+        19:
+            id: two_layer_diffuse_mod2x_n_a
+        20:
+            id: two_layer_diffuse_alpha
+        21:
+            id: lod
+        22:
+            id: parallax
+            doc: "SH_PARALLAX_ICE"
+
 types:
     momt_flags:
         seq:
@@ -38,6 +92,7 @@ types:
               type: momt_flags
             - id: shader
               type: u4
+              enum: momt_shaders
             - id: blend_mode
               type: u4
             - id: texture_1  # FIXME: Is this still an appropriate name?

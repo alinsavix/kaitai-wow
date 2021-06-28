@@ -459,6 +459,11 @@ interpolation_type_re = re.compile(r'''
     interpolation_type$
 ''', re.VERBOSE)
 
+# FIXME: this could be way, way better
+wmo_shader_re = re.compile(r'''
+    ^/chunks/\d+/chunk_data/materials/\d/shader$
+''', re.VERBOSE)
+
 # simplify_4bone
 fourbone_re = re.compile(r'''
     ^/model/vertices/\d+/(bone_indices|bone_weights)$
@@ -591,6 +596,7 @@ simplifications = [
     (wmomat_rgba_re, simplify_irgba),
     (wmomat_vertex_rgba_re, simplify_irgba),
     (wmomat_header_rgba_re, simplify_irgba),
+    (wmo_shader_re, simplify_enum),
 ]
 
 def check_simplify(path: str):
