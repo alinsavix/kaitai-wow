@@ -82,6 +82,8 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
+# Dependencies
+.deps/*
 
 # Stuff that might actually be kaitai-wow specific.     WOW!
 listfile.csv
@@ -91,3 +93,5 @@ listfile.csv
 
 *.cache
 output/
+
+!.notempty

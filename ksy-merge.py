@@ -303,6 +303,31 @@ def parse_arguments():
     parser.add_argument("-v", "--verbose", action="count", default=0)
 
     parser.add_argument(
+        "--deps-file",
+        type=str,
+        default=None,
+
+        help="file to output dependency information to",
+    )
+
+    parser.add_argument(
+        "--deps-target",
+        type=str,
+        default=None,
+
+        help="target name to use for created dependency,"
+    )
+
+    parser.add_argument(
+        "--deps-only",
+        action="store_true",
+        default=False,
+
+        help="only generate dependencies, don't output merged file",
+    )
+
+
+    parser.add_argument(
         "files",
         help="specify files or directories to process",
         metavar="files",
@@ -311,6 +336,10 @@ def parse_arguments():
     )
 
     parsed_args = parser.parse_args()
+
+    if parsed_args.deps_target is None:
+        parsed_args.deps_target = parsed_args.files[0]
+
     return parsed_args
 
 
@@ -327,11 +356,19 @@ def main():
         recurse_merge(data, f)
 
     dict_descent(data, False, data)
+
     # The kaitai IDE can't cope with yaml multiline strings, so width=9999
     # will stop it from wrapping those lines when processing long heredocs
-    print(yaml.dump(data, width=9999))
-    # log(ppretty(data, depth=99, seq_length=50))
+    if not args.deps_only:
+        print(yaml.dump(data, width=9999))
+        # log(ppretty(data, depth=99, seq_length=50))
 
+    if args.deps_file is not None:
+        with open(args.deps_file, "w") as f:
+            # FIXME: using a global sucks. don't use a global
+            handled = " \\\n    ".join(paths_handled)
+            print(f"{args.deps_target}: \\", file=f)
+            print("    " + handled, file=f)
 
 if __name__ == "__main__":
     sys.exit(main())
