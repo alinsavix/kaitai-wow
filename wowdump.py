@@ -477,6 +477,10 @@ unused_re = re.compile(r'''
     unused\d*$
 ''', re.VERBOSE)
 
+raw_chunk_re = re.compile(r'''
+    chunk_type_raw$
+''', re.VERBOSE)
+
 def simplify_remove(d, _):
     return None
 
@@ -597,6 +601,7 @@ simplifications = [
     (wmomat_vertex_rgba_re, simplify_irgba),
     (wmomat_header_rgba_re, simplify_irgba),
     (wmo_shader_re, simplify_enum),
+    (raw_chunk_re, simplify_remove),
 ]
 
 def check_simplify(path: str):
