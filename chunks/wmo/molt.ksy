@@ -20,7 +20,7 @@ types:
             - id: type
               type: u1
               enum: wmo_light_types
-            - id: use_atten
+            - id: use_attenuation
               type: u1
             - id: unknown1
               type: u2
@@ -34,7 +34,7 @@ types:
               type: f4
               repeat: expr
               repeat-expr: 4
-            - id: atten_start
+            - id: attenuation_start
               type: f4
-            - id: atten_end
+            - id: attenuation_end
               type: f4
