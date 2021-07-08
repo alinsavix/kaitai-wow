@@ -461,7 +461,7 @@ interpolation_type_re = re.compile(r'''
 
 # FIXME: this could be way, way better
 wmo_shader_re = re.compile(r'''
-    ^/chunks/\d+/chunk_data/materials/\d/shader$
+    ^/chunks/\d+/chunk_data/materials/\d+/shader$
 ''', re.VERBOSE)
 
 # simplify_4bone
