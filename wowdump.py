@@ -305,6 +305,19 @@ def csv_getfileid(id: int):
     return False
 
 
+# There's probably a way better way to do this.
+# filter_regex_cache = { }
+# def regex_cache(re_str):
+#     if not re_str.startswith("/") or not re_str.endswith("/"):
+#         return None
+
+#     if re_str in filter_regex_cache:
+#         return filter_regex_cache[re_str]
+
+#     re_compiled = re.compile(re_str, re.IGNORECASE)
+#     filter_regex_cache[re_str] = re_compiled
+#     return re_compiled
+
 # rudamentary filtering
 #
 # behavior depends on whether keep or discard filters are provided,
@@ -322,12 +335,20 @@ def check_filtered(path: str) -> bool:
     # don't care after that.
     if len(args.filters_keep) > 0:
         for filter in args.filters_keep:
+            # r = regex_cache(filter)
+            # if r and r.search(path):
+            #     return False
+
             # print(f"check filter {filter} vs {path}")
             if path.startswith(filter):
                 return False
 
     if len(args.filters_discard):
         for filter in args.filters_discard:
+            # r = regex_cache(filter)
+            # if r and r.search(path):
+            #     return True
+
             if path.startswith(filter):
                 return True
 
@@ -814,6 +835,7 @@ def parse_arguments():
     # args.filters = [item for subl in args.filters for item in subl]
     # prep our filters
     for filter in [item for subl in args.filters for item in subl]:
+        # args.arraylimit = 0  # can't have an array limit when filtering right now
         if filter.startswith("!"):
             args.filters_discard.append(filter.lstrip("!"))
         else:
