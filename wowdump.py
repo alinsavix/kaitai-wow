@@ -1051,8 +1051,8 @@ def parse_arguments():
     parser.add_argument(
         "files",
         action='store',
-        nargs='*',
-        # default=[],
+        nargs='+',
+        default=[],
         help="input file to be processed",
     )
 
