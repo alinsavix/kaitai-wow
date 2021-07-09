@@ -95,25 +95,25 @@ types:
               enum: momt_shaders
             - id: blend_mode
               type: u4
-            - id: texture_1  # FIXME: Is this still an appropriate name?
+            - id: texture1_file_data_id
               type: u4
             - id: sidn_color
               type: cimvector
             - id: frame_sidn_color
               type: cimvector
 
-            - id: texture_2
+            - id: texture2_file_data_id
               type: u4
             - id: diff_color
               type: cargb
             - id: foreign_key
               type: u4  # FIXME: Is this right?
 
-            - id: texture_3
+            - id: texture3_file_data_id
               type: u4
-            - id: color_2
+            - id: color2
               type: u4
-            - id: flags_2
+            - id: flags2
               type: u4  # FIXME: should this use the flag type above?
             - id: runtime_data
               type: u4
