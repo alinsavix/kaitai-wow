@@ -126,7 +126,7 @@ types:
 
             # alternate name "texture_indices_by_id"
             - id: texture_replaceable_lookup
-              type: m2array<u2>
+              type: m2array<s2>
 
             # blending modes / render flags
             - id: materials

@@ -13,7 +13,7 @@ meta:
         - chunks/skel
 
 seq:
-    - id: chunks
+    - id: skel
       type: skel_chunk
       repeat: until
       repeat-until: _io.eof
