@@ -375,19 +375,35 @@ def check_filtered(path: str) -> bool:
 # this works. For now. Until it offends my sight just a little too much
 # and gets torn out by the roots (just like my hair)   --A
 attachment_pos_re = re.compile(r'''
-    ^/model/attachments/\d+/position$
+    /attachments/\d+/position$
 ''', re.VERBOSE)
 
 bone_pivot_re = re.compile(r'''
-    ^/model/bones/\d+/pivot$
+    /bones/\d+/pivot$
 ''', re.VERBOSE)
 
 bone_rot_re = re.compile(r'''
-    ^/model/bones/\d+/rotation/values/values/\d+/values/\d+$
+    /bones/\d+/rotation/values/values/\d+/values/\d+$
 ''', re.VERBOSE)
 
 bone_xlate_re = re.compile(r'''
-    ^/model/bones/\d+/translation/values/values/\d+/values/\d+$
+    /bones/\d+/translation/values/values/\d+/values/\d+$
+''', re.VERBOSE)
+
+bone_scale_re = re.compile(r'''
+    /bones/\d+/scale/values/values/\d+/values/\d+$
+''', re.VERBOSE)
+
+skin_pos_re = re.compile(r'''
+    /submeshes/\d+/(sort_)?center_position$
+''', re.VERBOSE)
+
+camera_pos_re = re.compile(r'''
+    /cameras/\d+/(target_)?position_base$
+''', re.VERBOSE)
+
+collision_pos_re = re.compile(r'''
+    /collision_(face_normals|positions)/\d+$
 ''', re.VERBOSE)
 
 flags_re = re.compile(r'''
@@ -435,7 +451,7 @@ wmomat_header_rgba_re = re.compile(r'''
 ''', re.VERBOSE)
 
 seq_bbox_re = re.compile(r'''
-    ^/model/sequences/\d+/bounds/extent/(min|max)$
+    /sequences/\d+/bounds/extent/(min|max)$
 ''', re.VERBOSE)
 
 verts_vec_re = re.compile(r'''
@@ -598,6 +614,10 @@ simplifications = [
     (bone_pivot_re, simplify_xyz),
     (bone_rot_re, simplify_wxyz),
     (bone_xlate_re, simplify_xyz),
+    (bone_scale_re, simplify_xyz),
+    (skin_pos_re, simplify_xyz),
+    (camera_pos_re, simplify_xyz),
+    (collision_pos_re, simplify_xyz),
     (flags_re, simplify_flags),
     (bbox_re, simplify_xyz),
     (events_pos_re, simplify_xyz),
@@ -636,6 +656,17 @@ def check_simplify(path: str):
     return None
 
 
+# Given a path, check to see if it's one we want to normally elide (because
+# it's geometry-related and thus probably really long and spammy with minimal
+# value).
+#
+# FIXME: It'd be great if we didn't have to maintain the regex list by hand.
+geom_path_re = re.compile(r"/(model|chunk_data)/(polys|indices|vertices|normals|tex_coords|bspnodes|vertex_colors|node_face_indices)/\d+$")
+
+def geometry_path(path):
+    if geom_path_re.search(path):
+        return True
+
 # FIXME: Can we manage the cache better than jut passing cachecon around?
 def pathdump(d, path: str, cachecon) -> None:
     # This is kind of a lame way to get a loop that handles both lists
@@ -650,7 +681,8 @@ def pathdump(d, path: str, cachecon) -> None:
         if eject:
             return
 
-        if isinstance(d, list) and args.arraylimit > 0 and k >= args.arraylimit:
+        if isinstance(d, list) and (args.elide_all or geometry_path(f"{path}/{k}")) \
+            and args.arraylimit > 0 and k >= args.arraylimit:
             remaining = len(d) - args.arraylimit
             print(f"{path}/... = [{remaining-1} elided of {len(d)} total]")
             k = things[-1]
@@ -779,7 +811,7 @@ def parse_arguments():
         default=[],
         action='append',
         nargs="+",
-        help="filter results by path (can be used multiple times)"
+        help="filter results by path (can be used multiple times)",
     )
 
     # These next two aren't intended to be used by the user, just to make
@@ -803,7 +835,7 @@ def parse_arguments():
         action='store',
         type=int,
         default=6,
-        help="decimal digits to include on simplified floats"
+        help="decimal digits to include on simplified floats",
     )
 
     parser.add_argument(
@@ -812,6 +844,13 @@ def parse_arguments():
         type=int,
         default=25,
         help="elide array contents after this many entries (0 disables elision)",
+    )
+
+    parser.add_argument(
+        "--elide-all",
+        action='store_true',
+        default=False,
+        help="Limit array size on all fields, not just geometry-related",
     )
 
     parser.add_argument(
