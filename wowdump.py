@@ -518,40 +518,49 @@ raw_chunk_re = re.compile(r'''
     chunk_type_raw$
 ''', re.VERBOSE)
 
-def simplify_remove(d, _):
+m2_shader_re = re.compile(r'''
+    ^/batches/\d+/shader_id$
+''', re.VERBOSE)
+
+wmo_shader_re = re.compile(r'''
+    ^/chunks/\d+/chunk_data/materials/\d+/shader_id$
+''', re.VERBOSE)
+
+
+def simplify_remove(d, _parent, _cachecon):
     return None
 
-def simplify_xyz(d, _) -> str:
+def simplify_xyz(d, _parent, _cachecon) -> str:
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     z = round(d["z"], args.precision)
     return f"xyz({x}, {y}, {z})"
 
-def simplify_wxyz(d, _) -> str:
+def simplify_wxyz(d, _parent, _cachecon) -> str:
     w = round(d["w"], args.precision)
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     z = round(d["z"], args.precision)
     return f"wxyz({w}, {x}, {y}, {z})"
 
-def simplify_xy(d, _) -> str:
+def simplify_xy(d, _parent, _cachecon) -> str:
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     return f"xy({x}, {y})"
 
-def simplify_nested_xy(d, _) -> str:
+def simplify_nested_xy(d, _parent, _cachecon) -> str:
     x = d["x"]["value"]
     y = d["y"]["value"]
     return f"xy({x}, {y})"
 
-def simplify_irgb(d, _) -> str:
+def simplify_irgb(d, _parent, _cachecon) -> str:
     r = int(d["r"])
     g = int(d["g"])
     b = int(d["b"])
 
     return f"rgb({r}, {g}, {b})  # {r:02x}{g:02x}{b:02x}"
 
-def simplify_irgba(d, _) -> str:
+def simplify_irgba(d, _parent, _cachecon) -> str:
     r = int(d["r"])
     g = int(d["g"])
     b = int(d["b"])
@@ -559,12 +568,12 @@ def simplify_irgba(d, _) -> str:
 
     return f"rgba({r}, {g}, {b}, {a})  # {r:02x}{g:02x}{b:02x}{a:02x}"
 
-def simplify_fourbone(d, _) -> str:
+def simplify_fourbone(d, _parent, _cachecon) -> str:
     return f"[ {d[0]}, {d[1]}, {d[2]}, {d[3]} ]"
 
 
 # FIXME: Should the output be inside { } or something?
-def simplify_flags(d, _):
+def simplify_flags(d, _parent, _cachecon):
     if not isinstance(d, dict):
         return d
 
@@ -586,12 +595,189 @@ interpolation_types = {
     3: "interpolate_cubic_hermite_spline",
 }
 
-def simplify_enum(d, _):
+def simplify_enum(d, _parent, _cachecon):
     return f"{d['value']}  # {d['name']}"
 
 
-# FIXME: This gonna be slow until database or caching
-def resolve_fileid(id: id, cachecon) -> str:
+# shader lookup bits, stolen directly from WoWbject Importer
+m2_shader_table = (
+    ("PS_Combiners_Opaque_Mod2xNA_Alpha",
+     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_AddAlpha", "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_AddAlpha_Alpha",
+     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_Mod2xNA_Alpha_Add",
+     "VS_Diffuse_T1_Env_T1", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
+    ("PS_Combiners_Mod_AddAlpha", "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_AddAlpha", "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Mod_AddAlpha", "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Mod_AddAlpha_Alpha",
+     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_Alpha_Alpha",
+     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_Mod2xNA_Alpha_3s",
+     "VS_Diffuse_T1_Env_T1", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
+    ("PS_Combiners_Opaque_AddAlpha_Wgt",
+     "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Mod_Add_Alpha", "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_ModNA_Alpha",
+     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Mod_AddAlpha_Wgt", "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Mod_AddAlpha_Wgt", "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_AddAlpha_Wgt",
+     "VS_Diffuse_T1_T2", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_Mod_Add_Wgt",
+     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_Mod2xNA_Alpha_UnshAlpha",
+     "VS_Diffuse_T1_Env_T1", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
+    ("PS_Combiners_Mod_Dual_Crossfade", "VS_Diffuse_T1", "HS_T1", "DS_T1", 1),
+    ("PS_Combiners_Mod_Depth", "VS_Diffuse_EdgeFade_T1", "HS_T1", "DS_T1", 2),
+    ("PS_Combiners_Opaque_Mod2xNA_Alpha_Alpha",
+     "VS_Diffuse_T1_Env_T2", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
+    ("PS_Combiners_Mod_Mod", "VS_Diffuse_EdgeFade_T1_T2", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Mod_Masked_Dual_Crossfade",
+     "VS_Diffuse_T1_T2", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_Alpha", "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Opaque_Mod2xNA_Alpha_UnshAlpha",
+     "VS_Diffuse_T1_Env_T2", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
+    ("PS_Combiners_Mod_Depth", "VS_Diffuse_EdgeFade_Env", "HS_T1", "DS_T1", 1),
+    ("PS_Guild", "VS_Diffuse_T1_T2_T1", "HS_T1_T2_T3", "DS_T1_T2", 3),
+    ("PS_Guild_NoBorder", "VS_Diffuse_T1_T2", "HS_T1_T2", "DS_T1_T2_T3", 2),
+    ("PS_Guild_Opaque", "VS_Diffuse_T1_T2_T1", "HS_T1_T2_T3", "DS_T1_T2", 3),
+    ("PS_Illum", "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
+    ("PS_Combiners_Mod_Mod_Mod_Const",
+     "VS_Diffuse_T1_T2_T3", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
+    ("PS_Combiners_Mod_Mod_Mod_Const",
+     "VS_Color_T1_T2_T3", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
+    ("PS_Combiners_Opaque", "VS_Diffuse_T1", "HS_T1", "DS_T1", 1),
+    ("PS_Combiners_Mod_Mod2x", "VS_Diffuse_EdgeFade_T1_T2", "HS_T1_T2", "DS_T1_T2", 2),
+)
+
+def get_m2_pixel_shader(shaderID, op_count=2):
+    if shaderID == 0:
+        return "WotLK_Runtime_Selector"
+
+    if shaderID & 0x8000:
+        shaderID &= (~0x8000)
+        ind = shaderID.bit_length()
+        if not m2_shader_table[ind][4] == op_count:
+            return m2_shader_table[ind + 1][0]
+        else:
+            return m2_shader_table[ind][0]
+    else:
+        if op_count == 1:
+            if shaderID & 0x70:
+                return "PS_Combiners_Mod"
+            else:
+                return "PS_Combiners_Opaque"
+        else:
+            lower = shaderID & 7
+
+            if shaderID & 0x70:
+                if lower == 0:
+                    return "PS_Combiners_Mod_Opaque"
+                elif lower == 3:
+                    return "PS_Combiners_Mod_Add"
+                elif lower == 4:
+                    return "PS_Combiners_Mod_Mod2x"
+                elif lower == 6:
+                    return "PS_Combiners_Mod_Mod2xNA"
+                elif lower == 7:
+                    return "PS_Combiners_Mod_AddNA"
+                else:
+                    return "PS_Combiners_Mod_Mod"
+            else:
+                if lower == 0:
+                    return "PS_Combiners_Opaque_Opaque"
+                elif lower == 3:
+                    return "PS_Combiners_Opaque_AddAlpha"
+                elif lower == 4:
+                    return "PS_Combiners_Opaque_Mod2x"
+                elif lower == 6:
+                    return "PS_Combiners_Opaque_Mod2xNA"
+                elif lower == 7:
+                    return "PS_Combiners_Opaque_AddAlpha"
+                else:
+                    return "PS_Combiners_Opaque_Mod"
+
+
+def get_m2_vertex_shader(shader_id, op_count=2):
+    if shader_id & 0x8000:
+        shader_id &= (~0x8000)
+        ind = shader_id.bit_length()
+        return m2_shader_table[ind + 1][1]
+    else:
+        if op_count == 1:
+            if shader_id & 0x80:
+                return "VS_Diffuse_Env"
+            else:
+                if shader_id & 0x4000:
+                    return "VS_Diffuse_T2"
+                else:
+                    return "VS_Diffuse_T1"
+        else:
+            if shader_id & 0x80:
+                if shader_id & 0x8:
+                    return "VS_Diffuse_Env_Env"
+                else:
+                    return "VS_Diffuse_Env_T1"
+            else:
+                if shader_id & 0x8:
+                    return "VS_Diffuse_T1_Env"
+                else:
+                    if shader_id & 0x4000:
+                        return "VS_Diffuse_T1_T2"
+                    else:
+                        return "VS_Diffuse_T1_T1"
+
+
+def simplify_m2_shaderid(d, parent, _cachecon):
+    pixel = get_m2_pixel_shader(d, parent["texture_count"])
+    vertex = get_m2_vertex_shader(d, parent["texture_count"])
+
+    return f"{d}  # {pixel}, {vertex}"
+
+
+# in the format of (name, vertex shader, pixel shader)
+wmo_shader_table = [
+    ("Diffuse", "MapObjDiffuse_T1", "MapObjDiffuse"),
+    ("Specular", "MapObjSpecular_T1", "MapObjSpecular"),
+    ("Metal", "MapObjSpecular_T1", "MapObjMetal"),
+    ("Env", "MapObjDiffuse_T1_Refl", "MapObjEnv"),
+    ("Opaque", "MapObjDiffuse_T1", "MapObjOpaque"),
+    ("EnvMetal", "MapObjDiffuse_T1_Refl", "MapObjEnvMetal"),
+    ("TwoLayerDiffuse", "MapObjDiffuse_Comp", "MapObjTwoLayerDiffuse"),
+    ("TwoLayerEnvMetal", "MapObjDiffuse_T1", "MapObjTwoLayerEnvMetal"),
+    ("TwoLayerTerrain", "MapObjDiffuse_Comp_Terrain", "MapObjTwoLayerTerrain"),
+    ("DiffuseEmissive", "MapObjDiffuse_Comp", "MapObjDiffuseEmissive"),
+    ("waterWindow", "FFXWaterWindow", "FFXWaterWindow"),
+    ("MaskedEnvMetal", "MapObjDiffuse_T1_Env_T2", "MapObjMaskedEnvMetal"),
+    ("EnvMetalEmissive", "MapObjDiffuse_T1_Env_T2", "MapObjEnvMetalEmissive"),
+    ("TwoLayerDiffuseOpaque", "MapObjDiffuse_Comp", "MapObjTwoLayerDiffuseOpaque"),
+    ("submarineWindow", "FFXSubmarineWindow", "FFXSubmarineWindow"),
+    ("TwoLayerDiffuseEmissive", "MapObjDiffuse_Comp",
+     "MapObjTwoLayerDiffuseEmissive"),
+    ("DiffuseTerrain", "MapObjDiffuse_T1", "MapObjDiffuse"),
+    ("AdditiveMaskedEnvMetal", "MapObjDiffuse_T1_Env_T2",
+     "MapObjAdditiveMaskedEnvMetal"),
+    ("TwoLayerDiffuseMod2x", "MapObjDiffuse_CompAlpha", "MapObjTwoLayerDiffuseMod2x"),
+    ("TwoLayerDiffuseMod2xNA", "MapObjDiffuse_Comp", "MapObjTwoLayerDiffuseMod2xNA"),
+    ("TwoLayerDiffuseAlpha", "MapObjDiffuse_CompAlpha", "MapObjTwoLayerDiffuseAlpha"),
+    ("Lod", "MapObjDiffuse_T1", "MapObjLod"),
+    ("Parallax", "MapObjParallax", "MapObjParallax"),
+]
+
+# FIXME: deal with out-of-range values
+def simplify_wmo_shaderid(d, _parent, _cachecon):
+    id=d["value"]
+    pixel = wmo_shader_table[id][2]
+    vertex = wmo_shader_table[id][1]
+    name = wmo_shader_table[id][0]
+
+    return f"{id}  # {pixel}, {vertex}   (\"{name}\")"
+
+
+def simplify_fileid(id: id, _parent, cachecon) -> str:
     if not args.resolve or id <= 0:
         return f"{id}"
 
@@ -631,9 +817,9 @@ simplifications = [
     (verts_wmo_re, simplify_xyz),
     (verts_wmo_textcoords_re, simplify_xy),
     (verts_texcoords_re, simplify_xy),
-    (fileid_re, resolve_fileid),
-    (fileids_re, resolve_fileid),
-    (mapfileid_re, resolve_fileid),
+    (fileid_re, simplify_fileid),
+    (fileids_re, simplify_fileid),
+    (mapfileid_re, simplify_fileid),
     (interpolation_type_re, simplify_enum),
     (fourbone_re, simplify_fourbone),
     (version_re, simplify_enum),
@@ -641,8 +827,9 @@ simplifications = [
     (wmomat_rgba_re, simplify_irgba),
     (wmomat_vertex_rgba_re, simplify_irgba),
     (wmomat_header_rgba_re, simplify_irgba),
-    (wmo_shader_re, simplify_enum),
     (raw_chunk_re, simplify_remove),
+    (m2_shader_re, simplify_m2_shaderid),
+    (wmo_shader_re, simplify_wmo_shaderid),
 ]
 
 def check_simplify(path: str):
@@ -707,7 +894,7 @@ def pathdump(d, path: str, cachecon) -> None:
             # if it's simplified, we're at a 'final' path, so check filtering
             if check_filtered(workpath):
                 continue
-            simplified = s(thing, cachecon)
+            simplified = s(thing, d, cachecon)
             if simplified is not None:
                 print(f"{workpath} = {simplified}")
         elif isinstance(thing, dict) or isinstance(thing, list):
@@ -865,7 +1052,7 @@ def parse_arguments():
         "files",
         action='store',
         nargs='*',
-        default=[],
+        # default=[],
         help="input file to be processed",
     )
 
@@ -887,17 +1074,17 @@ if __name__ == "__main__":
     global args
     args = parse_arguments()
 
-    if len(args.files) == 0:
-        args.files = [DEFAULT_TARGET]
-        print(
-            f"WARNING: Using default target file {DEFAULT_TARGET}", flush=True, file=sys.stderr)
+    # if len(args.files) == 0:
+    #     args.files = [DEFAULT_TARGET]
+    #     print(
+    #         f"WARNING: Using default target file {DEFAULT_TARGET}", flush=True, file=sys.stderr)
 
     cache_current = False
     cachefile = f"{args.listfile}.cache"
 
     # FIXME: This is a bit deeply nested for my tastes.
     if not args.resolve:
-        print("INFO: not resolving, not initializing cache", file=sys.stderr)
+        # print("INFO: not resolving, not initializing cache", file=sys.stderr)
         cachecon = None
     elif not os.path.exists(args.listfile):
         print(
@@ -905,7 +1092,7 @@ if __name__ == "__main__":
         cachecon = None
     else:
         if os.path.exists(cachefile) and (os.path.getmtime(args.listfile) <= os.path.getmtime(cachefile)):
-            print("INFO: fileid cache up to date, not updating", file=sys.stderr)
+            # print("INFO: fileid cache up to date, not updating", file=sys.stderr)
             cachecon = cache_open(cachefile)
         else:
             cachecon = cache_open(cachefile)

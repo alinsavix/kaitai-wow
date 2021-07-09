@@ -90,7 +90,7 @@ types:
         seq:
             - id: flags
               type: momt_flags
-            - id: shader
+            - id: shader_id
               type: u4
               enum: momt_shaders
             - id: blend_mode
