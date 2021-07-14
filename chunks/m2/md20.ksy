@@ -104,7 +104,7 @@ types:
             - id: bones
               type: m2array<m2compbone>
             - id: bone_indices_by_id # FIXME: maybe 'boneFileDataIDs'?
-              type: m2array<u2>
+              type: m2array<s2>
 
             - id: vertices
               type: m2array<m2vertex>
@@ -170,7 +170,7 @@ types:
             - id: attachments
               type: m2array<m2attachment>
             - id: attachment_lookup
-              type: m2array<u2>
+              type: m2array<s2>
             - id: events
               type: m2array<m2event>
             - id: lights
