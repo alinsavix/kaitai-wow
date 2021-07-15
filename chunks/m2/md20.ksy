@@ -99,7 +99,7 @@ types:
             - id: sequences
               type: m2array<m2sequence>
             - id: sequence_idx_hash_by_id
-              type: m2array<u2>
+              type: m2array<s2>
 
             - id: bones
               type: m2array<m2compbone>
