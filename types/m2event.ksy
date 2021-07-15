@@ -1,7 +1,7 @@
 types:
     m2event:
         seq:
-            - id: identifier
+            - id: eventid
               type: str
               size: 4
               encoding: ASCII
