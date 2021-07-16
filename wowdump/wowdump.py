@@ -11,6 +11,8 @@ from typing import Any, Optional, Dict, List, Callable
 from ppretty import ppretty
 import inspect
 
+from kaitaistruct import KaitaiStruct, KaitaiStream, BytesIO
+
 # We can run without, we'll just be slow
 try:
     import sqlite3
@@ -1216,7 +1218,7 @@ def parse_arguments():
     return args
 
 
-if __name__ == "__main__":
+def main():
     global args
     args = parse_arguments()
 
@@ -1249,26 +1251,29 @@ if __name__ == "__main__":
 
     name, ext = os.path.splitext(file)
     if ext == ".m2":
-        from output.m2 import M2, KaitaiStruct
+        from .filetypes.m2 import M2
         target = M2.from_file(file)
     elif ext == ".skin":
-        from output.skin import Skin, KaitaiStruct
+        from .filetypes.skin import Skin
         target = Skin.from_file(file)
     elif ext == ".skel":
-        from output.skel import Skel, KaitaiStruct
+        from .filetypes.skel import Skel
         target = Skel.from_file(file)
     elif ext == ".blp":
-        from output.blp import Blp, KaitaiStruct
+        from .filetypes.blp import Blp
         target = Blp.from_file(file)
     elif ext == ".bls":
-        from output.bls import Bls, KaitaiStruct
+        from .filetypes.bls import Bls
         target = Bls.from_file(file)
     elif ext == ".wmo":
-        from output.wmo import Wmo, KaitaiStruct
+        from .filetypes.wmo import Wmo
         target = Wmo.from_file(file)
     elif ext == ".wdt":
-        from output.wdt import Wdt, KaitaiStruct
+        from .filetypes.wdt import Wdt
         target = Wdt.from_file(file)
+    elif ext == ".anim":
+        from .filetypes.anim import Anim
+        target = Anim.from_file(file)
     else:
         print(f"ERROR: don't know how to parse tile type {ext}")
         sys.exit(1)
@@ -1289,3 +1294,7 @@ if __name__ == "__main__":
         parsed = to_tree(target)
         json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
         print()  # newline at end
+
+
+if __name__ == "__main__":
+    sys.exit(xxxmain())
