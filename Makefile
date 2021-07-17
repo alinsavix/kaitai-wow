@@ -65,11 +65,11 @@ dist:
 
 .PHONY: install
 install:
-	$(PIP_BIN) install --use-feature=in-tree-build .
+	$(PIP_BIN) install .
 
 .PHONY:
 localdev:
-	$(PIP_BIN) install --use-feature=in-tree-build --editable .
+	$(PIP_BIN) install --editable .
 
 .PHONY: clean
 clean:

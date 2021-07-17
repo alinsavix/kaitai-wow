@@ -85,6 +85,10 @@ dmypy.json
 # Dependencies
 .deps/*
 
+# These are build artifacts, so don't keep them
+wowdump/filetypes/*
+!wowdump/filetypes/__init__.py
+
 # Stuff that might actually be kaitai-wow specific.     WOW!
 listfile.csv
 
@@ -93,5 +97,6 @@ listfile.csv
 
 *.cache
 output/
+outputs/
 
 !.notempty

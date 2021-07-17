@@ -94,7 +94,7 @@ Please note that we don't personally test any of these outputs, other than `pyth
 
 There is a utility included with this kaitai-wow repo, `wowdump`, which is intended as both an easy way to get at the data in various WoW filetypes (because, well, that's why we made this), and also serves as a bit of a more complex example of the ways that kaitai-struct can be used to read and process data.
 
-You can install this tool with either `make install` or `make localdev`, where it will install the script into your bindir as part of the python module install.
+You can install this tool with either `make install` or `make localdev`, where it will install the script into your bindir as part of the python module install. You will need a relatively recent version of `pip` for this.
 
 If you use this tool, please don't use it as part of some complex workflow -- it is experimental at best, *very* much a work in progress, and just about every aspect of it can (and will) change without warning. It is also rather crap code in a number of places. Patches to make it less garbage are gladly accepted.
 
