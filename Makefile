@@ -1,5 +1,5 @@
 # This makefile probably requires GNU make. Sorry.
-OUTDIR=output
+OUTDIR=outputs
 PYTHON_OUTDIR=wowdump/filetypes
 
 PYTHON_BIN ?= python3
@@ -63,9 +63,13 @@ $(PYTHON_OUTDIR)/%.py: $(OUTDIR)/%.py
 dist:
 	$(PYTHON_BIN) -m build
 
-.PHONY: localdev
-localdev: dist
-	$(PIP_BIN) install -e .
+.PHONY: install
+install:
+	$(PIP_BIN) install --use-feature=in-tree-build .
+
+.PHONY:
+localdev:
+	$(PIP_BIN) install --use-feature=in-tree-build --editable .
 
 .PHONY: clean
 clean:
