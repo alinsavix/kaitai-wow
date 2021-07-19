@@ -64,14 +64,6 @@ $(OUTDIR_PYTHON)/%.py: $(OUTDIR_KSY)/%.ksy
 	$(KSY_COMPILER) --outdir $(OUTDIR_PYTHON) --target python $<
 
 
-## svg
-# $(OUTDIR)/%.svg: $(OUTDIR)/%.dot
-# 	dot -Tsvg $< >$@
-
-# $(OUTDIR)/%.dot: $(OUTDIR)/%.ksy
-# 	$(KSY_COMPILER) --outdir $(OUTDIR) --target graphviz $<
-
-
 ## wowdump
 OUTDIR_WOWDUMP = wowdump/filetypes
 WOWDUMP_TARGETS = $(addprefix $(OUTDIR_WOWDUMP)/, $(addsuffix .py, $(FILETYPES)))
@@ -137,6 +129,19 @@ ALL_LANGS += graphviz
 $(OUTDIR_GRAPHVIZ)/%.dot: $(OUTDIR_KSY)/%.ksy
 	@mkdir -p $(OUTDIR_GRAPHVIZ)
 	$(KSY_COMPILER) --outdir $(OUTDIR_GRAPHVIZ) --target graphviz $<
+
+
+## svg
+OUTDIR_SVG ?= $(OUTDIR)/svg
+SVG_TARGETS = $(addprefix $(OUTDIR_SVG)/, $(addsuffix .svg, $(FILETYPES)))
+
+svg: $(SVG_TARGETS)
+ALL_LANGS += svg
+
+.PRECIOUS: $(OUTDIR_SVG)/%.svg
+$(OUTDIR_SVG)/%.svg: $(OUTDIR_GRAPHVIZ)/%.dot
+	@mkdir -p $(OUTDIR_SVG)
+	dot -Tsvg $< >$@
 
 
 ## html
