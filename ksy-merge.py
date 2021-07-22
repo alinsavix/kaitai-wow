@@ -295,7 +295,7 @@ def recurse_merge(yaml_data: Dict[Any, Any], path: str):
 # nondeterministically.
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        prog='yaml-merge.py',
+        prog='ksy-merge.py',
         description='Merge some yaml files',
     )
 
