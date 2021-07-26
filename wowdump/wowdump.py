@@ -12,6 +12,7 @@ from ppretty import ppretty
 import inspect
 
 from kaitaistruct import KaitaiStruct, KaitaiStream, BytesIO
+from . import simplifiers
 
 # We can run without, we'll just be slow
 try:
@@ -376,106 +377,12 @@ def check_filtered(path: str) -> bool:
 # bad ways to do it, and definitely better not-bad ways to do it, but
 # this works. For now. Until it offends my sight just a little too much
 # and gets torn out by the roots (just like my hair)   --A
-attachment_pos_re = re.compile(r'''
-    /attachments/\d+/position$
-''', re.VERBOSE)
-
-bone_pivot_re = re.compile(r'''
-    /bones/\d+/pivot$
-''', re.VERBOSE)
-
-bone_rot_re = re.compile(r'''
-    /bones/\d+/rotation/values/values/\d+/values/\d+$
-''', re.VERBOSE)
-
-bone_xlate_re = re.compile(r'''
-    /bones/\d+/translation/values/values/\d+/values/\d+$
-''', re.VERBOSE)
-
-bone_scale_re = re.compile(r'''
-    /bones/\d+/scale/values/values/\d+/values/\d+$
-''', re.VERBOSE)
-
-skin_pos_re = re.compile(r'''
-    /submeshes/\d+/(sort_)?center_position$
-''', re.VERBOSE)
-
-camera_pos_re = re.compile(r'''
-    /cameras/\d+/(target_)?position_base$
-''', re.VERBOSE)
-
-collision_pos_re = re.compile(r'''
-    /collision_(face_normals|positions)/\d+$
-''', re.VERBOSE)
 
 flags_re = re.compile(r'''
     /(global_)?flags$
 ''', re.VERBOSE)
 
-bbox_re = re.compile(r'''
-    /(bounding_box|collision_box)/(min|max)$
-''', re.VERBOSE)
 
-events_pos_re = re.compile(r'''
-    ^/model/events/\d+/position$
-''', re.VERBOSE)
-
-emitter_rgb_re = re.compile(r'''
-    ^/model/particle_emitters/\d+/old/p/colors/values/values/\d+$
-''', re.VERBOSE)
-
-emitter_rot_scale_xlate_re = re.compile(r'''
-    ^/model/particle_emitters/\d+/old/p/(rot\d|scales|trans)$
-''', re.VERBOSE)
-
-emitter_sizes_re = re.compile(r'''
-    ^/model/particle_emitters/\d+/old/p/sizes/values/values/\d+$
-''', re.VERBOSE)
-
-emitter_position_re = re.compile(r'''
-    ^/model/particle_emitters/\d+/old/position$
-''', re.VERBOSE)
-
-ambient_rgba_re = re.compile(r'''
-    ^/chunks/\d+/chunk_data/amb_color$
-''', re.VERBOSE)
-
-wmomat_rgba_re = re.compile(r'''
-    ^/chunks/\d+/chunk_data/materials/\d+/(diff_color|sidn_color|frame_sidn_color)$
-''', re.VERBOSE)
-
-wmomat_vertex_rgba_re = re.compile(r'''
-    /chunks/\d+/chunk_data/vertex_colors/\d+$
-''', re.VERBOSE)
-
-wmomat_header_rgba_re = re.compile(r'''
-    /chunks/\d+/chunk_data/header_color_replacement$
-''', re.VERBOSE)
-
-seq_bbox_re = re.compile(r'''
-    /sequences/\d+/bounds/extent/(min|max)$
-''', re.VERBOSE)
-
-verts_vec_re = re.compile(r'''
-    ^/model/vertices/\d+/(normal|pos)$
-''', re.VERBOSE)
-
-verts_wmo_re = re.compile(r'''
-    /chunks/\d+/chunk_data/(vertices|normals)/\d+$
-''', re.VERBOSE)
-
-verts_wmo_textcoords_re = re.compile(r'''
-    /chunks/\d+/chunk_data/(tex_coords)/\d+$
-''', re.VERBOSE)
-
-verts_texcoords_re = re.compile(r'''
-    ^/model/vertices/\d+/tex_coords/\d+$
-''', re.VERBOSE)
-
-# FIXME: Can we make these behave better straight out of kaitai?
-nested_xy_re = re.compile(r'''
-    ^/model/particle_emitters/\d+/multi_texture_param\d/\d+$
-''', re.VERBOSE)
 
 fileids_re = re.compile(r'''
     ^/chunks/\d+/chunk_data/([^/]+_)?file_data_ids/\d+$
@@ -498,81 +405,24 @@ interpolation_type_re = re.compile(r'''
     interpolation_type$
 ''', re.VERBOSE)
 
-# FIXME: this could be way, way better
-wmo_shader_re = re.compile(r'''
-    ^/chunks/\d+/chunk_data/materials/\d+/shader$
-''', re.VERBOSE)
+
 
 # simplify_4bone
 fourbone_re = re.compile(r'''
     ^/model/vertices/\d+/(bone_indices|bone_weights)$
 ''', re.VERBOSE)
 
-runtime_re = re.compile(r'''
-    /runtime_data$
-''', re.VERBOSE)
-
-unused_re = re.compile(r'''
-    unused\d*$
-''', re.VERBOSE)
-
-raw_chunk_re = re.compile(r'''
-    chunk_type_raw$
-''', re.VERBOSE)
-
-m2_shader_re = re.compile(r'''
-    ^/batches/\d+/shader_id$
-''', re.VERBOSE)
-
-wmo_shader_re = re.compile(r'''
-    ^/chunks/\d+/chunk_data/materials/\d+/shader_id$
-''', re.VERBOSE)
 
 eventid_re = re.compile(r'''
     ^/model/events/\d+/eventid$
 ''', re.VERBOSE)
 
 
-def simplify_remove(d, _parent, _cachecon):
-    return None
 
-def simplify_xyz(d, _parent, _cachecon) -> str:
-    x = round(d["x"], args.precision)
-    y = round(d["y"], args.precision)
-    z = round(d["z"], args.precision)
-    return f"xyz({x}, {y}, {z})"
 
-def simplify_wxyz(d, _parent, _cachecon) -> str:
-    w = round(d["w"], args.precision)
-    x = round(d["x"], args.precision)
-    y = round(d["y"], args.precision)
-    z = round(d["z"], args.precision)
-    return f"wxyz({w}, {x}, {y}, {z})"
 
-def simplify_xy(d, _parent, _cachecon) -> str:
-    x = round(d["x"], args.precision)
-    y = round(d["y"], args.precision)
-    return f"xy({x}, {y})"
 
-def simplify_nested_xy(d, _parent, _cachecon) -> str:
-    x = d["x"]["value"]
-    y = d["y"]["value"]
-    return f"xy({x}, {y})"
 
-def simplify_irgb(d, _parent, _cachecon) -> str:
-    r = int(d["r"])
-    g = int(d["g"])
-    b = int(d["b"])
-
-    return f"rgb({r}, {g}, {b})  # {r:02x}{g:02x}{b:02x}"
-
-def simplify_irgba(d, _parent, _cachecon) -> str:
-    r = int(d["r"])
-    g = int(d["g"])
-    b = int(d["b"])
-    a = int(d["a"])
-
-    return f"rgba({r}, {g}, {b}, {a})  # {r:02x}{g:02x}{b:02x}{a:02x}"
 
 def simplify_fourbone(d, _parent, _cachecon) -> str:
     return f"[ {d[0]}, {d[1]}, {d[2]}, {d[3]} ]"
@@ -605,182 +455,12 @@ def simplify_enum(d, _parent, _cachecon):
     return f"{d['value']}  # {d['name']}"
 
 
-# shader lookup bits, stolen directly from WoWbject Importer
-m2_shader_table = (
-    ("PS_Combiners_Opaque_Mod2xNA_Alpha",
-     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_AddAlpha", "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_AddAlpha_Alpha",
-     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_Mod2xNA_Alpha_Add",
-     "VS_Diffuse_T1_Env_T1", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
-    ("PS_Combiners_Mod_AddAlpha", "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_AddAlpha", "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Mod_AddAlpha", "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Mod_AddAlpha_Alpha",
-     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_Alpha_Alpha",
-     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_Mod2xNA_Alpha_3s",
-     "VS_Diffuse_T1_Env_T1", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
-    ("PS_Combiners_Opaque_AddAlpha_Wgt",
-     "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Mod_Add_Alpha", "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_ModNA_Alpha",
-     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Mod_AddAlpha_Wgt", "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Mod_AddAlpha_Wgt", "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_AddAlpha_Wgt",
-     "VS_Diffuse_T1_T2", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_Mod_Add_Wgt",
-     "VS_Diffuse_T1_Env", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_Mod2xNA_Alpha_UnshAlpha",
-     "VS_Diffuse_T1_Env_T1", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
-    ("PS_Combiners_Mod_Dual_Crossfade", "VS_Diffuse_T1", "HS_T1", "DS_T1", 1),
-    ("PS_Combiners_Mod_Depth", "VS_Diffuse_EdgeFade_T1", "HS_T1", "DS_T1", 2),
-    ("PS_Combiners_Opaque_Mod2xNA_Alpha_Alpha",
-     "VS_Diffuse_T1_Env_T2", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
-    ("PS_Combiners_Mod_Mod", "VS_Diffuse_EdgeFade_T1_T2", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Mod_Masked_Dual_Crossfade",
-     "VS_Diffuse_T1_T2", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_Alpha", "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Opaque_Mod2xNA_Alpha_UnshAlpha",
-     "VS_Diffuse_T1_Env_T2", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
-    ("PS_Combiners_Mod_Depth", "VS_Diffuse_EdgeFade_Env", "HS_T1", "DS_T1", 1),
-    ("PS_Guild", "VS_Diffuse_T1_T2_T1", "HS_T1_T2_T3", "DS_T1_T2", 3),
-    ("PS_Guild_NoBorder", "VS_Diffuse_T1_T2", "HS_T1_T2", "DS_T1_T2_T3", 2),
-    ("PS_Guild_Opaque", "VS_Diffuse_T1_T2_T1", "HS_T1_T2_T3", "DS_T1_T2", 3),
-    ("PS_Illum", "VS_Diffuse_T1_T1", "HS_T1_T2", "DS_T1_T2", 2),
-    ("PS_Combiners_Mod_Mod_Mod_Const",
-     "VS_Diffuse_T1_T2_T3", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
-    ("PS_Combiners_Mod_Mod_Mod_Const",
-     "VS_Color_T1_T2_T3", "HS_T1_T2_T3", "DS_T1_T2_T3", 3),
-    ("PS_Combiners_Opaque", "VS_Diffuse_T1", "HS_T1", "DS_T1", 1),
-    ("PS_Combiners_Mod_Mod2x", "VS_Diffuse_EdgeFade_T1_T2", "HS_T1_T2", "DS_T1_T2", 2),
-)
-
-def get_m2_pixel_shader(shaderID, op_count=2):
-    if shaderID == 0:
-        return "WotLK_Runtime_Selector"
-
-    if shaderID & 0x8000:
-        shaderID &= (~0x8000)
-        ind = shaderID.bit_length()
-        if not m2_shader_table[ind][4] == op_count:
-            return m2_shader_table[ind + 1][0]
-        else:
-            return m2_shader_table[ind][0]
-    else:
-        if op_count == 1:
-            if shaderID & 0x70:
-                return "PS_Combiners_Mod"
-            else:
-                return "PS_Combiners_Opaque"
-        else:
-            lower = shaderID & 7
-
-            if shaderID & 0x70:
-                if lower == 0:
-                    return "PS_Combiners_Mod_Opaque"
-                elif lower == 3:
-                    return "PS_Combiners_Mod_Add"
-                elif lower == 4:
-                    return "PS_Combiners_Mod_Mod2x"
-                elif lower == 6:
-                    return "PS_Combiners_Mod_Mod2xNA"
-                elif lower == 7:
-                    return "PS_Combiners_Mod_AddNA"
-                else:
-                    return "PS_Combiners_Mod_Mod"
-            else:
-                if lower == 0:
-                    return "PS_Combiners_Opaque_Opaque"
-                elif lower == 3:
-                    return "PS_Combiners_Opaque_AddAlpha"
-                elif lower == 4:
-                    return "PS_Combiners_Opaque_Mod2x"
-                elif lower == 6:
-                    return "PS_Combiners_Opaque_Mod2xNA"
-                elif lower == 7:
-                    return "PS_Combiners_Opaque_AddAlpha"
-                else:
-                    return "PS_Combiners_Opaque_Mod"
 
 
-def get_m2_vertex_shader(shader_id, op_count=2):
-    if shader_id & 0x8000:
-        shader_id &= (~0x8000)
-        ind = shader_id.bit_length()
-        return m2_shader_table[ind + 1][1]
-    else:
-        if op_count == 1:
-            if shader_id & 0x80:
-                return "VS_Diffuse_Env"
-            else:
-                if shader_id & 0x4000:
-                    return "VS_Diffuse_T2"
-                else:
-                    return "VS_Diffuse_T1"
-        else:
-            if shader_id & 0x80:
-                if shader_id & 0x8:
-                    return "VS_Diffuse_Env_Env"
-                else:
-                    return "VS_Diffuse_Env_T1"
-            else:
-                if shader_id & 0x8:
-                    return "VS_Diffuse_T1_Env"
-                else:
-                    if shader_id & 0x4000:
-                        return "VS_Diffuse_T1_T2"
-                    else:
-                        return "VS_Diffuse_T1_T1"
 
 
-def simplify_m2_shaderid(d, parent, _cachecon):
-    pixel = get_m2_pixel_shader(d, parent["texture_count"])
-    vertex = get_m2_vertex_shader(d, parent["texture_count"])
-
-    return f"{d}  # {pixel}, {vertex}"
 
 
-# in the format of (name, vertex shader, pixel shader)
-wmo_shader_table = [
-    ("Diffuse", "MapObjDiffuse_T1", "MapObjDiffuse"),
-    ("Specular", "MapObjSpecular_T1", "MapObjSpecular"),
-    ("Metal", "MapObjSpecular_T1", "MapObjMetal"),
-    ("Env", "MapObjDiffuse_T1_Refl", "MapObjEnv"),
-    ("Opaque", "MapObjDiffuse_T1", "MapObjOpaque"),
-    ("EnvMetal", "MapObjDiffuse_T1_Refl", "MapObjEnvMetal"),
-    ("TwoLayerDiffuse", "MapObjDiffuse_Comp", "MapObjTwoLayerDiffuse"),
-    ("TwoLayerEnvMetal", "MapObjDiffuse_T1", "MapObjTwoLayerEnvMetal"),
-    ("TwoLayerTerrain", "MapObjDiffuse_Comp_Terrain", "MapObjTwoLayerTerrain"),
-    ("DiffuseEmissive", "MapObjDiffuse_Comp", "MapObjDiffuseEmissive"),
-    ("waterWindow", "FFXWaterWindow", "FFXWaterWindow"),
-    ("MaskedEnvMetal", "MapObjDiffuse_T1_Env_T2", "MapObjMaskedEnvMetal"),
-    ("EnvMetalEmissive", "MapObjDiffuse_T1_Env_T2", "MapObjEnvMetalEmissive"),
-    ("TwoLayerDiffuseOpaque", "MapObjDiffuse_Comp", "MapObjTwoLayerDiffuseOpaque"),
-    ("submarineWindow", "FFXSubmarineWindow", "FFXSubmarineWindow"),
-    ("TwoLayerDiffuseEmissive", "MapObjDiffuse_Comp",
-     "MapObjTwoLayerDiffuseEmissive"),
-    ("DiffuseTerrain", "MapObjDiffuse_T1", "MapObjDiffuse"),
-    ("AdditiveMaskedEnvMetal", "MapObjDiffuse_T1_Env_T2",
-     "MapObjAdditiveMaskedEnvMetal"),
-    ("TwoLayerDiffuseMod2x", "MapObjDiffuse_CompAlpha", "MapObjTwoLayerDiffuseMod2x"),
-    ("TwoLayerDiffuseMod2xNA", "MapObjDiffuse_Comp", "MapObjTwoLayerDiffuseMod2xNA"),
-    ("TwoLayerDiffuseAlpha", "MapObjDiffuse_CompAlpha", "MapObjTwoLayerDiffuseAlpha"),
-    ("Lod", "MapObjDiffuse_T1", "MapObjLod"),
-    ("Parallax", "MapObjParallax", "MapObjParallax"),
-]
-
-# FIXME: deal with out-of-range values
-def simplify_wmo_shaderid(d, _parent, _cachecon):
-    id=d["value"]
-    pixel = wmo_shader_table[id][2]
-    vertex = wmo_shader_table[id][1]
-    name = wmo_shader_table[id][0]
-
-    return f"{id}  # {pixel}, {vertex}   (\"{name}\")"
 
 
 m2_events = {
@@ -941,42 +621,20 @@ def simplify_fileid(id: id, _parent, cachecon) -> str:
 
 
 simplifications = [
-    (runtime_re, simplify_remove),
-    (unused_re, simplify_remove),
-    (attachment_pos_re, simplify_xyz),
-    (bone_pivot_re, simplify_xyz),
-    (bone_rot_re, simplify_wxyz),
-    (bone_xlate_re, simplify_xyz),
-    (bone_scale_re, simplify_xyz),
-    (skin_pos_re, simplify_xyz),
-    (camera_pos_re, simplify_xyz),
-    (collision_pos_re, simplify_xyz),
+
     (flags_re, simplify_flags),
-    (bbox_re, simplify_xyz),
-    (events_pos_re, simplify_xyz),
-    (nested_xy_re, simplify_nested_xy),
-    (emitter_rgb_re, simplify_irgb),
-    (emitter_rot_scale_xlate_re, simplify_xyz),
-    (emitter_sizes_re, simplify_xy),
-    (emitter_position_re, simplify_xyz),
-    (seq_bbox_re, simplify_xyz),
-    (verts_vec_re, simplify_xyz),
-    (verts_wmo_re, simplify_xyz),
-    (verts_wmo_textcoords_re, simplify_xy),
-    (verts_texcoords_re, simplify_xy),
+
+
+
     (fileid_re, simplify_fileid),
     (fileids_re, simplify_fileid),
     (mapfileid_re, simplify_fileid),
     (interpolation_type_re, simplify_enum),
     (fourbone_re, simplify_fourbone),
     (version_re, simplify_enum),
-    (ambient_rgba_re, simplify_irgba),
-    (wmomat_rgba_re, simplify_irgba),
-    (wmomat_vertex_rgba_re, simplify_irgba),
-    (wmomat_header_rgba_re, simplify_irgba),
-    (raw_chunk_re, simplify_remove),
-    (m2_shader_re, simplify_m2_shaderid),
-    (wmo_shader_re, simplify_wmo_shaderid),
+
+
+
     (eventid_re, simplify_events),
 ]
 
