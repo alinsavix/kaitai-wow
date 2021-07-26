@@ -1,6 +1,6 @@
 # simplify flags
 # FIXME: Should the output be inside { } or something?
-def simplify_flags(d, _parent, _cachecon):
+def simplify_flags(d, _parent, _cachecon, _args):
     if not isinstance(d, dict):
         return d
 

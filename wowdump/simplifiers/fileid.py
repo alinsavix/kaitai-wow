@@ -9,11 +9,8 @@ except ImportError:
 
 
 # simplify file ids of various types
-def simplify_fileid(id: id, _parent, cachecon) -> str:
-    # FIXME: we probably need to pass args to simplifiers
-    # if not args.resolve or id <= 0:
-    #     return f"{id}"
-    if id <= 0:
+def simplify_fileid(id: id, _parent, cachecon, args) -> str:
+    if not args.resolve or id <= 0:
         return f"{id}"
 
     c = cache_getfileid(id, cachecon)

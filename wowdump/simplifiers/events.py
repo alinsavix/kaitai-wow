@@ -1,5 +1,5 @@
 # simplify event identifiers in events in m2 files
-def simplify_events(d, _parent, _cachecon):
+def simplify_events(d, _parent, _cachecon, _args):
     if d in m2_events:
         return f"{d}  # {m2_events[d]}"
     else:

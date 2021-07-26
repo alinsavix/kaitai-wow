@@ -1,5 +1,5 @@
 # simplifiers for bone-related things (when we have them)
-def simplify_fourbone(d, _parent, _cachecon) -> str:
+def simplify_fourbone(d, _parent, _cachecon, _args) -> str:
     return f"[ {d[0]}, {d[1]}, {d[2]}, {d[3]} ]"
 
 

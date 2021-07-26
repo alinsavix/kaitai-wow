@@ -1,12 +1,12 @@
 # simplifiers for color values
-def simplify_irgb(d, _parent, _cachecon) -> str:
+def simplify_irgb(d, _parent, _cachecon, _args) -> str:
     r = int(d["r"])
     g = int(d["g"])
     b = int(d["b"])
 
     return f"rgb({r}, {g}, {b})  # {r:02x}{g:02x}{b:02x}"
 
-def simplify_irgba(d, _parent, _cachecon) -> str:
+def simplify_irgba(d, _parent, _cachecon, _args) -> str:
     r = int(d["r"])
     g = int(d["g"])
     b = int(d["b"])

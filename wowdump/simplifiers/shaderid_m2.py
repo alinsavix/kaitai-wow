@@ -1,5 +1,5 @@
 # simplifier to simplify shaderids for m2 models
-def simplify_shaderid_m2(d, parent, _cachecon):
+def simplify_shaderid_m2(d, parent, _cachecon, _args):
     pixel = get_m2_pixel_shader(d, parent["texture_count"])
     vertex = get_m2_vertex_shader(d, parent["texture_count"])
 

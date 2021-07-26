@@ -1,5 +1,5 @@
 # simplifier to just remove stuff
-def simplify_remove(d, _parent, _cachecon) -> str:
+def simplify_remove(d, _parent, _cachecon, _args) -> str:
     return None
 
 

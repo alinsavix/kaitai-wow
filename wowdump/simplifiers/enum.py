@@ -1,5 +1,5 @@
 # simplifiers for enum values
-def simplify_enum(d, _parent, _cachecon):
+def simplify_enum(d, _parent, _cachecon, _args):
     return f"{d['value']}  # {d['name']}"
 
 

@@ -1,23 +1,23 @@
 # simplifier to display coordinates as (x,y) or similar
-def simplify_xyz(d, _parent, _cachecon) -> str:
+def simplify_xyz(d, _parent, _cachecon, args) -> str:
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     z = round(d["z"], args.precision)
     return f"xyz({x}, {y}, {z})"
 
-def simplify_wxyz(d, _parent, _cachecon) -> str:
+def simplify_wxyz(d, _parent, _cachecon, args) -> str:
     w = round(d["w"], args.precision)
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     z = round(d["z"], args.precision)
     return f"wxyz({w}, {x}, {y}, {z})"
 
-def simplify_xy(d, _parent, _cachecon) -> str:
+def simplify_xy(d, _parent, _cachecon, args) -> str:
     x = round(d["x"], args.precision)
     y = round(d["y"], args.precision)
     return f"xy({x}, {y})"
 
-def simplify_nested_xy(d, _parent, _cachecon) -> str:
+def simplify_nested_xy(d, _parent, _cachecon, _args) -> str:
     x = d["x"]["value"]
     y = d["y"]["value"]
     return f"xy({x}, {y})"

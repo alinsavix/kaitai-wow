@@ -232,6 +232,7 @@ def to_tree(obj, path: str = ""):
 # Caching bits (yeah, they're ugly)
 # or maybe type of os.PathLike for cache_open
 # FIXME: move caching bits to separate module
+# FIXME: needs locking for cache rebuild
 def cache_open(dbfile: str):
     if "sqlite3" not in sys.modules:
         print("WARNING: sqlite not available, caching disabled", file=sys.stderr)
@@ -342,38 +343,6 @@ def check_filtered(path: str) -> bool:
     return False
 
 
-
-
-
-
-
-
-
-
-interpolation_types = {
-    0: "interpolate_const",
-    1: "interpolate_linear",
-    2: "interpolate_cubic_bezier_spline",
-    3: "interpolate_cubic_hermite_spline",
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Given a path, check to see if it's one we want to normally elide (because
 # it's geometry-related and thus probably really long and spammy with minimal
 # value).
@@ -427,7 +396,7 @@ def pathdump(d, path: str, cachecon) -> None:
             # if it's simplified, we're at a 'final' path, so check filtering
             if check_filtered(workpath):
                 continue
-            simplified = s(thing, d, cachecon)
+            simplified = s(thing, d, cachecon, args)
             if simplified is not None:
                 print(f"{workpath} = {simplified}")
         elif isinstance(thing, dict) or isinstance(thing, list):
@@ -682,4 +651,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(xxxmain())
+    sys.exit(main())
