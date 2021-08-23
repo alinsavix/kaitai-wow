@@ -317,7 +317,8 @@ def check_filtered(path: str) -> bool:
             #     return False
 
             # print(f"check filter {filter} vs {path}")
-            if path.startswith(filter):
+            # if path.startswith(filter):
+            if filter in path:
                 return False
 
     if len(args.filters_discard):
@@ -326,7 +327,8 @@ def check_filtered(path: str) -> bool:
             # if r and r.search(path):
             #     return True
 
-            if path.startswith(filter):
+            # if path.startswith(filter):
+            if filter in path:
                 return True
 
     # If we're here, we didn't match anything, so check which of the
