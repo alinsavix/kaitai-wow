@@ -1,17 +1,19 @@
 #!/usr/local/bin/python3
 import argparse
 import csv
-import json
 import hashlib
+import inspect
+import json
 import os
 import re
 import sys
 import time
-from typing import Any, Optional, Dict, List, Callable
-from ppretty import ppretty
-import inspect
+from typing import Any, Callable, Dict, List, Optional
 
-from kaitaistruct import KaitaiStruct, KaitaiStream, BytesIO
+import logging
+from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct
+from ppretty import ppretty
+
 from .simplifiers import check_simplify
 
 # We can run without, we'll just be slow
@@ -69,6 +71,10 @@ def treepath(path, key, value=None):
     # else
     if showtree:
         print(f"{path}.{key} == {value}", flush=True)
+
+
+def pathpath(path, key):
+    return f"{path}/{key}"
 
 
 def whatis(obj):
@@ -155,6 +161,130 @@ def find_related(filepath, base):
     return None
 
 
+# "kaitai type"
+def ktype(v):
+    logger = logging.getLogger()
+    if inspect.isclass(v):
+        logger.debug("var is type class, skipping")
+        return "skip"
+
+    if inspect.ismethod(v) or inspect.isbuiltin(v):
+        logger.debug("var is is method or builtin, skipping")
+        return "skip"
+
+    if isinstance(v, type):
+        logger.debug("var is defines a datatype, skipping")
+        return "skip"
+
+    if isinstance(v, list):
+        logger.debug("var is type list")
+        return "list"
+
+    if isinstance(v, KaitaiStruct):
+        logger.debug(f"var is a kaitai type {type(v)}")
+        return "kaitai"
+
+    if type(v) in [int, float, str, bool]:
+        logger.debug("var is a base type")
+        return "base"
+
+    # otherwise is a dict type
+    # FIXME: I think dict type, anyhow
+    logger.debug("var is (probably) a dict type")
+    return "dict"
+
+
+# FIXME: needs dict key sorting (if possible)
+def walk(obj, path=""):
+    # t = type(obj)
+    # v = vars(obj)
+    # w = whatis(obj)
+    # print(f"top obj type: {t}; what: {w}; vars: {v}")
+    simplify = logging.getLogger("simplify")
+    disp = logging.getLogger("disposition")
+
+    logger = logging.getLogger()
+    logger.debug(f"in: path: {path}  type: {type(obj)} {whatis(obj)}")
+
+    for k in dir(obj):
+        if k[0] == "_":
+            continue
+
+        logger.debug(f"getattr {k} from obj type {type(obj)}")
+        v = getattr(obj, k)
+
+        kt = ktype(v)
+        if kt == "skip":  # class, method, datatype
+            continue
+
+
+        # FIXME: Where is the best place for simplifiers? Here?
+        workpath = f"{path}/{k}"
+        simplify.debug(f"checking simplifier for {workpath}")
+
+        s = check_simplify(workpath) if args.simplify else None
+
+        if s:
+            simplify.debug(f"using simplifier for {workpath}")
+
+            # FIXME: this feels sloppy
+            if kt == "base" or kt == "list":
+                simplified = s(v, to_tree(obj), None, args)
+            else:
+                simplified = s(to_tree(v), to_tree(obj), None, args)
+            if simplified is not None:
+                print(f"{workpath} = {simplified}")
+
+            # We either simplified w/ output, or simplified out of existence.
+            # either way, move on
+            continue
+
+
+        # FIXME: Verify isinstance() does the right thing, since for some
+        # reason we weren't using it before -- we were using type(v) == type([])
+        if kt == "list":
+            disp.debug(f"{path}/{k}[] --> array processing (len {len(v)})")
+            value = []
+            for i, el in enumerate(v):
+                if type(el) in [int, float, str]:
+                    disp.debug(f"array {path}[{i}] --> final ({el})")
+                    print(f"{path}/{k}/{i} = {el}")
+
+                    # print thing?
+                    # value.append(el)
+                else:
+                    disp.debug(f"{path}[{i}] --> array descent")
+                    # value.append(to_tree(el, treepath(path, k + f"[{i}]")))
+                    walk(el, pathpath(path, f"{k}/{i}"))
+
+        elif kt == "kaitai":
+            # FIXME: I think we're supposed to do one of these without the {k}
+            if k == "data":
+                disp.debug(f"{path} --> kaitai data descent")
+                walk(v, pathpath(path, k))
+            else:
+                disp.debug(f"{path}/{k} --> kaitai descent type {type(k)}")
+                # debug(f"recursing kaitai value, type: {type(k)}")
+                walk(v, pathpath(path, k))
+
+        elif kt == "base":
+            if type(v) in [int, float, str, bool]:
+                disp.debug(f"{path}.{k} --> final ({v})")
+                # logger.debug(f"(output) {v}")
+                print(f"{path}/{k} = {v}")
+
+        else:
+            if k == "m2array_type" or k == "m2track_type":
+                disp.debug(f"{path}/{k} --> ignored")
+            else:
+                disp.debug(f"{path}/{k} --> descend (type {type(v)}")
+                walk(v, pathpath(path, k))
+
+        # if value is not None:
+        #     r[k] = value
+
+
+
 def to_tree(obj, path: str = ""):
     r = {}
     debug(f"in: path: {path}  type: {type(obj)} {whatis(obj)}")
@@ -185,7 +315,7 @@ def to_tree(obj, path: str = ""):
                 # if isinstance(v, list):
                 # debug("processing array type")
                 # log(f"array is: {ppretty(v)}")
-                disp(f"{path}.{k}[]", f"array processing (len {len(v)})")
+                disp(f"{path}/{k}[]", f"array processing (len {len(v)})")
                 value = []
                 for i, el in enumerate(v):
                     # debug(f"appending {el}")
@@ -276,12 +406,6 @@ def cache_fileids(listfile: str, cachecon) -> None:
         f"INFO: fileid cache successfully rebuilt in {runtime:.2f}s", file=sys.stderr)
 
 
-
-
-
-
-
-
 # There's probably a way better way to do this.
 # filter_regex_cache = { }
 # def regex_cache(re_str):
@@ -350,7 +474,8 @@ def check_filtered(path: str) -> bool:
 # value).
 #
 # FIXME: It'd be great if we didn't have to maintain the regex list by hand.
-geom_path_re = re.compile(r"/(model|chunk_data)/(polys|indices|vertices|normals|tex_coords|bspnodes|vertex_colors|node_face_indices)/\d+$")
+geom_path_re = re.compile(
+    r"/(model|chunk_data)/(polys|indices|vertices|normals|tex_coords|bspnodes|vertex_colors|node_face_indices)/\d+$")
 
 def geometry_path(path):
     if geom_path_re.search(path):
@@ -361,7 +486,8 @@ def pathdump(d, path: str, cachecon) -> None:
     # This is kind of a lame way to get a loop that handles both lists
     # and dicts, but is there a better way?
     if isinstance(d, dict):
-        things = sorted(d.keys(), key=lambda x: (not (x == "chunk_size" or x == "chunk_type"), x))
+        things = sorted(d.keys(), key=lambda x: (
+            not (x == "chunk_size" or x == "chunk_type"), x))
     elif isinstance(d, list):
         things = range(0, len(d))
 
@@ -371,7 +497,7 @@ def pathdump(d, path: str, cachecon) -> None:
             return
 
         if isinstance(d, list) and (args.elide_all or geometry_path(f"{path}/{k}")) \
-            and args.arraylimit > 0 and k >= args.arraylimit:
+                and args.arraylimit > 0 and k >= args.arraylimit:
             remaining = len(d) - args.arraylimit
             print(f"{path}/... = [{remaining-1} elided of {len(d)} total]")
             k = things[-1]
@@ -422,7 +548,7 @@ class NegateAction(argparse.Action):
     def __call__(self, parser, ns, values, option):
         setattr(ns, self.dest, option[2:4] != 'no')
 
-def parse_arguments():
+def parse_arguments(loggers):
     parser = argparse.ArgumentParser(
         prog="wowdump",
         description="A tool for dumping the information out of WoW files",
@@ -433,7 +559,7 @@ def parse_arguments():
         action='store_const',
         const=True,
         default=False,
-        # help="Read objects and prepare them for decimation",
+        # help="help text",
     )
 
     parser.add_argument(
@@ -441,7 +567,23 @@ def parse_arguments():
         action='store_const',
         const=True,
         default=False,
-        # help="Read objects and prepare them for decimation",
+        # help="help text",
+    )
+
+    for lg in loggers:
+        parser.add_argument(
+            f"--debug-{lg}",
+            action="store_const",
+            const=True,
+            default=False,
+            #help = "whatever",
+        )
+
+    levels = ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')
+    parser.add_argument(
+        "--log-level",
+        default='INFO',
+        choices=levels,
     )
 
     parser.add_argument(
@@ -471,7 +613,7 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "--hide-unneeded"
+        "--hide-unneeded",
         "--no-hide-unneeded",
         dest="hide_unneeded",
         default=True,
@@ -546,9 +688,10 @@ def parse_arguments():
 
     parser.add_argument(
         "--output_type",
+        "--output-type",
         "-t",
-        choices=["path", "json", "final", "raw", ],
-        default="path",
+        choices=["path", "json", "final", "raw", "walk", ],
+        default="walk",
         help="select output type (default: %(default)s)",
     )
 
@@ -561,6 +704,9 @@ def parse_arguments():
     )
 
     args = parser.parse_args()
+
+    if args.debug:
+        args.log_level = 'DEBUG'
 
     # args.filters = [item for subl in args.filters for item in subl]
     # prep our filters
@@ -576,14 +722,25 @@ def parse_arguments():
 
 def main():
     global args
-    args = parse_arguments()
+
+    LOGGER_LIST = ["disposition", "simplify"]
+    args = parse_arguments(loggers=LOGGER_LIST)
+
+    LOG_FORMAT = "[%(filename)s:%(lineno)s:%(funcName)s] (%(name)s) %(message)s"
+    logging.basicConfig(level=args.log_level, format=LOG_FORMAT)
+
+    for lg in LOGGER_LIST:
+        if getattr(args, f"debug_{lg}"):
+            l = logging.getLogger(lg)
+            l.setLevel(logging.DEBUG)
+
+    logging.info("That's it, beautiful and simple logging!")
 
     # if len(args.files) == 0:
     #     args.files = [DEFAULT_TARGET]
     #     print(
     #         f"WARNING: Using default target file {DEFAULT_TARGET}", flush=True, file=sys.stderr)
 
-    cache_current = False
     cachefile = f"{args.listfile}.cache"
 
     # FIXME: This is a bit deeply nested for my tastes.
@@ -650,6 +807,9 @@ def main():
         parsed = to_tree(target)
         json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
         print()  # newline at end
+    elif args.output_type == "walk":
+        # temporary for performance work
+        walk(target)
 
 
 if __name__ == "__main__":
