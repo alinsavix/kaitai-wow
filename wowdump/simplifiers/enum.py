@@ -1,5 +1,10 @@
 # simplifiers for enum values
+import logging
+
 def simplify_enum(d, _parent, _cachecon, _args):
+    logger = logging.getLogger("simplify")
+    logger.debug("using enum simplifier")
+
     return f"{d['value']}  # {d['name']}"
 
 

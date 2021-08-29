@@ -1,6 +1,11 @@
 # simplifier for shader ids for WMO objects
+import logging
+
 # FIXME: deal with out-of-range values
 def simplify_shaderid_wmo(d, _parent, _cachecon, _args):
+    logger = logging.getLogger("simplify")
+    logger.debug("using shaderid (wmo) simplifier")
+
     id = d["value"]
     pixel = wmo_shader_table[id][2]
     vertex = wmo_shader_table[id][1]

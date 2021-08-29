@@ -1,6 +1,11 @@
 # simplify flags
+import logging
+
 # FIXME: Should the output be inside { } or something?
 def simplify_flags(d, _parent, _cachecon, _args):
+    logger = logging.getLogger("simplify")
+    logger.debug("using flags simplifier")
+
     if not isinstance(d, dict):
         return d
 

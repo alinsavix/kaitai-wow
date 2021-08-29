@@ -1,5 +1,10 @@
 # simplifiers for color values
+import logging
+
 def simplify_irgb(d, _parent, _cachecon, _args) -> str:
+    logger = logging.getLogger("simplify")
+    logger.debug("using irgb simplifier")
+
     r = int(d["r"])
     g = int(d["g"])
     b = int(d["b"])
@@ -7,6 +12,8 @@ def simplify_irgb(d, _parent, _cachecon, _args) -> str:
     return f"rgb({r}, {g}, {b})  # {r:02x}{g:02x}{b:02x}"
 
 def simplify_irgba(d, _parent, _cachecon, _args) -> str:
+    logger = logging.getLogger("simplify")
+    logger.debug("using irgba simplifier")
     r = int(d["r"])
     g = int(d["g"])
     b = int(d["b"])

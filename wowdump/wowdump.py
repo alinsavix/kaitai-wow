@@ -193,9 +193,8 @@ def ktype(v):
     logger.debug("var is (probably) a dict type")
     return "dict"
 
-
 # FIXME: needs dict key sorting (if possible)
-def walk(obj, path=""):
+def walk(obj, path: str, cachecon) -> None:
     # t = type(obj)
     # v = vars(obj)
     # w = whatis(obj)
@@ -210,6 +209,13 @@ def walk(obj, path=""):
         if k[0] == "_":
             continue
 
+        # if f"{path}/{k}" == "/model/particle_emitters/4/old/recursion_model_filename":
+        #     print("breakpoint me")
+
+        if k == "m2array_type" or k == "m2track_type":
+            disp.debug(f"{path}/{k} --> ignored")
+            continue
+
         logger.debug(f"getattr {k} from obj type {type(obj)}")
         v = getattr(obj, k)
 
@@ -217,21 +223,19 @@ def walk(obj, path=""):
         if kt == "skip":  # class, method, datatype
             continue
 
-
         # FIXME: Where is the best place for simplifiers? Here?
         workpath = f"{path}/{k}"
         simplify.debug(f"checking simplifier for {workpath}")
 
         s = check_simplify(workpath) if args.simplify else None
-
         if s:
             simplify.debug(f"using simplifier for {workpath}")
 
             # FIXME: this feels sloppy
             if kt == "base" or kt == "list":
-                simplified = s(v, to_tree(obj), None, args)
+                simplified = s(v, to_tree(obj), cachecon, args)
             else:
-                simplified = s(to_tree(v), to_tree(obj), None, args)
+                simplified = s(to_tree(v), to_tree(obj), cachecon, args)
             if simplified is not None:
                 print(f"{workpath} = {simplified}")
 
@@ -239,50 +243,66 @@ def walk(obj, path=""):
             # either way, move on
             continue
 
-
-        # FIXME: Verify isinstance() does the right thing, since for some
-        # reason we weren't using it before -- we were using type(v) == type([])
         if kt == "list":
-            disp.debug(f"{path}/{k}[] --> array processing (len {len(v)})")
-            value = []
+            disp.debug(f"{workpath}[] --> array processing (len {len(v)})")
+
             for i, el in enumerate(v):
-                if type(el) in [int, float, str]:
-                    disp.debug(f"array {path}[{i}] --> final ({el})")
-                    print(f"{path}/{k}/{i} = {el}")
+                arraypath = f"{workpath}/{i}"
+                elt = ktype(el)
+
+                # FIXME: dedupe dedupe
+                s = check_simplify(arraypath) if args.simplify else None
+
+                if s:
+                    simplify.debug(f"using simplifier for {arraypath}")
+
+                    simplify.debug(f"array simplify type: {type(el)}   value: {el}")
+                    # FIXME: this feels sloppy
+                    if elt == "base" or elt == "list":
+                        simplified = s(el, to_tree(v), cachecon, args)
+                    else:
+                        simplified = s(to_tree(el), to_tree(v), cachecon, args)
+                    if simplified is not None:
+                        print(f"{arraypath} = {simplified}")
+
+                    # We either simplified w/ output, or simplified out of existence.
+                    # either way, move on
+                    continue
+
+                # if elt in [int, float, str]:
+                if elt == "base":
+                    if isinstance(el, str):
+                        el = el.rstrip("\0")
+                    disp.debug(f"array {arraypath} --> final ({el})")
+                    print(f"{arraypath} = {el}")
 
                     # print thing?
                     # value.append(el)
                 else:
-                    disp.debug(f"{path}[{i}] --> array descent")
+                    disp.debug(f"{arraypath} --> array descent")
                     # value.append(to_tree(el, treepath(path, k + f"[{i}]")))
-                    walk(el, pathpath(path, f"{k}/{i}"))
+                    walk(el, arraypath, cachecon)
 
         elif kt == "kaitai":
             # FIXME: I think we're supposed to do one of these without the {k}
             if k == "data":
-                disp.debug(f"{path} --> kaitai data descent")
-                walk(v, pathpath(path, k))
+                disp.debug(f"{workpath} --> kaitai data descent")
+                walk(v, workpath, cachecon)
             else:
-                disp.debug(f"{path}/{k} --> kaitai descent type {type(k)}")
+                disp.debug(f"{workpath} --> kaitai descent type {type(k)}")
                 # debug(f"recursing kaitai value, type: {type(k)}")
-                walk(v, pathpath(path, k))
+                walk(v, workpath, cachecon)
 
         elif kt == "base":
-            if type(v) in [int, float, str, bool]:
-                disp.debug(f"{path}.{k} --> final ({v})")
-                # logger.debug(f"(output) {v}")
-                print(f"{path}/{k} = {v}")
+            if isinstance(v, str):
+                v = v.rstrip("\0")
+            disp.debug(f"{workpath} --> final ({v})")
+            # logger.debug(f"(output) {v}")
+            print(f"{workpath} = {v}")
 
         else:
-            if k == "m2array_type" or k == "m2track_type":
-                disp.debug(f"{path}/{k} --> ignored")
-            else:
-                disp.debug(f"{path}/{k} --> descend (type {type(v)}")
-                walk(v, pathpath(path, k))
-
-        # if value is not None:
-        #     r[k] = value
-
+            disp.debug(f"{workpath} --> descend (type {type(v)}")
+            walk(v, workpath, cachecon)
 
 
 def to_tree(obj, path: str = ""):
@@ -748,8 +768,7 @@ def main():
         # print("INFO: not resolving, not initializing cache", file=sys.stderr)
         cachecon = None
     elif not os.path.exists(args.listfile):
-        print(
-            f"WARNING: {args.listfile} does not exist, not resolving fileids")
+        logging.warning(f"{args.listfile} does not exist, not resolving fileids")
         cachecon = None
     else:
         if os.path.exists(cachefile) and (os.path.getmtime(args.listfile) <= os.path.getmtime(cachefile)):
@@ -808,8 +827,12 @@ def main():
         json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
         print()  # newline at end
     elif args.output_type == "walk":
+        print(f"# path = {file}")
+        h = get_contenthash(file)
+        print(f"# contenthash = {h}")
+
         # temporary for performance work
-        walk(target)
+        walk(target, "", cachecon)
 
 
 if __name__ == "__main__":
