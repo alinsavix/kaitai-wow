@@ -5,19 +5,19 @@ def simplify_irgb(d, _parent, _cachecon, _args) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using irgb simplifier")
 
-    r = int(d["r"])
-    g = int(d["g"])
-    b = int(d["b"])
+    r = int(d.r)
+    g = int(d.g)
+    b = int(d.b)
 
     return f"rgb({r}, {g}, {b})  # {r:02x}{g:02x}{b:02x}"
 
 def simplify_irgba(d, _parent, _cachecon, _args) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using irgba simplifier")
-    r = int(d["r"])
-    g = int(d["g"])
-    b = int(d["b"])
-    a = int(d["a"])
+    r = int(d.r)
+    g = int(d.g)
+    b = int(d.b)
+    a = int(d.a)
 
     return f"rgba({r}, {g}, {b}, {a})  # {r:02x}{g:02x}{b:02x}{a:02x}"
 

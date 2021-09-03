@@ -6,7 +6,7 @@ def simplify_shaderid_wmo(d, _parent, _cachecon, _args):
     logger = logging.getLogger("simplify")
     logger.debug("using shaderid (wmo) simplifier")
 
-    id = d["value"]
+    id = d.value
     pixel = wmo_shader_table[id][2]
     vertex = wmo_shader_table[id][1]
     name = wmo_shader_table[id][0]

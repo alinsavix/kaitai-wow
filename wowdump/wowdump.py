@@ -14,6 +14,7 @@ import logging
 from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct
 from ppretty import ppretty
 
+from .dumputil import kttree
 from .simplifiers import check_simplify
 
 # We can run without, we'll just be slow
@@ -193,27 +194,49 @@ def ktype(v):
     logger.debug("var is (probably) a dict type")
     return "dict"
 
+
 # FIXME: needs dict key sorting (if possible)
 def walk(obj, path: str, cachecon) -> None:
-    # t = type(obj)
-    # v = vars(obj)
-    # w = whatis(obj)
-    # print(f"top obj type: {t}; what: {w}; vars: {v}")
-    simplify = logging.getLogger("simplify")
-    disp = logging.getLogger("disposition")
+    lgsimplify = logging.getLogger("simplify")
+    lgdisp = logging.getLogger("disposition")
 
     logger = logging.getLogger()
     logger.debug(f"in: path: {path}  type: {type(obj)} {whatis(obj)}")
 
-    for k in dir(obj):
+    # This is kind of a lame way to get a loop that handles both lists
+    # and dicts, but is there a better way?
+    if isinstance(obj, dict):
+        logger.debug(f"using sorted dict for {path}")
+        obj_keys = sorted(dir(obj), key=lambda x: (
+            not (x == "chunk_size" or x == "chunk_type"), x))
+
+    # if path == "/model/vertices":
+    #     print("breakpoint")
+
+    # FIXME: isn't detecting ... /model/vertices
+    elif isinstance(obj, list):
+        logger.debug(f"using list for {path}")
+        obj_keys = range(0, len(obj))
+    else:
+        logger.debug(f"using normal ordering for {path}")
+        obj_keys = dir(obj)
+
+    eject = False
+    for k in obj_keys:
+        # Is this right? Do we want to return completely if we're ejecting?
+        if eject:
+            return
+
         if k[0] == "_":
             continue
 
-        # if f"{path}/{k}" == "/model/particle_emitters/4/old/recursion_model_filename":
-        #     print("breakpoint me")
+        workpath = f"{path}/{k}"
+
+        # if workpath == "/model/vertices":
+        #     print("breakpoint")
 
         if k == "m2array_type" or k == "m2track_type":
-            disp.debug(f"{path}/{k} --> ignored")
+            lgdisp.debug(f"{workpath} --> ignored")
             continue
 
         logger.debug(f"getattr {k} from obj type {type(obj)}")
@@ -223,19 +246,44 @@ def walk(obj, path: str, cachecon) -> None:
         if kt == "skip":  # class, method, datatype
             continue
 
-        # FIXME: Where is the best place for simplifiers? Here?
-        workpath = f"{path}/{k}"
-        simplify.debug(f"checking simplifier for {workpath}")
+        logger.debug(f"checking for array elision for {workpath}")
+        # this is probably a code smell, if not worse. If our current level
+        # isn't geometry, but we add a '/0' to it and it is, that means it's
+        # the very top of a geometry tree, and we can save ourselves the
+        # effort of descending into it (and thus reading & parsing it) by
+        # just escaping now.
+        if not args.geometry and not geometry_path(workpath) and geometry_path(f"{workpath}/0"):
+            # seriously, fuuuuuuugly
+            print(f"{workpath}/... = [geometry data elided, use --geometry to include]")
+            continue
 
+        if geometry_path(workpath) and args.arraylimit > 0 and k >= args.arraylimit:
+            logger.debug(f"eliding remaining geometry entries for {workpath}")
+            remaining = len(d) - args.arraylimit
+            print(f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
+            k = obj_keys[-1]
+            eject = True
+            continue
+
+        if args.elide_all and isinstance(obj, list) and args.arraylimit > 0 and k >= args.arraylimit:
+            logger.debug(f"eliding remaining array entries for {workpath}")
+            remaining = len(d) - args.arraylimit
+            print(f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
+            k = obj_keys[-1]
+            eject = True
+            continue
+
+        # FIXME: Where is the best place for simplifiers? Here?
+        lgsimplify.debug(f"checking simplifier for {workpath}")
         s = check_simplify(workpath) if args.simplify else None
         if s:
-            simplify.debug(f"using simplifier for {workpath}")
+            lgsimplify.debug(f"using simplifier for {workpath}")
 
             # FIXME: this feels sloppy
             if kt == "base" or kt == "list":
-                simplified = s(v, to_tree(obj), cachecon, args)
+                simplified = s(v, obj, cachecon, args)
             else:
-                simplified = s(to_tree(v), to_tree(obj), cachecon, args)
+                simplified = s(v, obj, cachecon, args)
             if simplified is not None:
                 print(f"{workpath} = {simplified}")
 
@@ -244,7 +292,7 @@ def walk(obj, path: str, cachecon) -> None:
             continue
 
         if kt == "list":
-            disp.debug(f"{workpath}[] --> array processing (len {len(v)})")
+            lgdisp.debug(f"{workpath}[] --> array processing (len {len(v)})")
 
             for i, el in enumerate(v):
                 arraypath = f"{workpath}/{i}"
@@ -254,14 +302,14 @@ def walk(obj, path: str, cachecon) -> None:
                 s = check_simplify(arraypath) if args.simplify else None
 
                 if s:
-                    simplify.debug(f"using simplifier for {arraypath}")
+                    lgsimplify.debug(f"using simplifier for {arraypath}")
 
-                    simplify.debug(f"array simplify type: {type(el)}   value: {el}")
+                    lgsimplify.debug(f"array simplify type: {type(el)}   value: {el}")
                     # FIXME: this feels sloppy
                     if elt == "base" or elt == "list":
-                        simplified = s(el, to_tree(v), cachecon, args)
+                        simplified = s(el, v, cachecon, args)
                     else:
-                        simplified = s(to_tree(el), to_tree(v), cachecon, args)
+                        simplified = s(el, v, cachecon, args)
                     if simplified is not None:
                         print(f"{arraypath} = {simplified}")
 
@@ -273,110 +321,51 @@ def walk(obj, path: str, cachecon) -> None:
                 if elt == "base":
                     if isinstance(el, str):
                         el = el.rstrip("\0")
-                    disp.debug(f"array {arraypath} --> final ({el})")
+                    lgdisp.debug(f"array {arraypath} --> final ({el})")
                     print(f"{arraypath} = {el}")
 
                     # print thing?
                     # value.append(el)
                 else:
-                    disp.debug(f"{arraypath} --> array descent")
+                    lgdisp.debug(f"{arraypath} --> array descent")
                     # value.append(to_tree(el, treepath(path, k + f"[{i}]")))
                     walk(el, arraypath, cachecon)
 
         elif kt == "kaitai":
             # FIXME: I think we're supposed to do one of these without the {k}
             if k == "data":
-                disp.debug(f"{workpath} --> kaitai data descent")
+                lgdisp.debug(f"{workpath} --> kaitai data descent")
                 walk(v, workpath, cachecon)
             else:
-                disp.debug(f"{workpath} --> kaitai descent type {type(k)}")
+                lgdisp.debug(f"{workpath} --> kaitai descent type {type(k)}")
                 # debug(f"recursing kaitai value, type: {type(k)}")
                 walk(v, workpath, cachecon)
 
         elif kt == "base":
             if isinstance(v, str):
                 v = v.rstrip("\0")
-            disp.debug(f"{workpath} --> final ({v})")
+            lgdisp.debug(f"{workpath} --> final ({v})")
             # logger.debug(f"(output) {v}")
             print(f"{workpath} = {v}")
 
         else:
-            disp.debug(f"{workpath} --> descend (type {type(v)}")
+            lgdisp.debug(f"{workpath} --> descend (type {type(v)}")
             walk(v, workpath, cachecon)
 
+# for maybe speeding up logging when a debug level is disabled:
+#
+# class Lazy(object):
+#     def __init__(self,func):
+#         self.func=func
+#     def __str__(self):
+#         return self.func()
+#
+# logger.debug(Lazy(lambda: time.sleep(20)))
+#
+# logger.info(Lazy(lambda: "Stupid log message " + ' '.join([str(i) for i in range(20)])))
 
-def to_tree(obj, path: str = ""):
-    r = {}
-    debug(f"in: path: {path}  type: {type(obj)} {whatis(obj)}")
 
-    value = None
 
-    for k in dir(obj):
-        if k[0] == "_":
-            continue
-
-        debug(f"getattr {k} from obj type {type(obj)}")
-        v = getattr(obj, k)
-        # t = type(v)
-        # debug(f"processing attribute {k} type {t}")
-        # if inspect.isclass(v) or inspect.ismethod(v):
-
-        if inspect.isclass(v):
-            # debug(f"is class, skipping")
-            pass
-        elif inspect.ismethod(v) or inspect.isbuiltin(v):
-            # debug(f"is method or builtin, skipping")
-            pass
-        elif isinstance(v, type):
-            # debug(f"defines a datatype, skipping")
-            pass
-        else:
-            if type(v) == type([]):
-                # if isinstance(v, list):
-                # debug("processing array type")
-                # log(f"array is: {ppretty(v)}")
-                disp(f"{path}/{k}[]", f"array processing (len {len(v)})")
-                value = []
-                for i, el in enumerate(v):
-                    # debug(f"appending {el}")
-                    if type(el) in [int, float, str]:
-                        disp(f"{path}[{i}]", f"final ({el})")
-                        value.append(el)
-                    else:
-                        disp(f"{path}[{i}]", "array descent")
-                        value.append(to_tree(el, treepath(path, k + f"[{i}]")))
-            elif isinstance(v, KaitaiStruct):
-                if k == "data":
-                    disp(f"{path}", "kaitai data descent")
-                    value = to_tree(v, treepath(path, k))
-                else:
-                    disp(f"{path}.{k}", "kaitai descent")
-                    # debug(f"recursing kaitai value, type: {type(k)}")
-                    value = to_tree(v, treepath(path, k))
-            else:
-                # log(f"using plain value: {v} {whatis(v)}")
-                # debug(f"dir: {dir(v)}")
-                # print(ppretty(v))
-
-                # treepath(path, k, v)
-                # print(f"{path}.{k} == {v}")
-                # value = v
-                # value = to_tree(v, treepath(path, k))
-                if type(v) in [int, float, str, bool]:
-                    disp(f"{path}.{k}", f"final ({v})")
-                    value = v
-                else:
-                    if k == "m2array_type" or k == "m2track_type":
-                        disp(f"{path}.{k}", "ignored")
-                    else:
-                        disp(f"{path}.{k}", f"descend (type {type(v)}")
-                        value = to_tree(v, treepath(path, k))
-
-            if value is not None:
-                r[k] = value
-
-    debug(f"out:  returning {r}")
-    return r
 
 
 # Caching bits (yeah, they're ugly)
@@ -699,6 +688,18 @@ def parse_arguments(loggers):
         help="elide array contents after this many entries (0 disables elision)",
     )
 
+    # FIXME: Not sure this is the best way to handle this?
+    parser.add_argument(
+        "--geometry",
+        "--no-geometry",
+        dest="geometry",
+        default=False,
+        action=NegateAction,
+        nargs=0,
+
+        help="Decode individual vertexes and related fields"
+    )
+
     parser.add_argument(
         "--elide-all",
         action='store_true',
@@ -743,7 +744,7 @@ def parse_arguments(loggers):
 def main():
     global args
 
-    LOGGER_LIST = ["disposition", "simplify"]
+    LOGGER_LIST = ["disposition", "simplify", "kttree"]
     args = parse_arguments(loggers=LOGGER_LIST)
 
     LOG_FORMAT = "[%(filename)s:%(lineno)s:%(funcName)s] (%(name)s) %(message)s"

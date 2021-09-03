@@ -5,8 +5,8 @@ def simplify_shaderid_m2(d, parent, _cachecon, _args):
     logger = logging.getLogger("simplify")
     logger.debug("using shaderid (m2) simplifier")
 
-    pixel = get_m2_pixel_shader(d, parent["texture_count"])
-    vertex = get_m2_vertex_shader(d, parent["texture_count"])
+    pixel = get_m2_pixel_shader(d, parent.texture_count)
+    vertex = get_m2_vertex_shader(d, parent.texture_count)
 
     return f"{d}  # {pixel}, {vertex}"
 

@@ -1,10 +1,13 @@
 # simplify flags
 import logging
+from ..dumputil import kttree
 
 # FIXME: Should the output be inside { } or something?
 def simplify_flags(d, _parent, _cachecon, _args):
     logger = logging.getLogger("simplify")
     logger.debug("using flags simplifier")
+
+    d = kttree(d)
 
     if not isinstance(d, dict):
         return d
