@@ -8,7 +8,7 @@ import os
 import re
 import sys
 import time
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union, TextIO
 
 import logging
 from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct
@@ -30,9 +30,38 @@ except ImportError:
 #
 # Also, did I mention it's garbage?
 
+class DataOutput(object):
+    fileHandle: TextIO
+    is_stdout: bool
+
+    def __init__(self, fn: Optional[str]):
+        if fn is not None:
+            self.fileHandle = open(fn, "w")
+            self.is_stdout = False
+        else:
+            self.fileHandle = sys.stdout
+            self.is_stdout = True
+
+    def close(self):
+        # only close if not stdout
+        if not self.is_stdout:
+            self.fileHandle.close()
+
+    def write(self, outstr: str):
+        print(outstr, file=self.fileHandle, flush=self.is_stdout)
+
+
+import contextlib
+@contextlib.contextmanager
+def dataout(fn: Optional[str]):
+    output = DataOutput(fn)
+    yield output
+    output.close()
+
+
 # DEFAULT_TARGET = "testfiles/spectraltiger.m2"
 DEFAULT_TARGET = "testfiles/staff_2h_draenorcrafted_d_02_c.m2"
-#CASCDIR = None
+CASCDIR = None
 DATADIR = os.path.dirname(os.path.realpath(__file__))
 
 # FIXME: Turn these into proper verbosity flags
@@ -196,7 +225,7 @@ def ktype(v):
 
 
 # FIXME: needs dict key sorting (if possible)
-def walk(obj, path: str, cachecon) -> None:
+def walk(out: DataOutput, obj, path: str, cachecon) -> None:
     lgsimplify = logging.getLogger("simplify")
     lgdisp = logging.getLogger("disposition")
 
@@ -254,13 +283,13 @@ def walk(obj, path: str, cachecon) -> None:
         # just escaping now.
         if not args.geometry and not geometry_path(workpath) and geometry_path(f"{workpath}/0"):
             # seriously, fuuuuuuugly
-            print(f"{workpath}/... = [geometry data elided, use --geometry to include]")
+            out.write(f"{workpath}/... = [geometry data elided, use --geometry to include]")
             continue
 
         if geometry_path(workpath) and args.arraylimit > 0 and k >= args.arraylimit:
             logger.debug(f"eliding remaining geometry entries for {workpath}")
             remaining = len(d) - args.arraylimit
-            print(f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
+            out.write(f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
             k = obj_keys[-1]
             eject = True
             continue
@@ -268,7 +297,7 @@ def walk(obj, path: str, cachecon) -> None:
         if args.elide_all and isinstance(obj, list) and args.arraylimit > 0 and k >= args.arraylimit:
             logger.debug(f"eliding remaining array entries for {workpath}")
             remaining = len(d) - args.arraylimit
-            print(f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
+            out.write(f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
             k = obj_keys[-1]
             eject = True
             continue
@@ -285,7 +314,7 @@ def walk(obj, path: str, cachecon) -> None:
             else:
                 simplified = s(v, obj, cachecon, args)
             if simplified is not None:
-                print(f"{workpath} = {simplified}")
+                out.write(f"{workpath} = {simplified}")
 
             # We either simplified w/ output, or simplified out of existence.
             # either way, move on
@@ -311,7 +340,7 @@ def walk(obj, path: str, cachecon) -> None:
                     else:
                         simplified = s(el, v, cachecon, args)
                     if simplified is not None:
-                        print(f"{arraypath} = {simplified}")
+                        out.write(f"{arraypath} = {simplified}")
 
                     # We either simplified w/ output, or simplified out of existence.
                     # either way, move on
@@ -322,35 +351,35 @@ def walk(obj, path: str, cachecon) -> None:
                     if isinstance(el, str):
                         el = el.rstrip("\0")
                     lgdisp.debug(f"array {arraypath} --> final ({el})")
-                    print(f"{arraypath} = {el}")
+                    out.write(f"{arraypath} = {el}")
 
                     # print thing?
                     # value.append(el)
                 else:
                     lgdisp.debug(f"{arraypath} --> array descent")
                     # value.append(to_tree(el, treepath(path, k + f"[{i}]")))
-                    walk(el, arraypath, cachecon)
+                    walk(out,el, arraypath, cachecon)
 
         elif kt == "kaitai":
             # FIXME: I think we're supposed to do one of these without the {k}
             if k == "data":
                 lgdisp.debug(f"{workpath} --> kaitai data descent")
-                walk(v, workpath, cachecon)
+                walk(out,v, workpath, cachecon)
             else:
                 lgdisp.debug(f"{workpath} --> kaitai descent type {type(k)}")
                 # debug(f"recursing kaitai value, type: {type(k)}")
-                walk(v, workpath, cachecon)
+                walk(out, v, workpath, cachecon)
 
         elif kt == "base":
             if isinstance(v, str):
                 v = v.rstrip("\0")
             lgdisp.debug(f"{workpath} --> final ({v})")
             # logger.debug(f"(output) {v}")
-            print(f"{workpath} = {v}")
+            out.write(f"{workpath} = {v}")
 
         else:
             lgdisp.debug(f"{workpath} --> descend (type {type(v)}")
-            walk(v, workpath, cachecon)
+            walk(out, v, workpath, cachecon)
 
 # for maybe speeding up logging when a debug level is disabled:
 #
@@ -491,7 +520,7 @@ def geometry_path(path):
         return True
 
 # FIXME: Can we manage the cache better than jut passing cachecon around?
-def pathdump(d, path: str, cachecon) -> None:
+def pathdump(out: DataOutput, d, path: str, cachecon) -> None:
     # This is kind of a lame way to get a loop that handles both lists
     # and dicts, but is there a better way?
     if isinstance(d, dict):
@@ -508,7 +537,7 @@ def pathdump(d, path: str, cachecon) -> None:
         if isinstance(d, list) and (args.elide_all or geometry_path(f"{path}/{k}")) \
                 and args.arraylimit > 0 and k >= args.arraylimit:
             remaining = len(d) - args.arraylimit
-            print(f"{path}/... = [{remaining-1} elided of {len(d)} total]")
+            out.write(f"{path}/... = [{remaining-1} elided of {len(d)} total]")
             k = things[-1]
             eject = True
             # return
@@ -535,9 +564,9 @@ def pathdump(d, path: str, cachecon) -> None:
                 continue
             simplified = s(thing, d, cachecon, args)
             if simplified is not None:
-                print(f"{workpath} = {simplified}")
+                out.write(f"{workpath} = {simplified}")
         elif isinstance(thing, dict) or isinstance(thing, list):
-            pathdump(thing, workpath, cachecon)
+            pathdump(out, thing, workpath, cachecon)
         else:
             # we're at a final path, so check filtering
             if check_filtered(workpath):
@@ -548,7 +577,7 @@ def pathdump(d, path: str, cachecon) -> None:
             # that up for now.
             if isinstance(thing, str):
                 thing = thing.rstrip("\0")
-            print(f"{workpath} = {thing}")
+            out.write(f"{workpath} = {thing}")
 
     return
 
@@ -557,7 +586,7 @@ class NegateAction(argparse.Action):
     def __call__(self, parser, ns, values, option):
         setattr(ns, self.dest, option[2:4] != 'no')
 
-def parse_arguments(loggers):
+def parse_arguments(argv, loggers):
     parser = argparse.ArgumentParser(
         prog="wowdump",
         description="A tool for dumping the information out of WoW files",
@@ -717,6 +746,15 @@ def parse_arguments(loggers):
     )
 
     parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        default=None,
+
+        help="file to output results to",
+    )
+
+    parser.add_argument(
         "files",
         action='store',
         nargs='+',
@@ -724,7 +762,7 @@ def parse_arguments(loggers):
         help="input file to be processed",
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.debug:
         args.log_level = 'DEBUG'
@@ -741,11 +779,13 @@ def parse_arguments(loggers):
     return args
 
 
-def main():
+def main(argv=None):
     global args
+    if not argv:
+        argv = sys.argv[1:]
 
     LOGGER_LIST = ["disposition", "simplify", "kttree"]
-    args = parse_arguments(loggers=LOGGER_LIST)
+    args = parse_arguments(argv, loggers=LOGGER_LIST)
 
     LOG_FORMAT = "[%(filename)s:%(lineno)s:%(funcName)s] (%(name)s) %(message)s"
     logging.basicConfig(level=args.log_level, format=LOG_FORMAT)
@@ -755,7 +795,7 @@ def main():
             l = logging.getLogger(lg)
             l.setLevel(logging.DEBUG)
 
-    logging.info("That's it, beautiful and simple logging!")
+    logging.info("wowdump initialized")  # FIXME: remove me
 
     # if len(args.files) == 0:
     #     args.files = [DEFAULT_TARGET]
@@ -808,33 +848,35 @@ def main():
         from .filetypes.anim import Anim
         target = Anim.from_file(file)
     else:
-        print(f"ERROR: don't know how to parse tile type {ext}")
+        print(f"ERROR: don't know how to parse file type {ext}", file=sys.stderr)
         sys.exit(1)
 
-    if args.output_type == "path":
-        parsed = to_tree(target)
-        print(f"# path = {file}")
-        h = get_contenthash(file)
-        print(f"# contenthash = {h}")
+    with dataout(args.output) as out:
+        if args.output_type == "path":
+            parsed = kttree(target)
+            out.write(f"# path = {file}")
+            h = get_contenthash(file)
+            out.write(f"# contenthash = {h}")
 
-        pathdump(parsed, "", cachecon)
-    elif args.output_type == "raw":
-        print(ppretty(target, depth=99, seq_length=100,))
-    elif args.output_type == "final":
-        parsed = to_tree(target)
-        print(ppretty(parsed, depth=99, seq_length=100,))
-    elif args.output_type == "json":
-        parsed = to_tree(target)
-        json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
-        print()  # newline at end
-    elif args.output_type == "walk":
-        print(f"# path = {file}")
-        h = get_contenthash(file)
-        print(f"# contenthash = {h}")
+            pathdump(out, parsed, "", cachecon)
+        elif args.output_type == "raw":
+            out.write(ppretty(target, depth=99, seq_length=100,))
+        elif args.output_type == "final":
+            parsed = kttree(target)
+            out.write(ppretty(parsed, depth=99, seq_length=100,))
+        # FIXME: re-enable json, make it use out.write()
+        # elif args.output_type == "json":
+        #     parsed = kttree(target)
+        #     json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
+        #     print()  # newline at end
+        elif args.output_type == "walk":
+            out.write(f"# path = {file}")
+            h = get_contenthash(file)
+            out.write(f"# contenthash = {h}")
 
-        # temporary for performance work
-        walk(target, "", cachecon)
+            # temporary for performance work
+            walk(out, target, "", cachecon)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))
