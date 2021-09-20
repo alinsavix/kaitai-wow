@@ -59,11 +59,16 @@ def kttree(obj, path: str=""):
                     # disp(f"{path}.{k}", f"final ({v})")
                     value = v
                 else:
-                    if k == "m2array_type" or k == "m2track_type":
-                        # disp(f"{path}.{k}", "ignored")
+                    # FIXME: figure out m2track better
+                    # if k == "m2array_type" or k == "m2track_type":
+                    #     # disp(f"{path}.{k}", "ignored")
+                    #     pass
+                    # else:
+                    #     # disp(f"{path}.{k}", f"descend (type {type(v)}")
+                    #     value = kttree(v, f"{path}/{k}")
+                    if k == "m2array_type":
                         pass
                     else:
-                        # disp(f"{path}.{k}", f"descend (type {type(v)}")
                         value = kttree(v, f"{path}/{k}")
 
             if value is not None:

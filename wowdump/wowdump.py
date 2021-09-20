@@ -264,7 +264,11 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
         # if workpath == "/model/vertices":
         #     print("breakpoint")
 
-        if k == "m2array_type" or k == "m2track_type":
+        # FIXME: figure out what to do with m2track
+        # if k == "m2array_type" or k == "m2track_type":
+        #     lgdisp.debug(f"{workpath} --> ignored")
+        #     continue
+        if k == "m2array_type":
             lgdisp.debug(f"{workpath} --> ignored")
             continue
 
@@ -283,13 +287,15 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
         # just escaping now.
         if not args.geometry and not geometry_path(workpath) and geometry_path(f"{workpath}/0"):
             # seriously, fuuuuuuugly
-            out.write(f"{workpath}/... = [geometry data elided, use --geometry to include]")
+            out.write(
+                f"{workpath}/... = [geometry data elided, use --geometry to include]")
             continue
 
         if geometry_path(workpath) and args.arraylimit > 0 and k >= args.arraylimit:
             logger.debug(f"eliding remaining geometry entries for {workpath}")
             remaining = len(d) - args.arraylimit
-            out.write(f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
+            out.write(
+                f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
             k = obj_keys[-1]
             eject = True
             continue
@@ -297,7 +303,8 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
         if args.elide_all and isinstance(obj, list) and args.arraylimit > 0 and k >= args.arraylimit:
             logger.debug(f"eliding remaining array entries for {workpath}")
             remaining = len(d) - args.arraylimit
-            out.write(f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
+            out.write(
+                f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
             k = obj_keys[-1]
             eject = True
             continue
@@ -333,7 +340,8 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
                 if s:
                     lgsimplify.debug(f"using simplifier for {arraypath}")
 
-                    lgsimplify.debug(f"array simplify type: {type(el)}   value: {el}")
+                    lgsimplify.debug(
+                        f"array simplify type: {type(el)}   value: {el}")
                     # FIXME: this feels sloppy
                     if elt == "base" or elt == "list":
                         simplified = s(el, v, cachecon, args)
@@ -358,13 +366,13 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
                 else:
                     lgdisp.debug(f"{arraypath} --> array descent")
                     # value.append(to_tree(el, treepath(path, k + f"[{i}]")))
-                    walk(out,el, arraypath, cachecon)
+                    walk(out, el, arraypath, cachecon)
 
         elif kt == "kaitai":
             # FIXME: I think we're supposed to do one of these without the {k}
             if k == "data":
                 lgdisp.debug(f"{workpath} --> kaitai data descent")
-                walk(out,v, workpath, cachecon)
+                walk(out, v, workpath, cachecon)
             else:
                 lgdisp.debug(f"{workpath} --> kaitai descent type {type(k)}")
                 # debug(f"recursing kaitai value, type: {type(k)}")
@@ -787,7 +795,7 @@ def main(argv=None):
     LOGGER_LIST = ["disposition", "simplify", "kttree"]
     args = parse_arguments(argv, loggers=LOGGER_LIST)
 
-    LOG_FORMAT = "[%(filename)s:%(lineno)s:%(funcName)s] (%(name)s) %(message)s"
+    LOG_FORMAT = "[%(filename)s:%(lineno)s:%(funcName)s] (%(name)s) %(levelname)s: %(message)s"
     logging.basicConfig(level=args.log_level, format=LOG_FORMAT)
 
     for lg in LOGGER_LIST:
@@ -795,23 +803,23 @@ def main(argv=None):
             l = logging.getLogger(lg)
             l.setLevel(logging.DEBUG)
 
-    logging.info("wowdump initialized")  # FIXME: remove me
+    log = logging.getLogger()
+    log.info("wowdump initialized")  # FIXME: remove me
 
     # if len(args.files) == 0:
     #     args.files = [DEFAULT_TARGET]
     #     print(
     #         f"WARNING: Using default target file {DEFAULT_TARGET}", flush=True, file=sys.stderr)
 
-    cachefile = f"{args.listfile}.cache"
-
-    # FIXME: This is a bit deeply nested for my tastes.
     if not args.resolve:
         # print("INFO: not resolving, not initializing cache", file=sys.stderr)
         cachecon = None
     elif not os.path.exists(args.listfile):
-        logging.warning(f"{args.listfile} does not exist, not resolving fileids")
+        log.warning(
+            f"{args.listfile} does not exist, not resolving fileids")
         cachecon = None
     else:
+        cachefile = f"{args.listfile}.cache"
         if os.path.exists(cachefile) and (os.path.getmtime(args.listfile) <= os.path.getmtime(cachefile)):
             # print("INFO: fileid cache up to date, not updating", file=sys.stderr)
             cachecon = cache_open(cachefile)
@@ -821,6 +829,10 @@ def main(argv=None):
 
     # FIXME: handle more than one file
     file = args.files[0]
+
+    if not os.path.isfile(file):
+        log.error(f"no such file: {file}")
+        return 1
 
     name, ext = os.path.splitext(file)
     if ext == ".m2":
@@ -848,13 +860,14 @@ def main(argv=None):
         from .filetypes.anim import Anim
         target = Anim.from_file(file)
     else:
-        print(f"ERROR: don't know how to parse file type {ext}", file=sys.stderr)
+        print(
+            f"ERROR: don't know how to parse file type {ext}", file=sys.stderr)
         sys.exit(1)
 
     with dataout(args.output) as out:
         if args.output_type == "path":
             parsed = kttree(target)
-            out.write(f"# path = {file}")
+            # out.write(f"# path = {file}")
             h = get_contenthash(file)
             out.write(f"# contenthash = {h}")
 
@@ -865,12 +878,12 @@ def main(argv=None):
             parsed = kttree(target)
             out.write(ppretty(parsed, depth=99, seq_length=100,))
         # FIXME: re-enable json, make it use out.write()
-        # elif args.output_type == "json":
-        #     parsed = kttree(target)
-        #     json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
-        #     print()  # newline at end
+        elif args.output_type == "json":
+            parsed = kttree(target)
+            json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
+            print()  # newline at end
         elif args.output_type == "walk":
-            out.write(f"# path = {file}")
+            # out.write(f"# path = {file}")
             h = get_contenthash(file)
             out.write(f"# contenthash = {h}")
 

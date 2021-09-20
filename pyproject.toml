@@ -4,3 +4,14 @@ requires = [
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+log_cli = true
+addopts = ["--tb=short", "--strict-markers", "--html=report.html", "--css=report.css", "--self-contained-html", ]
+
+console_output_style = "count"
+log_auto_indent = true
+norecursedirs = [ "*", ]
+python_files = [ "test_*.py", "check_*.py", "example_*.py", ]
+required_plugins = [ "pytest-html>=3.1", ]
+testpaths = [ "tests", ]
