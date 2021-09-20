@@ -239,9 +239,6 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
         obj_keys = sorted(dir(obj), key=lambda x: (
             not (x == "chunk_size" or x == "chunk_type"), x))
 
-    # if path == "/model/vertices":
-    #     print("breakpoint")
-
     # FIXME: isn't detecting ... /model/vertices
     elif isinstance(obj, list):
         logger.debug(f"using list for {path}")
@@ -249,6 +246,9 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
     else:
         logger.debug(f"using normal ordering for {path}")
         obj_keys = dir(obj)
+
+    # if path == "/skin/batches/0":
+    #     print("breakpoint")
 
     eject = False
     for k in obj_keys:
@@ -264,6 +264,7 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
         # if workpath == "/model/vertices":
         #     print("breakpoint")
 
+
         # FIXME: figure out what to do with m2track
         # if k == "m2array_type" or k == "m2track_type":
         #     lgdisp.debug(f"{workpath} --> ignored")
@@ -278,6 +279,9 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
         kt = ktype(v)
         if kt == "skip":  # class, method, datatype
             continue
+
+        # if workpath == "/model/vertices":
+        #     print("breakpoint")
 
         logger.debug(f"checking for array elision for {workpath}")
         # this is probably a code smell, if not worse. If our current level
@@ -308,6 +312,13 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
             k = obj_keys[-1]
             eject = True
             continue
+
+        # if we have ofs_xxx or num_xxx, and *also* just have xxx,
+        # we don't need the offset/size anymore
+        if args.hide_unneeded and isinstance(k, str) and (k.startswith("ofs_") or k.startswith("num_")):
+            s = k[len("ofs_"):]
+            if s in obj_keys:
+                continue
 
         # FIXME: Where is the best place for simplifiers? Here?
         lgsimplify.debug(f"checking simplifier for {workpath}")
@@ -521,7 +532,7 @@ def check_filtered(path: str) -> bool:
 #
 # FIXME: It'd be great if we didn't have to maintain the regex list by hand.
 geom_path_re = re.compile(
-    r"/(model|chunk_data)/(polys|indices|vertices|normals|tex_coords|bspnodes|vertex_colors|node_face_indices)/\d+$")
+    r"/(model|skin|chunk_data)/(bones|polys|indices|vertices|normals|tex_coords|bspnodes|vertex_colors|node_face_indices)/\d+$")
 
 def geometry_path(path):
     if geom_path_re.search(path):

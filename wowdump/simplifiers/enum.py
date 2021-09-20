@@ -9,7 +9,7 @@ def simplify_enum(d, _parent, _cachecon, _args):
     return f"{d.value}  # {d.name}"
 
 
-interpolation_type_re = r"interpolation_type$"
+interpolation_type_re = r"(interpolation_type|m2track_type)$"
 version_re = r"^/model/version$"
 
 

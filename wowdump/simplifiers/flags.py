@@ -7,6 +7,10 @@ def simplify_flags(d, _parent, _cachecon, _args):
     logger = logging.getLogger("simplify")
     logger.debug("using flags simplifier")
 
+    # Somethihg named flags but isn't actually flags
+    if isinstance(d, int):
+        return str(d)
+
     d = kttree(d)
 
     if not isinstance(d, dict):
