@@ -42,27 +42,24 @@ tlist_tests = [
     "levelup.m2",
     "levelup00.skin",
     "nightelfarcher_f.m2",
-    "nightelfarcher_f.skel",
     "nightelfarcher_f00.skin",
     "nightelfarcher_f_lod01.skin",
-    "nightelffemale_hd.m2",
-    "nightelffemale_hd.skel",
-    "nightelffemale_hd00.skin",
     "nightelffemale_hd0060-00.anim",
-    # "nightelffemale_hd_01.bone",
+    "flyingspriteevil.skel",
+    # "nightelffemale_hd_01.bone",  # Not yet supported
     "nightelffemale_hd_markings_color_3641609.blp",
 
     "spectraltiger.m2",
     "staff_2h_draenorcrafted_d_02_c.m2",
 
-    # "zandalarcontinentfinale.tex",
-    # "zandalarcontinentfinale.wdl",
+    # "zandalarcontinentfinale.tex",  # Not yet supported
+    # "zandalarcontinentfinale.wdl",  # Not yet supported
     "zandalarcontinentfinale.wdt",
-    # "zandalarcontinentfinale_28_30.adt",
-    # "zandalarcontinentfinale_28_30_lod.adt",
-    # "zandalarcontinentfinale_28_30_obj0.adt",
-    # "zandalarcontinentfinale_28_30_obj1.adt",
-    # "zandalarcontinentfinale_28_30_tex0.adt",
+    # "zandalarcontinentfinale_28_30.adt",  # Not yet supported
+    # "zandalarcontinentfinale_28_30_lod.adt",  # Not yet supported
+    # "zandalarcontinentfinale_28_30_obj0.adt",  # Not yet supported
+    # "zandalarcontinentfinale_28_30_obj1.adt",  # Not yet supported
+    # "zandalarcontinentfinale_28_30_tex0.adt",  # Not yet supported
     "zandalarcontinentfinale_fogs.wdt",
     "zandalarcontinentfinale_lgt.wdt",
     "zandalarcontinentfinale_mpv.wdt",
