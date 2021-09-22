@@ -815,7 +815,7 @@ def main(argv=None):
             l.setLevel(logging.DEBUG)
 
     log = logging.getLogger()
-    log.info("wowdump initialized")  # FIXME: remove me
+    # log.info("wowdump initialized")  # FIXME: remove me
 
     # if len(args.files) == 0:
     #     args.files = [DEFAULT_TARGET]
