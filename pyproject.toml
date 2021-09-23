@@ -7,7 +7,12 @@ build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 log_cli = true
-addopts = ["--tb=short", "--strict-markers", "--html=report.html", "--css=report.css", "--self-contained-html", ]
+addopts = [
+    "--tb=short",
+    "--strict-markers",
+    "--html=report.html", "--css=report.css", "--self-contained-html",
+    "--cov-report=html", "--cov=wowdump",
+]
 
 console_output_style = "count"
 log_auto_indent = true

@@ -2,7 +2,6 @@
 import argparse
 import csv
 import hashlib
-import inspect
 import json
 import os
 import re
@@ -14,7 +13,7 @@ import logging
 from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct
 from ppretty import ppretty
 
-from .dumputil import kttree
+from .dumputil import ktype, kttree, whatis
 from .simplifiers import check_simplify
 
 # We can run without, we'll just be slow
@@ -72,93 +71,6 @@ do_disposition = 0
 
 global args
 
-def log(text):
-    if do_verbose:
-        # print(text, file=sys.stderr)
-        print(text, flush=True)
-
-
-def debug(text):
-    if do_debug:
-        # print(text, file=sys.stderr)
-        print("DEBUG", text, flush=True)
-
-
-def disp(path, what):
-    if do_disposition:
-        print(f":: {path} --> {what}", flush=True)
-
-
-def treepath(path, key, value=None):
-    # log(f"treepath: {path}.{key} ({value})")
-    if not value:
-        # if key == "data":
-        #     return path
-
-        # else
-        return f"{path}.{key}"
-
-    # else
-    if showtree:
-        print(f"{path}.{key} == {value}", flush=True)
-
-
-def pathpath(path, key):
-    return f"{path}/{key}"
-
-
-def whatis(obj):
-    objis = []
-
-    if inspect.ismodule(obj):
-        objis.append("module")
-    if inspect.isclass(obj):
-        objis.append("class")
-    if inspect.ismethod(obj):
-        objis.append("method")
-    if inspect.isfunction(obj):
-        objis.append("function")
-    if inspect.isgeneratorfunction(obj):
-        objis.append("generatorfunction")
-    if inspect.isgenerator(obj):
-        objis.append("generator")
-    if inspect.iscoroutinefunction(obj):
-        objis.append("coroutinefunction")
-    if inspect.iscoroutine(obj):
-        objis.append("coroutine")
-    if inspect.isawaitable(obj):
-        objis.append("awaitable")
-    if inspect.isasyncgenfunction(obj):
-        objis.append("asyncgenfunction")
-    if inspect.isasyncgen(obj):
-        objis.append("asyncgen")
-    if inspect.istraceback(obj):
-        objis.append("traceback")
-    if inspect.isframe(obj):
-        objis.append("frame")
-    if inspect.iscode(obj):
-        objis.append("code")
-    if inspect.isbuiltin(obj):
-        objis.append("builtin")
-    if inspect.isroutine(obj):
-        objis.append("routine")
-    if inspect.isabstract(obj):
-        objis.append("abstract")
-    if inspect.ismethoddescriptor(obj):
-        objis.append("methoddescriptor")
-    if inspect.isdatadescriptor(obj):
-        objis.append("datadescriptor")
-    if inspect.isgetsetdescriptor(obj):
-        objis.append("getsetdescriptor")
-    if inspect.ismemberdescriptor(obj):
-        objis.append("memberdescriptor")
-
-    if isinstance(obj, KaitaiStruct):
-        objis.append("kaitaistruct")
-
-    return objis
-
-
 def get_contenthash(filename):
     with open(filename, "rb") as f:
         h = hashlib.md5()
@@ -174,54 +86,21 @@ def get_contenthash(filename):
 #   - next to original file
 #   - maybe some directory relative to original file
 #   - some configured CASC path
-def find_related(filepath, base):
-    if os.path.isfile(base):
-        base = os.path.dirname(base)
+# def find_related(filepath, base):
+#     if os.path.isfile(base):
+#         base = os.path.dirname(base)
 
-    filename = os.path.basename(filepath)
-    check = os.path.join(base, filename)
-    if os.path.isfile(check):
-        return check
+#     filename = os.path.basename(filepath)
+#     check = os.path.join(base, filename)
+#     if os.path.isfile(check):
+#         return check
 
-    if CASCDIR:
-        check = os.path.join(CASCDIR, filepath)
-        if os.path.isfile(check):
-            return check
+#     if CASCDIR:
+#         check = os.path.join(CASCDIR, filepath)
+#         if os.path.isfile(check):
+#             return check
 
-    return None
-
-
-# "kaitai type"
-def ktype(v):
-    logger = logging.getLogger()
-    if inspect.isclass(v):
-        logger.debug("var is type class, skipping")
-        return "skip"
-
-    if inspect.ismethod(v) or inspect.isbuiltin(v):
-        logger.debug("var is is method or builtin, skipping")
-        return "skip"
-
-    if isinstance(v, type):
-        logger.debug("var is defines a datatype, skipping")
-        return "skip"
-
-    if isinstance(v, list):
-        logger.debug("var is type list")
-        return "list"
-
-    if isinstance(v, KaitaiStruct):
-        logger.debug(f"var is a kaitai type {type(v)}")
-        return "kaitai"
-
-    if type(v) in [int, float, str, bool]:
-        logger.debug("var is a base type")
-        return "base"
-
-    # otherwise is a dict type
-    # FIXME: I think dict type, anyhow
-    logger.debug("var is (probably) a dict type")
-    return "dict"
+#     return None
 
 
 # FIXME: needs dict key sorting (if possible)
@@ -234,21 +113,26 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
 
     # This is kind of a lame way to get a loop that handles both lists
     # and dicts, but is there a better way?
+    #
+    # FIXME: none of the special cases here are ever called
     if isinstance(obj, dict):
+        # logger.debug(f"in: path: {path}  instance: dict")
         logger.debug(f"using sorted dict for {path}")
         obj_keys = sorted(dir(obj), key=lambda x: (
             not (x == "chunk_size" or x == "chunk_type"), x))
-
-    # FIXME: isn't detecting ... /model/vertices
     elif isinstance(obj, list):
+        # logger.debug(f"in: path: {path}  instance: list")
         logger.debug(f"using list for {path}")
         obj_keys = range(0, len(obj))
     else:
+        # logger.debug(f"in: path: {path}  instance: normie")
         logger.debug(f"using normal ordering for {path}")
         obj_keys = dir(obj)
 
     # if path == "/skin/batches/0":
     #     print("breakpoint")
+
+    logger.debug(f"obj_keys: {obj_keys}")
 
     eject = False
     for k in obj_keys:
@@ -280,8 +164,10 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
         if kt == "skip":  # class, method, datatype
             continue
 
-        # if workpath == "/model/vertices":
-        #     print("breakpoint")
+        # FIXME/bug: We get here with workpath="/model/bones/30/bone_name_crc", but never
+        # with just "/model/bones/30", which mucks up the elision logic.  halp???
+        if workpath.startswith("/model/bones/30"):
+            print("breakpoint")
 
         logger.debug(f"checking for array elision for {workpath}")
         # this is probably a code smell, if not worse. If our current level
