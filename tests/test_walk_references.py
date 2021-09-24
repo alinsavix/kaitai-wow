@@ -18,7 +18,6 @@ DATADIR = os.path.join(".", "test_data")
 OUTPUTDIR = os.path.join(".", "outputs")
 REFERENCEDIR = os.path.join(".", "output_references")
 
-
 # def test_command():
 #     success, failmsg = capture_cmd("ls", ["-al"], outfile="out.txt", errfile="err.txt")
 #     assert success, failmsg

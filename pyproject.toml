@@ -6,7 +6,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
-log_cli = true
+log_cli = false
 addopts = [
     "--tb=short",
     "--strict-markers",

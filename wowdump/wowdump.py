@@ -556,7 +556,7 @@ def parse_arguments(argv, loggers):
     parser.add_argument(
         "--listfile",
         default=f"{DATADIR}/listfile.csv",
-        help="specify listfile to use for fileids (default: %(default)s",
+        help="specify listfile to use for fileids (default: %(default)s)",
     )
 
     parser.add_argument(
