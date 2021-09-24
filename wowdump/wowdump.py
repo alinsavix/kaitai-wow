@@ -134,12 +134,7 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
 
     logger.debug(f"obj_keys: {obj_keys}")
 
-    eject = False
     for k in obj_keys:
-        # Is this right? Do we want to return completely if we're ejecting?
-        if eject:
-            return
-
         if k[0] == "_":
             continue
 
@@ -164,10 +159,8 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
         if kt == "skip":  # class, method, datatype
             continue
 
-        # FIXME/bug: We get here with workpath="/model/bones/30/bone_name_crc", but never
-        # with just "/model/bones/30", which mucks up the elision logic.  halp???
-        if workpath.startswith("/model/bones/30"):
-            print("breakpoint")
+        # if workpath.startswith("/model/bones/30"):
+        #     print("breakpoint")
 
         logger.debug(f"checking for array elision for {workpath}")
         # this is probably a code smell, if not worse. If our current level
@@ -179,24 +172,6 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
             # seriously, fuuuuuuugly
             out.write(
                 f"{workpath}/... = [geometry data elided, use --geometry to include]")
-            continue
-
-        if geometry_path(workpath) and args.arraylimit > 0 and k >= args.arraylimit:
-            logger.debug(f"eliding remaining geometry entries for {workpath}")
-            remaining = len(d) - args.arraylimit
-            out.write(
-                f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
-            k = obj_keys[-1]
-            eject = True
-            continue
-
-        if args.elide_all and isinstance(obj, list) and args.arraylimit > 0 and k >= args.arraylimit:
-            logger.debug(f"eliding remaining array entries for {workpath}")
-            remaining = len(d) - args.arraylimit
-            out.write(
-                f"{path}/... = [{remaining-1} elided of {len(obj)} total]")
-            k = obj_keys[-1]
-            eject = True
             continue
 
         # if we have ofs_xxx or num_xxx, and *also* just have xxx,
@@ -230,6 +205,20 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
             for i, el in enumerate(v):
                 arraypath = f"{workpath}/{i}"
                 elt = ktype(el)
+
+                if geometry_path(arraypath) and args.arraylimit > 0 and i >= args.arraylimit:
+                    logger.debug(f"eliding remaining geometry entries for {workpath}")
+                    remaining = len(v) - args.arraylimit
+                    out.write(
+                        f"{workpath}/... = [{remaining} elided of {len(v)} total]")
+                    break
+
+                elif args.elide_all and args.arraylimit > 0 and i >= args.arraylimit:
+                    logger.debug(f"eliding remaining array entries for {workpath}")
+                    remaining = len(v) - args.arraylimit
+                    out.write(
+                        f"{workpath}/... = [{remaining} elided of {len(v)} total]")
+                    break
 
                 # FIXME: dedupe dedupe
                 s = check_simplify(arraypath) if args.simplify else None
