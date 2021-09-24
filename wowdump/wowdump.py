@@ -63,11 +63,6 @@ DEFAULT_TARGET = "testfiles/staff_2h_draenorcrafted_d_02_c.m2"
 CASCDIR = None
 DATADIR = os.path.dirname(os.path.realpath(__file__))
 
-# FIXME: Turn these into proper verbosity flags
-do_verbose = 0
-do_debug = 0
-showtree = 0
-do_disposition = 0
 
 global args
 
@@ -103,7 +98,7 @@ def get_contenthash(filename):
 #     return None
 
 
-# FIXME: needs dict key sorting (if possible)
+
 def walk(out: DataOutput, obj, path: str, cachecon) -> None:
     lgsimplify = logging.getLogger("simplify")
     lgdisp = logging.getLogger("disposition")
@@ -111,23 +106,13 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
     logger = logging.getLogger()
     logger.debug(f"in: path: {path}  type: {type(obj)} {whatis(obj)}")
 
-    # This is kind of a lame way to get a loop that handles both lists
-    # and dicts, but is there a better way?
-    #
-    # FIXME: none of the special cases here are ever called
-    if isinstance(obj, dict):
-        # logger.debug(f"in: path: {path}  instance: dict")
-        logger.debug(f"using sorted dict for {path}")
-        obj_keys = sorted(dir(obj), key=lambda x: (
-            not (x == "chunk_size" or x == "chunk_type"), x))
-    elif isinstance(obj, list):
-        # logger.debug(f"in: path: {path}  instance: list")
-        logger.debug(f"using list for {path}")
-        obj_keys = range(0, len(obj))
-    else:
-        # logger.debug(f"in: path: {path}  instance: normie")
-        logger.debug(f"using normal ordering for {path}")
-        obj_keys = dir(obj)
+    # I don't thiiiiiiiink we get called with an object that isn't a
+    # kaitai type, so even though we used to have to figure out object
+    # type here, seems like we don't, at this point?
+
+    # obj_keys = sorted(dir(obj), key=lambda x: (
+    #     not (x == "chunk_size" or x == "chunk_type"), x))
+    obj_keys = dir(obj)
 
     # if path == "/skin/batches/0":
     #     print("breakpoint")
@@ -142,7 +127,6 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
 
         # if workpath == "/model/vertices":
         #     print("breakpoint")
-
 
         # FIXME: figure out what to do with m2track
         # if k == "m2array_type" or k == "m2track_type":
@@ -206,15 +190,21 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
                 arraypath = f"{workpath}/{i}"
                 elt = ktype(el)
 
+                # if --geometry is specified, we still want to limit it to just
+                # our array limit of entries, unless we've set arraylimit=0
                 if geometry_path(arraypath) and args.arraylimit > 0 and i >= args.arraylimit:
-                    logger.debug(f"eliding remaining geometry entries for {workpath}")
+                    logger.debug(
+                        f"eliding remaining geometry entries for {workpath}")
                     remaining = len(v) - args.arraylimit
                     out.write(
                         f"{workpath}/... = [{remaining} elided of {len(v)} total]")
                     break
 
-                elif args.elide_all and args.arraylimit > 0 and i >= args.arraylimit:
-                    logger.debug(f"eliding remaining array entries for {workpath}")
+                # if we're going to elide all arrays (via --elide-all), check
+                # that, too, and bail if we've hit the limit
+                if args.elide_all and args.arraylimit > 0 and i >= args.arraylimit:
+                    logger.debug(
+                        f"eliding remaining array entries for {workpath}")
                     remaining = len(v) - args.arraylimit
                     out.write(
                         f"{workpath}/... = [{remaining} elided of {len(v)} total]")
@@ -222,7 +212,6 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
 
                 # FIXME: dedupe dedupe
                 s = check_simplify(arraypath) if args.simplify else None
-
                 if s:
                     lgsimplify.debug(f"using simplifier for {arraypath}")
 
