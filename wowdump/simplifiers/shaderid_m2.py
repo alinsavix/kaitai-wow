@@ -144,7 +144,7 @@ def get_m2_vertex_shader(shader_id, op_count=2):
                         return "VS_Diffuse_T1_T1"
 
 
-shader_m2_re = r"^/batches/\d+/shader_id$"
+shader_m2_re = r"^/skin/batches/\d+/shader_id$"
 
 
 simplifiers = [

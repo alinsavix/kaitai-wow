@@ -5,7 +5,7 @@
 /skin/batches/0/material_index = 1
 /skin/batches/0/material_layer = 0
 /skin/batches/0/priority_plane = 0
-/skin/batches/0/shader_id = 16
+/skin/batches/0/shader_id = 16  # PS_Combiners_Mod, VS_Diffuse_T1
 /skin/batches/0/skin_section_index = 1
 /skin/batches/0/texture_combo_index = 1
 /skin/batches/0/texture_coord_combo_index = 0
@@ -18,7 +18,7 @@
 /skin/batches/1/material_index = 0
 /skin/batches/1/material_layer = 0
 /skin/batches/1/priority_plane = 0
-/skin/batches/1/shader_id = 16
+/skin/batches/1/shader_id = 16  # PS_Combiners_Mod, VS_Diffuse_T1
 /skin/batches/1/skin_section_index = 0
 /skin/batches/1/texture_combo_index = 0
 /skin/batches/1/texture_coord_combo_index = 0
