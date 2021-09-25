@@ -1,4 +1,4 @@
-# contenthash = de0ec037aed38dece07303494a7302ae
+/contenthash = de0ec037aed38dece07303494a7302ae
 /alpha_channel_bit_depth = 8
 /color_encoding/name = color_dxt
 /color_encoding/value = 2

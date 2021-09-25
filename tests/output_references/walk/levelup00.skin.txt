@@ -1,4 +1,4 @@
-# contenthash = fcffa7b9d7a1ed8f0d021d58b7289f01
+/contenthash = fcffa7b9d7a1ed8f0d021d58b7289f01
 /skin/batches/0/color_index = 0
 /skin/batches/0/flags = none
 /skin/batches/0/geoset_index = 1

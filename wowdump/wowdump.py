@@ -153,9 +153,9 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
         # effort of descending into it (and thus reading & parsing it) by
         # just escaping now.
         if not args.geometry and not geometry_path(workpath) and geometry_path(f"{workpath}/0"):
-            # seriously, fuuuuuuugly
-            out.write(
-                f"{workpath}/... = [geometry data elided, use --geometry to include]")
+            if not check_filtered(workpath):
+                out.write(
+                    f"{workpath}/... = [geometry data elided, use --geometry to include]")
             continue
 
         # if we have ofs_xxx or num_xxx, and *also* just have xxx,
@@ -170,6 +170,10 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
         s = check_simplify(workpath) if args.simplify else None
         if s:
             lgsimplify.debug(f"using simplifier for {workpath}")
+
+            # if getting simplified, it's a "final" path, so check filtering
+            if check_filtered(workpath):
+                continue
 
             # FIXME: this feels sloppy
             if kt == "base" or kt == "list":
@@ -195,9 +199,10 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
                 if geometry_path(arraypath) and args.arraylimit > 0 and i >= args.arraylimit:
                     logger.debug(
                         f"eliding remaining geometry entries for {workpath}")
-                    remaining = len(v) - args.arraylimit
-                    out.write(
-                        f"{workpath}/... = [{remaining} elided of {len(v)} total]")
+                    if not check_filtered(arraypath):
+                        remaining = len(v) - args.arraylimit
+                        out.write(
+                            f"{workpath}/... = [{remaining} elided of {len(v)} total]")
                     break
 
                 # if we're going to elide all arrays (via --elide-all), check
@@ -205,15 +210,20 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
                 if args.elide_all and args.arraylimit > 0 and i >= args.arraylimit:
                     logger.debug(
                         f"eliding remaining array entries for {workpath}")
-                    remaining = len(v) - args.arraylimit
-                    out.write(
-                        f"{workpath}/... = [{remaining} elided of {len(v)} total]")
+                    if not check_filtered(arraypath):
+                        remaining = len(v) - args.arraylimit
+                        out.write(
+                            f"{workpath}/... = [{remaining} elided of {len(v)} total]")
                     break
 
                 # FIXME: dedupe dedupe
                 s = check_simplify(arraypath) if args.simplify else None
                 if s:
                     lgsimplify.debug(f"using simplifier for {arraypath}")
+
+                    # if getting simplified, it's a "final" path, so check filtering
+                    if check_filtered(arraypath):
+                        continue
 
                     lgsimplify.debug(
                         f"array simplify type: {type(el)}   value: {el}")
@@ -231,6 +241,10 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
 
                 # if elt in [int, float, str]:
                 if elt == "base":
+                    # we're at a final path, check filtering
+                    if check_filtered(workpath):
+                        continue
+
                     if isinstance(el, str):
                         el = el.rstrip("\0")
                     lgdisp.debug(f"array {arraypath} --> final ({el})")
@@ -254,8 +268,13 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
                 walk(out, v, workpath, cachecon)
 
         elif kt == "base":
+            # we're at a final path, check filtering
+            if check_filtered(workpath):
+                continue
+
             if isinstance(v, str):
                 v = v.rstrip("\0")
+
             lgdisp.debug(f"{workpath} --> final ({v})")
             # logger.debug(f"(output) {v}")
             out.write(f"{workpath} = {v}")
@@ -564,7 +583,7 @@ def parse_arguments(argv, loggers):
         dest="filters",
         default=[],
         action='append',
-        nargs="+",
+        nargs=1,
         help="filter results by path (can be used multiple times)",
     )
 
@@ -759,8 +778,9 @@ def main(argv=None):
             print()  # newline at end
         elif args.output_type == "walk":
             # out.write(f"# path = {file}")
-            h = get_contenthash(file)
-            out.write(f"# contenthash = {h}")
+            if not check_filtered("/contenthash"):
+                h = get_contenthash(file)
+                out.write(f"/contenthash = {h}")
 
             # temporary for performance work
             walk(out, target, "", cachecon)

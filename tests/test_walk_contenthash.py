@@ -27,4 +27,4 @@ def test_contenthash(capsys, extra):
     captured = capsys.readouterr()
 
     # contenthash should always be the first line, and should always be there
-    assert captured.out.split("\n")[0] == "# contenthash = d1b1a625d1396a83b907319265346580"
+    assert captured.out.split("\n")[0] == "/contenthash = d1b1a625d1396a83b907319265346580"

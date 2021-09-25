@@ -1,4 +1,4 @@
-# contenthash = 589b3609af2141309b8c97c273fda784
+/contenthash = 589b3609af2141309b8c97c273fda784
 /chunks/0/chunk_data/amb_color = rgba(78, 28, 69, 255)  # 4e1c45ff
 /chunks/0/chunk_data/bounding_box/max = xyz(243.594727, 173.564896, 431.437866)
 /chunks/0/chunk_data/bounding_box/min = xyz(-261.570679, -350.985748, -103.148254)
@@ -861,8 +861,8 @@
 /chunks/1/chunk_data/materials/64/texture3_file_data_id = 0
 /chunks/1/chunk_size = 4160
 /chunks/1/chunk_type = MOMT
-/chunks/2/chunk_data/group_names/0 = 
-/chunks/2/chunk_data/group_names/1 = 
+/chunks/2/chunk_data/group_names/0 =
+/chunks/2/chunk_data/group_names/1 =
 /chunks/2/chunk_data/group_names/2 = tower
 /chunks/2/chunk_data/group_names/3 = centerbot
 /chunks/2/chunk_data/group_names/4 = balcony
@@ -876,9 +876,9 @@
 /chunks/2/chunk_data/group_names/12 = kingsroom
 /chunks/2/chunk_data/group_names/13 = topext
 /chunks/2/chunk_data/group_names/14 = antiportal
-/chunks/2/chunk_data/group_names/15 = 
-/chunks/2/chunk_data/group_names/16 = 
-/chunks/2/chunk_data/group_names/17 = 
+/chunks/2/chunk_data/group_names/15 =
+/chunks/2/chunk_data/group_names/16 =
+/chunks/2/chunk_data/group_names/17 =
 /chunks/2/chunk_size = 132
 /chunks/2/chunk_type = MOGN
 /chunks/3/chunk_data/group_info/0/bounding_box/max = xyz(243.594727, -119.493271, 431.437866)

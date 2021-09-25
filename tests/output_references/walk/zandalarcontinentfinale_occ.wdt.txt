@@ -1,4 +1,4 @@
-# contenthash = fc9175a2d2616082b233b680bc2cda91
+/contenthash = fc9175a2d2616082b233b680bc2cda91
 /chunks/0/chunk_data/maois/0/offset = 0
 /chunks/0/chunk_data/maois/0/size = 578
 /chunks/0/chunk_data/maois/0/tile_x = 28

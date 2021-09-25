@@ -1,4 +1,4 @@
-# contenthash = a9a0e4ce4a25f8c5aba836821b5e8d92
+/contenthash = a9a0e4ce4a25f8c5aba836821b5e8d92
 /chunks/0/chunk_data/txac_mesh/0 = 0
 /chunks/0/chunk_size = 2
 /chunks/0/chunk_type = TXAC
@@ -1089,7 +1089,7 @@
 /model/texture_weights/0/weight/values/values/0/offset = 3143888
 /model/texture_weights/0/weight/values/values/0/values/0/value = 1.0
 /model/texture_weights/0/weight/values/values/0/values/0/value_raw = 32767
-/model/textures/0/filename = 
+/model/textures/0/filename =
 /model/textures/0/flags = none
 /model/textures/0/type/name = component_monster_1
 /model/textures/0/type/value = 11

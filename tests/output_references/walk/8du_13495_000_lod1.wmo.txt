@@ -1,4 +1,4 @@
-# contenthash = 0452c8aebec105c0c1f6d154b37e2399
+/contenthash = 0452c8aebec105c0c1f6d154b37e2399
 /chunks/0/chunk_data/bounding_box/max = xyz(243.594727, -119.493271, 431.437866)
 /chunks/0/chunk_data/bounding_box/min = xyz(25.858154, -343.301849, -26.186348)
 /chunks/0/chunk_data/chunks/0/chunk_data/indices/... = [geometry data elided, use --geometry to include]

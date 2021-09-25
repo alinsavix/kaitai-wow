@@ -1,4 +1,4 @@
-# contenthash = f2a72a0febf342c534a9510c87a9dc58
+/contenthash = f2a72a0febf342c534a9510c87a9dc58
 /skel/0/chunk_size = 48
 /skel/0/chunk_type = SKL1
 /skel/0/data/flags = 256

@@ -1,4 +1,4 @@
-# contenthash = 27bdc6106b7947087c9205e9929a96d9
+/contenthash = 27bdc6106b7947087c9205e9929a96d9
 /chunks/0/chunk_data/flags = adt_has_doodadrefs_sorted_by_size_cat, adt_has_height_texturing, adt_has_mccv, unknown1, unknown2, wdt_has_maid
 /chunks/0/chunk_data/fogs_file_data_id = 1860053
 /chunks/0/chunk_data/lgt_file_data_id = 1860052
