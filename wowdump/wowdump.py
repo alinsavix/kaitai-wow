@@ -754,7 +754,7 @@ def main(argv=None):
 
     if not os.path.isfile(file):
         log.error(f"no such file: {file}")
-        return 1
+        return 66  # os.EX_NOINPUT
 
     name, ext = os.path.splitext(file)
     if ext == ".m2":
@@ -784,7 +784,7 @@ def main(argv=None):
     else:
         print(
             f"ERROR: don't know how to parse file type {ext}", file=sys.stderr)
-        sys.exit(1)
+        return 65  # os.EX_DATAERR
 
     with dataout(args.output) as out:
         if args.output_type == "path":
@@ -814,6 +814,8 @@ def main(argv=None):
             walk(out, target, "", cachecon)
 
             # print(ppretty(attrcache, depth=99, seq_length=100))
+
+    return 0  # os.EX_OK
 
 
 if __name__ == "__main__":
