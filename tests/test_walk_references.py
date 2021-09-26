@@ -14,6 +14,7 @@ from pytest_html import extras
 
 from testutil import util
 
+
 DATADIR = os.path.join("tests", "test_data")
 OUTPUTDIR = os.path.join("tests", "outputs")
 REFERENCEDIR = os.path.join("tests", "output_references")
@@ -74,8 +75,20 @@ def tlist():
     return tests_list
 
 
+# FIXME: should probably use a fixture-managed temp dir here, now
+@pytest.fixture(scope="session")
+def outputdir():
+    if os.path.exists(OUTPUTDIR):
+        assert os.path.isdir(
+            OUTPUTDIR), f"{OUTPUTDIR}: not a directory"
+    else:
+        os.makedirs(OUTPUTDIR)
+
+    return OUTPUTDIR
+
+
 @pytest.fixture(scope="module", params=tlist())
-def t_output_walk(request):
+def t_output_walk(request, outputdir):
     fn = request.param
 
     outpath = os.path.join(request.config.rootdir, OUTPUTDIR, "walk", f"{fn}.txt")
@@ -100,4 +113,5 @@ def test_diff_walk(request, t_output_walk, pytestconfig, extra):
     refpath = os.path.join(request.config.rootdir, REFERENCEDIR, "walk", f"{fn}.txt")
     outpath = os.path.join(request.config.rootdir, OUTPUTDIR, "walk", f"{fn}.txt")
 
-    assert util.filediff(refpath, outpath, limit=int(pytestconfig.getoption("diff_lines"))) == 0, "output file differences found"
+    assert util.filediff(refpath, outpath, limit=int(
+        pytestconfig.getoption("diff_lines"))) == 0, "output file differences found"
