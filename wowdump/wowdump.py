@@ -97,6 +97,49 @@ def get_contenthash(filename):
 
 #     return None
 
+# When dealing with big files with a lot of fields, we end up spending a
+# good bit of time filtering through the various attributes on each object
+# to find the ones we need to actually descend through and such. By pulling
+# that filtering logic into a separate funciton that caches the results, we
+# can gain some performance on big objects (and make the main walk function
+# a little easier to read). Some testing on `valeera.m2` suggests that on
+# large files dumped with `--geometry` save about 5% runtime. Definitely
+# not great, but no real downsides, either. At least, don't think so. All
+# the unit tests pass!
+#
+# FIXME: how much overhead to passing objects here? Is there any better way?
+attrcache = {}
+
+def cacheattrs(obj):
+    t = type(obj)
+
+    if t in attrcache:
+        return attrcache[t]
+
+    cacheentry = []
+
+    obj_keys = dir(obj)
+
+    for k in obj_keys:
+        if k[0] == "_":
+            continue
+
+        # FIXME: figure out what to do with m2track
+        if k == "m2array_type":
+            continue
+
+        v = getattr(obj, k)
+
+        # FIXME: Can we economize here, any?
+        kt = ktype(v)
+        if kt == "skip":  # class, method, datatype
+            continue
+
+        # looks like k is something we want to keep
+        cacheentry.append(k)
+
+    attrcache[t] = cacheentry
+    return cacheentry
 
 
 def walk(out: DataOutput, obj, path: str, cachecon) -> None:
@@ -109,42 +152,22 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
     # I don't thiiiiiiiink we get called with an object that isn't a
     # kaitai type, so even though we used to have to figure out object
     # type here, seems like we don't, at this point?
+    obj_keys = cacheattrs(obj)
 
-    # obj_keys = sorted(dir(obj), key=lambda x: (
-    #     not (x == "chunk_size" or x == "chunk_type"), x))
-    obj_keys = dir(obj)
 
     # if path == "/skin/batches/0":
     #     print("breakpoint")
 
-    logger.debug(f"obj_keys: {obj_keys}")
-
     for k in obj_keys:
-        if k[0] == "_":
-            continue
-
         workpath = f"{path}/{k}"
 
         # if workpath == "/model/vertices":
         #     print("breakpoint")
 
-        # FIXME: figure out what to do with m2track
-        # if k == "m2array_type" or k == "m2track_type":
-        #     lgdisp.debug(f"{workpath} --> ignored")
-        #     continue
-        if k == "m2array_type":
-            lgdisp.debug(f"{workpath} --> ignored")
-            continue
-
         logger.debug(f"getattr {k} from obj type {type(obj)}")
         v = getattr(obj, k)
 
         kt = ktype(v)
-        if kt == "skip":  # class, method, datatype
-            continue
-
-        # if workpath.startswith("/model/bones/30"):
-        #     print("breakpoint")
 
         logger.debug(f"checking for array elision for {workpath}")
         # this is probably a code smell, if not worse. If our current level
