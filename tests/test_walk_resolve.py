@@ -8,7 +8,7 @@ from pytest_html import extras
 
 from testutil import util
 
-DATADIR = os.path.join(".", "test_data")
+DATADIR = os.path.join("tests", "test_data")
 input_model = "levelup.m2"
 
 # FIXME: We also probably want unit tests for resolution & caching
@@ -23,12 +23,12 @@ input_model = "levelup.m2"
 
 
 # make sure we can resolve fdids
-def test_resolve(capsys, extra):
+def test_resolve(request, capsys, extra):
     import wowdump
     wowdump.main([
         "--resolve",
-        "--listfile", os.path.join(DATADIR, "listfile_minimal.csv"),
-        os.path.join(DATADIR, input_model),
+        "--listfile", os.path.join(request.config.rootdir, DATADIR, "listfile_minimal.csv"),
+        os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
     captured = capsys.readouterr()
 
@@ -41,12 +41,12 @@ def test_resolve(capsys, extra):
 
 
 # make sure we don't resolve fdids when we don't want to
-def test_resolve_noresolve(capsys, caplog, extra):
+def test_resolve_noresolve(request, capsys, caplog, extra):
     import wowdump
     wowdump.main([
         "--no-resolve",
         "--listfile", "/this/does/not/exist",
-        os.path.join(DATADIR, input_model),
+        os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
     captured = capsys.readouterr()
 
@@ -63,12 +63,12 @@ def test_resolve_noresolve(capsys, caplog, extra):
 
 # make sure we throw a warning if the listfile doesn't exist, but make sure
 # we continue regardless
-def test_resolve_missing_listfile(capsys, caplog, extra):
+def test_resolve_missing_listfile(request, capsys, caplog, extra):
     import wowdump
     wowdump.main([
         "--resolve",
         "--listfile", "/this/does/not/exist",
-        os.path.join(DATADIR, input_model),
+        os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
     captured = capsys.readouterr()
 

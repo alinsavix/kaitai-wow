@@ -14,9 +14,9 @@ from pytest_html import extras
 
 from testutil import util
 
-DATADIR = os.path.join(".", "test_data")
-OUTPUTDIR = os.path.join(".", "outputs")
-REFERENCEDIR = os.path.join(".", "output_references")
+DATADIR = os.path.join("tests", "test_data")
+OUTPUTDIR = os.path.join("tests", "outputs")
+REFERENCEDIR = os.path.join("tests", "output_references")
 
 # def test_command():
 #     success, failmsg = capture_cmd("ls", ["-al"], outfile="out.txt", errfile="err.txt")
@@ -78,7 +78,7 @@ def tlist():
 def t_output_walk(request):
     fn = request.param
 
-    outpath = os.path.join(OUTPUTDIR, "walk", f"{fn}.txt")
+    outpath = os.path.join(request.config.rootdir, OUTPUTDIR, "walk", f"{fn}.txt")
 
     import wowdump
     wowdump.main([
@@ -90,14 +90,14 @@ def t_output_walk(request):
     return fn
 
 
-def test_execute_walk(t_output_walk, extra):
+def test_execute_walk(request, t_output_walk, extra):
     assert True
 
 
-def test_diff_walk(t_output_walk, pytestconfig, extra):
+def test_diff_walk(request, t_output_walk, pytestconfig, extra):
     fn = t_output_walk
 
-    refpath = os.path.join(REFERENCEDIR, "walk", f"{fn}.txt")
-    outpath = os.path.join(OUTPUTDIR, "walk", f"{fn}.txt")
+    refpath = os.path.join(request.config.rootdir, REFERENCEDIR, "walk", f"{fn}.txt")
+    outpath = os.path.join(request.config.rootdir, OUTPUTDIR, "walk", f"{fn}.txt")
 
     assert util.filediff(refpath, outpath, limit=int(pytestconfig.getoption("diff_lines"))) == 0, "output file differences found"

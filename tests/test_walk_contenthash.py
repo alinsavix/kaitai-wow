@@ -8,7 +8,7 @@ from pytest_html import extras
 
 from testutil import util
 
-DATADIR = os.path.join(".", "test_data")
+DATADIR = os.path.join("tests", "test_data")
 
 input_model = "levelup.m2"
 input_hash = "d1b1a625d1396a83b907319265346580"
@@ -17,12 +17,12 @@ input_hash = "d1b1a625d1396a83b907319265346580"
 
 
 # make sure simplifier output seems to be working
-def test_contenthash(capsys, extra):
+def test_contenthash(request, capsys, extra):
     import wowdump
     wowdump.main([
         "--no-resolve",
         "--no-simplify",  # don't do more work than needed
-        os.path.join(DATADIR, input_model),
+        os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
     captured = capsys.readouterr()
 

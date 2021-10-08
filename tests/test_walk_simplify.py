@@ -8,7 +8,7 @@ from pytest_html import extras
 
 from testutil import util
 
-DATADIR = os.path.join(".", "test_data")
+DATADIR = os.path.join("tests", "test_data")
 input_model = "levelup.m2"
 
 # FIXME: There's a lot of simplifiers ... should we give them all a unit test?
@@ -18,12 +18,12 @@ input_model = "levelup.m2"
 
 
 # make sure simplifier output seems to be working
-def test_simplify(capsys, extra):
+def test_simplify(request, capsys, extra):
     import wowdump
     wowdump.main([
         "--no-resolve",
         "--simplify",  # also the default
-        os.path.join(DATADIR, input_model),
+        os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
     captured = capsys.readouterr()
 
@@ -32,12 +32,12 @@ def test_simplify(capsys, extra):
 
 
 # make sure we don't resolve fdids when we don't want to
-def test_simplify_nosimplify(capsys, extra):
+def test_simplify_nosimplify(request, capsys, extra):
     import wowdump
     wowdump.main([
         "--no-resolve",
         "--no-simplify",
-        os.path.join(DATADIR, input_model),
+        os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
     captured = capsys.readouterr()
 

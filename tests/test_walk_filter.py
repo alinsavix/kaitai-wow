@@ -8,7 +8,7 @@ from pytest_html import extras
 
 from testutil import util
 
-DATADIR = os.path.join(".", "test_data")
+DATADIR = os.path.join("tests", "test_data")
 
 input_model = "levelup.m2"
 
@@ -24,12 +24,12 @@ input_model = "levelup.m2"
 
 
 # make sure we're hiding things that should be hidden
-def test_filter_keep(capsys, extra):
+def test_filter_keep(request, capsys, extra):
     import wowdump
     wowdump.main([
         "--no-resolve",
         "--filter", "/model/version",
-        os.path.join(DATADIR, input_model),
+        os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
     captured = capsys.readouterr()
 
@@ -46,13 +46,13 @@ def test_filter_keep(capsys, extra):
     assert len(captured.out.rstrip("\n").split("\n")) == 1
 
 
-def test_filter_keep_multi(capsys, extra):
+def test_filter_keep_multi(request, capsys, extra):
     import wowdump
     wowdump.main([
         "--no-resolve",
         "--filter", "/model/version",
         "--filter", "/model/collision_sphere_radius",
-        os.path.join(DATADIR, input_model),
+        os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
     captured = capsys.readouterr()
 
@@ -71,12 +71,12 @@ def test_filter_keep_multi(capsys, extra):
     assert len(captured.out.rstrip("\n").split("\n")) == 2
 
 
-def test_filter_discard(capsys, extra):
+def test_filter_discard(request, capsys, extra):
     import wowdump
     wowdump.main([
         "--no-resolve",
         "--filter", "!/model/vertices",
-        os.path.join(DATADIR, input_model),
+        os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
     captured = capsys.readouterr()
 
@@ -91,13 +91,13 @@ def test_filter_discard(capsys, extra):
     assert "elided" in captured.out
 
 
-def test_filter_discard_multi(capsys, extra):
+def test_filter_discard_multi(request, capsys, extra):
     import wowdump
     wowdump.main([
         "--no-resolve",
         "--filter", "!/model/vertices",
         "--filter", "!/model/version",
-        os.path.join(DATADIR, input_model),
+        os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
     captured = capsys.readouterr()
 
@@ -114,13 +114,13 @@ def test_filter_discard_multi(capsys, extra):
     assert "elided" in captured.out
 
 
-def test_filter_keep_discard(capsys, extra):
+def test_filter_keep_discard(request, capsys, extra):
     import wowdump
     wowdump.main([
         "--no-resolve",
         "--filter", "/model/texture_weights/0",
         "--filter", "!/model/texture_weights",
-        os.path.join(DATADIR, input_model),
+        os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
     captured = capsys.readouterr()
 
