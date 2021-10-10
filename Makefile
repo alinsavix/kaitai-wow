@@ -123,7 +123,13 @@ depend:
 
 .PHONY: test
 test: wowdump
-	python3 ./wowdump.py
+	cd tests ; pytest
+
+
+.PHONY: benchmark
+benchmark: wowdump
+	python3 -m cProfile -o wowdump-m2-valeera-geometry-$$(date +%Y%m%dT%H%M%S).prof ./wowdump-script.py -o zot.tmp --geometry --arraylimit 0 testfiles/valeera/valeera.m2
+	python3 -m cProfile -o wowdump-m2-valeera-nogeometry-$$(date +%Y%m%dT%H%M%S).prof ./wowdump-script.py -o zot.tmp testfiles/valeera/valeera.m2
 
 
 .PHONY: lint
