@@ -213,6 +213,11 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
         if kt == "list":
             lgdisp.debug(f"{workpath}[] --> array processing (len {len(v)})")
 
+            # everything in an array shoooould have the same contents, so no
+            # benefit to checking for a simplifier match for each, just check
+            # for the first element and keep it
+            s = check_simplify(f"{workpath}/0") if args.simplify else None
+
             for i, el in enumerate(v):
                 arraypath = f"{workpath}/{i}"
                 elt = ktype(el)
@@ -240,7 +245,7 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
                     break
 
                 # FIXME: dedupe dedupe
-                s = check_simplify(arraypath) if args.simplify else None
+                # s = check_simplify(arraypath) if args.simplify else None
                 if s:
                     lgsimplify.debug(f"using simplifier for {arraypath}")
 
@@ -807,6 +812,8 @@ def main(argv=None):
 
             # temporary for performance work
             walk(out, target, "", cachecon)
+
+            # print(ppretty(attrcache, depth=99, seq_length=100))
 
 
 if __name__ == "__main__":
