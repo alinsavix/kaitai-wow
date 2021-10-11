@@ -77,26 +77,27 @@ def tlist():
 
 # FIXME: should probably use a fixture-managed temp dir here, now
 @pytest.fixture(scope="session")
-def outputdir():
-    if os.path.exists(OUTPUTDIR):
-        assert os.path.isdir(
-            OUTPUTDIR), f"{OUTPUTDIR}: not a directory"
+def outputdir(request):
+    outdir = os.path.join(request.config.rootdir, OUTPUTDIR, "walk")
+    if os.path.exists(outdir):
+        assert os.path.isdir(outdir), f"{outdir}: not a directory"
     else:
-        os.makedirs(OUTPUTDIR)
+        os.makedirs(outdir)
 
-    return OUTPUTDIR
+    return outdir
 
 
 @pytest.fixture(scope="module", params=tlist())
 def t_output_walk(request, outputdir):
     fn = request.param
 
-    outpath = os.path.join(request.config.rootdir, OUTPUTDIR, "walk", f"{fn}.txt")
+    outpath = os.path.join(outputdir, f"{fn}.txt")
+    print(f"outputting tests to {outpath}")
 
     import wowdump
     wowdump.main([
         "--no-resolve",
-        os.path.join(DATADIR, fn),
+        os.path.join(request.config.rootdir, DATADIR, fn),
         "-o", outpath,
     ])
 
