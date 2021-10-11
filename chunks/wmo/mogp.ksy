@@ -5,67 +5,81 @@ types:
               type: b1  # 0x01
             - id: has_light_map
               type: b1  # 0x02
+              doc: "subtract mohd.color in mocv fixing"
             - id: has_vertex_colors
               type: b1  # 0x04
-            - id: smogroup_exterior
+              doc: "has MOCV chunk"
+            - id: exterior
               type: b1  # 0x08
             - id: unused1
               type: b1  # 0x10
             - id: unused2
               type: b1  # 0x20
-            - id: smogroup_exterior_lit
+            - id: exterior_lit
               type: b1  # 0x40
-            - id: smogroup_unreachable
+            - id: unreachable
               type: b1  # 0x80
 
-            - id: show_exterior_sky
+            - id: show_exterior_skybox
               type: b1  # 0x0100
             - id: has_lights
               type: b1  # 0x0200
-            - id: unknown_shadow
+              doc: "has MOLR chunk"
+            - id: l_o_d
               type: b1  # 0x0400
+              doc: "Also load for LoD != 0 (_lod* groups)"
             - id: has_doodads
               type: b1  # 0x0800
-            - id: smogroup_liquidsurface
+            - id: liquidsurface
               type: b1  # 0x1000
-            - id: smogroup_interior
+              doc: "Has water (MLIQ chunk)"
+            - id: interior
               type: b1  # 0x2000
+              doc: "Indoors"
             - id: unused3
               type: b1  # 0x4000
-            - id: query_mount_allowed
+            - id: unused4
               type: b1  # 0x8000
 
-            - id: smogroup_alwaysdraw
+            - id: alwaysdraw
               type: b1  # 0x00010000
-            - id: unused4
+              doc: "wowdev.wiki: clear 0x08 after CMapObjGroup::Create() in MOGP and MOGI"
+            - id: has_mori
               type: b1  # 0x00020000
+              doc: "Has MORI and MORB chunks"
             - id: show_skybox
               type: b1  # 0x00040000
+              doc: "Automatically unset if MOSB not present"
             - id: water_is_ocean
               type: b1  # 0x00080000
+              doc: "LiquidType related, see MLIQ"
             - id: unknown1
               type: b1  # 0x00100000
             - id: is_mount_allowed  # FIXME: should this be "mount_is_allowed"?
               type: b1  # 0x00200000
             - id: unused5
               type: b1  # 0x00400000
-            - id: unknown2
+            - id: unused6
               type: b1  # 0x00800000
 
-            - id: smogroup_cverts2
+            - id: cverts2
               type: b1  # 0x01000000
-            - id: smogroup_tverts2
+              doc: "Has two MOCV chunks"
+            - id: tverts2
               type: b1  # 0x02000000
-            - id: smogroup_antiportal
+              doc: "Has two MOTV chunks"
+            - id: antiportal
               type: b1  # 0x04000000
+              doc: "Antiportal; requires intBatchCount == 0, extBatchCount == 0, UNREACHABLE"
             - id: unknown3
               type: b1  # 0x08000000
-            - id: unused6
+            - id: unused7
               type: b1  # 0x10000000
-            - id: smogroup_exterior_cull
+            - id: exterior_cull
               type: b1  # 0x20000000
-            - id: smogroup_tverts3
+            - id: tverts3
               type: b1  # 0x40000000
+              doc: "has three MOTV chunks"
             - id: unknown4
               type: b1  # 0x80000000
 
@@ -111,7 +125,7 @@ types:
             - id: group_liquid
               type: u4
               doc: "See MLIQ chunk"
-            - id: foreign_key  # FIXME: still gotta figure this out
+            - id: foreign_key  # FIXME: still gotta figure this out  # name: wmo_group_id?
               type: u4
             - id: flags2
               type: u4

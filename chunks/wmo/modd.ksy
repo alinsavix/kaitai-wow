@@ -21,11 +21,16 @@ types:
               type: b1
             - id: unknown3
               type: b1
+            - id: unused1
+              type: b4
             - id: position
               type: c3vector
+              doc: "(x, Z, -Y)"
             - id: orientation
               type: c4quaternion
+              doc: "(X, Y, Z, W)"
             - id: scale
               type: f4
             - id: color
               type: cimvector
+              doc: "(B, G, R, A) diffuse lighting color, in place of global diffuse from DBCs"

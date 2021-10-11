@@ -434,7 +434,7 @@
 /chunks/0/chunk_data/chunks/12/chunk_type = MDAL
 /chunks/0/chunk_data/descriptive_group_name = 0
 /chunks/0/chunk_data/ext_batch_count = 22
-/chunks/0/chunk_data/flags = has_bsp_tree, has_doodads, smogroup_cverts2, smogroup_exterior, smogroup_tverts2, unknown4
+/chunks/0/chunk_data/flags = cverts2, exterior, has_bsp_tree, has_doodads, tverts2, unknown4
 /chunks/0/chunk_data/flags2 = 0
 /chunks/0/chunk_data/fog_ids/0 = 1
 /chunks/0/chunk_data/fog_ids/1 = 0

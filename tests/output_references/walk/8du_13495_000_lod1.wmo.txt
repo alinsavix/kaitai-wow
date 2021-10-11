@@ -62,7 +62,7 @@
 /chunks/0/chunk_data/chunks/7/chunk_type = MODR
 /chunks/0/chunk_data/descriptive_group_name = 0
 /chunks/0/chunk_data/ext_batch_count = 1
-/chunks/0/chunk_data/flags = has_doodads, smogroup_exterior, unknown4, unknown_shadow
+/chunks/0/chunk_data/flags = exterior, has_doodads, l_o_d, unknown4
 /chunks/0/chunk_data/flags2 = 0
 /chunks/0/chunk_data/fog_ids/0 = 1
 /chunks/0/chunk_data/fog_ids/1 = 0
