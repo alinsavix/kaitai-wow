@@ -32,45 +32,49 @@ REFERENCEDIR = os.path.join("tests", "output_references")
 #     # call and check help
 #     pass
 # lists of format examples to test
+from collections import namedtuple
+t = namedtuple("t", [ "file", "dumpflags" ])
+
 tlist_tests = [
-    "8du_13495.wmo",
-    "8du_13495_000.wmo",
-    "8du_13495_000_lod1.wmo",
+    t("8du_13495.wmo", []),
+    t("8du_13495_000.wmo", []),
+    t("8du_13495_000_lod1.wmo", []),
 
-    "diffuse_edgefade_t1_t2.bls",
+    t("diffuse_edgefade_t1_t2.bls", []),
 
-    "levelup.m2",
-    "levelup00.skin",
-    "nightelfarcher_f.m2",
-    "nightelfarcher_f00.skin",
-    "nightelfarcher_f_lod01.skin",
-    "nightelffemale_hd0060-00.anim",
-    "flyingspriteevil.skel",
-    # "nightelffemale_hd_01.bone",  # Not yet supported
-    "nightelffemale_hd_markings_color_3641609.blp",
+    t("levelup.m2", []),
+    t("levelup00.skin", ["--geometry"]),
+    t("nightelfarcher_f.m2", []),
+    t("nightelfarcher_f00.skin", []),
+    t("nightelfarcher_f_lod01.skin", []),
+    t("nightelffemale_hd0060-00.anim", []),
+    t("flyingspriteevil.skel", []),
+    # t("nightelffemale_hd_01.bone", []),
+    t("nightelffemale_hd_markings_color_3641609.blp", []),
 
-    "spectraltiger.m2",
-    "staff_2h_draenorcrafted_d_02_c.m2",
+    t("spectraltiger.m2", []),
+    t("staff_2h_draenorcrafted_d_02_c.m2", []),
 
-    # "zandalarcontinentfinale.tex",  # Not yet supported
-    # "zandalarcontinentfinale.wdl",  # Not yet supported
-    "zandalarcontinentfinale.wdt",
-    # "zandalarcontinentfinale_28_30.adt",  # Not yet supported
-    # "zandalarcontinentfinale_28_30_lod.adt",  # Not yet supported
-    # "zandalarcontinentfinale_28_30_obj0.adt",  # Not yet supported
-    # "zandalarcontinentfinale_28_30_obj1.adt",  # Not yet supported
-    # "zandalarcontinentfinale_28_30_tex0.adt",  # Not yet supported
-    "zandalarcontinentfinale_fogs.wdt",
-    "zandalarcontinentfinale_lgt.wdt",
-    "zandalarcontinentfinale_mpv.wdt",
-    "zandalarcontinentfinale_occ.wdt",
+    # t("zandalarcontinentfinale.tex", []),
+    # t("zandalarcontinentfinale.wdl", []),
+    t("zandalarcontinentfinale.wdt", []),
+    # t("zandalarcontinentfinale_28_30.adt", []),
+    # t("zandalarcontinentfinale_28_30_lod.adt", []),
+    # t("zandalarcontinentfinale_28_30_obj0.adt", []),
+    # t("zandalarcontinentfinale_28_30_obj1.adt", []),
+    # t("zandalarcontinentfinale_28_30_tex0.adt", []),
+    t("zandalarcontinentfinale_fogs.wdt", []),
+    t("zandalarcontinentfinale_lgt.wdt", []),
+    t("zandalarcontinentfinale_mpv.wdt", []),
+    t("zandalarcontinentfinale_occ.wdt", []),
 ]
+
 
 # generate the test list and such. Relatively simple, for now
 def tlist():
     tests_list = []
     for test in tlist_tests:
-        tests_list.append(pytest.param(test, id=test))
+        tests_list.append(pytest.param(test, id=test.file))
 
     return tests_list
 
@@ -89,19 +93,19 @@ def outputdir(request):
 
 @pytest.fixture(scope="module", params=tlist())
 def t_output_walk(request, outputdir):
-    fn = request.param
+    test = request.param
 
-    outpath = os.path.join(outputdir, f"{fn}.txt")
+    outpath = os.path.join(outputdir, f"{test.file}.txt")
     print(f"outputting tests to {outpath}")
 
     import wowdump
     wowdump.main([
         "--no-resolve",
-        os.path.join(request.config.rootdir, DATADIR, fn),
+        os.path.join(request.config.rootdir, DATADIR, test.file),
         "-o", outpath,
-    ])
+    ] + test.dumpflags)
 
-    return fn
+    return test.file
 
 
 def test_execute_walk(request, t_output_walk, extra):
