@@ -142,7 +142,7 @@ def cacheattrs(obj):
     return cacheentry
 
 
-def walk(out: DataOutput, obj, path: str, cachecon) -> None:
+def pathwalk(out: DataOutput, obj, path: str, cachecon) -> None:
     lgsimplify = logging.getLogger("simplify")
     lgdisp = logging.getLogger("disposition")
 
@@ -283,17 +283,17 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
                 else:
                     lgdisp.debug(f"{arraypath} --> array descent")
                     # value.append(to_tree(el, treepath(path, k + f"[{i}]")))
-                    walk(out, el, arraypath, cachecon)
+                    pathwalk(out, el, arraypath, cachecon)
 
         elif kt == "kaitai":
             # FIXME: I think we're supposed to do one of these without the {k}
             if k == "data":
                 lgdisp.debug(f"{workpath} --> kaitai data descent")
-                walk(out, v, workpath, cachecon)
+                pathwalk(out, v, workpath, cachecon)
             else:
                 lgdisp.debug(f"{workpath} --> kaitai descent type {type(k)}")
                 # debug(f"recursing kaitai value, type: {type(k)}")
-                walk(out, v, workpath, cachecon)
+                pathwalk(out, v, workpath, cachecon)
 
         elif kt == "base":
             # we're at a final path, check filtering
@@ -309,7 +309,7 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
 
         else:
             lgdisp.debug(f"{workpath} --> descend (type {type(v)}")
-            walk(out, v, workpath, cachecon)
+            pathwalk(out, v, workpath, cachecon)
 
 # for maybe speeding up logging when a debug level is disabled:
 #
@@ -322,9 +322,6 @@ def walk(out: DataOutput, obj, path: str, cachecon) -> None:
 # logger.debug(Lazy(lambda: time.sleep(20)))
 #
 # logger.info(Lazy(lambda: "Stupid log message " + ' '.join([str(i) for i in range(20)])))
-
-
-
 
 
 # Caching bits (yeah, they're ugly)
@@ -448,68 +445,6 @@ geom_path_re = re.compile(
 def geometry_path(path):
     if geom_path_re.search(path):
         return True
-
-# FIXME: Can we manage the cache better than jut passing cachecon around?
-def pathdump(out: DataOutput, d, path: str, cachecon) -> None:
-    # This is kind of a lame way to get a loop that handles both lists
-    # and dicts, but is there a better way?
-    if isinstance(d, dict):
-        things = sorted(d.keys(), key=lambda x: (
-            not (x == "chunk_size" or x == "chunk_type"), x))
-    elif isinstance(d, list):
-        things = range(0, len(d))
-
-    eject = False
-    for k in things:
-        if eject:
-            return
-
-        if isinstance(d, list) and (args.elide_all or geometry_path(f"{path}/{k}")) \
-                and args.arraylimit > 0 and k >= args.arraylimit:
-            remaining = len(d) - args.arraylimit
-            out.write(f"{path}/... = [{remaining-1} elided of {len(d)} total]")
-            k = things[-1]
-            eject = True
-            # return
-
-        workpath = f"{path}/{k}"
-        thing = d[k]
-
-        # if we have ofs_xxx or num_xxx, and *also* just have xxx,
-        # we don't need the offset/size anymore
-        if args.hide_unneeded and isinstance(k, str) and (k.startswith("ofs_") or k.startswith("num_")):
-            s = k[len("ofs_"):]
-            if s in things:
-                continue
-
-        # if check_filtered(workpath):
-        #     continue
-
-        # doublecheck to make sure check_simply doesn't get called if disabled
-        s = check_simplify(workpath) if args.simplify else None
-
-        if s:
-            # if it's simplified, we're at a 'final' path, so check filtering
-            if check_filtered(workpath):
-                continue
-            simplified = s(thing, d, cachecon, args)
-            if simplified is not None:
-                out.write(f"{workpath} = {simplified}")
-        elif isinstance(thing, dict) or isinstance(thing, list):
-            pathdump(out, thing, workpath, cachecon)
-        else:
-            # we're at a final path, so check filtering
-            if check_filtered(workpath):
-                continue
-
-            # FIXME: Not sure if this is a kaitai bug or what, but we're
-            # getting nulls at the end of strings right now. This cleans
-            # that up for now.
-            if isinstance(thing, str):
-                thing = thing.rstrip("\0")
-            out.write(f"{workpath} = {thing}")
-
-    return
 
 
 class NegateAction(argparse.Action):
@@ -670,8 +605,8 @@ def parse_arguments(argv, loggers):
         "--output_type",
         "--output-type",
         "-t",
-        choices=["path", "json", "final", "raw", "walk", ],
-        default="walk",
+        choices=["pathwalk", "json", "final", "raw", ],
+        default="pathwalk",
         help="select output type (default: %(default)s)",
     )
 
@@ -787,13 +722,12 @@ def main(argv=None):
         return 65  # os.EX_DATAERR
 
     with dataout(args.output) as out:
-        if args.output_type == "path":
-            parsed = kttree(target)
+        if args.output_type == "pathwalk":
             # out.write(f"# path = {file}")
-            h = get_contenthash(file)
-            out.write(f"# contenthash = {h}")
-
-            pathdump(out, parsed, "", cachecon)
+            if not check_filtered("/contenthash"):
+                h = get_contenthash(file)
+                out.write(f"/contenthash = {h}")
+            pathwalk(out, target, "", cachecon)
         elif args.output_type == "raw":
             out.write(ppretty(target, depth=99, seq_length=100,))
         elif args.output_type == "final":
@@ -804,16 +738,6 @@ def main(argv=None):
             parsed = kttree(target)
             json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
             print()  # newline at end
-        elif args.output_type == "walk":
-            # out.write(f"# path = {file}")
-            if not check_filtered("/contenthash"):
-                h = get_contenthash(file)
-                out.write(f"/contenthash = {h}")
-
-            # temporary for performance work
-            walk(out, target, "", cachecon)
-
-            # print(ppretty(attrcache, depth=99, seq_length=100))
 
     return 0  # os.EX_OK
 
