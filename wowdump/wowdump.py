@@ -736,8 +736,7 @@ def main(argv=None):
         # FIXME: re-enable json, make it use out.write()
         elif args.output_type == "json":
             parsed = kttree(target)
-            json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
-            print()  # newline at end
+            out.write(json.dumps(parsed, indent=2, sort_keys=True))
 
     return 0  # os.EX_OK
 
