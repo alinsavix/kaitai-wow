@@ -7,6 +7,7 @@ import pytest
 from pytest_html import extras
 
 from testutil import util
+import wowdump
 
 DATADIR = os.path.join("tests", "test_data")
 input_model = "levelup.m2"
@@ -24,12 +25,13 @@ input_model = "levelup.m2"
 
 # make sure we can resolve fdids
 def test_resolve(request, capsys, extra):
-    import wowdump
-    wowdump.main([
+    ret = wowdump.main([
         "--resolve",
         "--listfile", os.path.join(request.config.rootdir, DATADIR, "listfile_minimal.csv"),
         os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
+
     captured = capsys.readouterr()
 
     # Make sure we actually got fdid resolution
@@ -42,12 +44,13 @@ def test_resolve(request, capsys, extra):
 
 # make sure we don't resolve fdids when we don't want to
 def test_resolve_noresolve(request, capsys, caplog, extra):
-    import wowdump
-    wowdump.main([
+    ret = wowdump.main([
         "--no-resolve",
         "--listfile", "/this/does/not/exist",
         os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
+
     captured = capsys.readouterr()
 
     # verify we don't get an error on opening listfile (because we shouldn't
@@ -64,12 +67,13 @@ def test_resolve_noresolve(request, capsys, caplog, extra):
 # make sure we throw a warning if the listfile doesn't exist, but make sure
 # we continue regardless
 def test_resolve_missing_listfile(request, capsys, caplog, extra):
-    import wowdump
-    wowdump.main([
+    ret = wowdump.main([
         "--resolve",
         "--listfile", "/this/does/not/exist",
         os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
+
     captured = capsys.readouterr()
 
     # verify we get our warning for the missing listfile

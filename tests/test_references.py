@@ -13,7 +13,7 @@ import pytest
 from pytest_html import extras
 
 from testutil import util
-
+import wowdump
 
 DATADIR = os.path.join("tests", "test_data")
 OUTPUTDIR = os.path.join("tests", "outputs")
@@ -108,19 +108,21 @@ def t_reference_output(request, outputdir):
     inpath = os.path.join(request.config.rootdir, DATADIR, test.infile)
     outpath = os.path.join(outputsubdir, f"{test.infile}.{test.ext}")
 
-    import wowdump
-    wowdump.main([
+    ret = wowdump.main([
         "--no-resolve",
         "-o", outpath,
     ] + test.dumpflags + [
         inpath,
     ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
 
     return test
+
 
 @pytest.mark.order(-2)
 def test_references(request, t_reference_output, extra):
     assert True
+
 
 @pytest.mark.order(-2)
 def test_diff_references(request, t_reference_output, pytestconfig, extra):

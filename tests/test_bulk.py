@@ -18,11 +18,9 @@ import wowdump
 DATADIR = os.path.join("tests", "test_data")
 
 # kind of a hack, because pytest makes it difficult to pass via the
-# command line in a useful way. Just set this to something not-none to
+# command line in a useful way. Just set this env var to something to
 # actually run bulk tests as a one-off.
 BULKDIR = os.getenv("TEST_BULKDIR")
-# BULKDIR = "../testfiles"
-# BULKDIR = "/mnt/WoW/data"
 
 @pytest.fixture
 def bulkdir():
@@ -49,7 +47,7 @@ def t_bulk_list(bulkdir=BULKDIR):
 
 @pytest.fixture(params=t_bulk_list())
 def t_bulk(request, bulkdir, extra):
-    fn = request.param
+    fn = request.param  # type: str
 
     if fn == "no_bulk_tests":
         return
@@ -59,7 +57,6 @@ def t_bulk(request, bulkdir, extra):
         "-o", "scratch.txt",
         os.path.join(BULKDIR, fn),
     ])
-
     assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
 
     return fn

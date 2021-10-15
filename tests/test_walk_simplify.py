@@ -7,24 +7,26 @@ import pytest
 from pytest_html import extras
 
 from testutil import util
+import wowdump
 
 DATADIR = os.path.join("tests", "test_data")
 input_model = "levelup.m2"
 
-# FIXME: There's a lot of simplifiers ... should we give them all a unit test?
-# (yes, probably)
+# FIXME: There's a lot of simplifiers ... should we give them all a
+# unit test? (yes, probably)
 
 # FIXME: can we find a smaller test file for this?
 
 
 # make sure simplifier output seems to be working
 def test_simplify(request, capsys, extra):
-    import wowdump
-    wowdump.main([
+    ret = wowdump.main([
         "--no-resolve",
         "--simplify",  # also the default
         os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
+
     captured = capsys.readouterr()
 
     # make sure we got our simplifier output as expected
@@ -33,12 +35,13 @@ def test_simplify(request, capsys, extra):
 
 # make sure we don't resolve fdids when we don't want to
 def test_simplify_nosimplify(request, capsys, extra):
-    import wowdump
-    wowdump.main([
+    ret = wowdump.main([
         "--no-resolve",
         "--no-simplify",
         os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
+
     captured = capsys.readouterr()
 
     # FIXME: can/should we check for -any- simplifier in the output?

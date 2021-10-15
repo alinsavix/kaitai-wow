@@ -7,6 +7,7 @@ import pytest
 from pytest_html import extras
 
 from testutil import util
+import wowdump
 
 DATADIR = os.path.join("tests", "test_data")
 
@@ -25,12 +26,13 @@ input_model = "levelup.m2"
 
 # make sure we're hiding things that should be hidden
 def test_filter_keep(request, capsys, extra):
-    import wowdump
-    wowdump.main([
+    ret = wowdump.main([
         "--no-resolve",
         "--filter", "/model/version",
         os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
+
     captured = capsys.readouterr()
 
     # make sure what we requested is there
@@ -47,13 +49,14 @@ def test_filter_keep(request, capsys, extra):
 
 
 def test_filter_keep_multi(request, capsys, extra):
-    import wowdump
-    wowdump.main([
+    ret = wowdump.main([
         "--no-resolve",
         "--filter", "/model/version",
         "--filter", "/model/collision_sphere_radius",
         os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
+
     captured = capsys.readouterr()
 
     # basically identical to the previous test
@@ -72,12 +75,13 @@ def test_filter_keep_multi(request, capsys, extra):
 
 
 def test_filter_discard(request, capsys, extra):
-    import wowdump
-    wowdump.main([
+    ret = wowdump.main([
         "--no-resolve",
         "--filter", "!/model/vertices",
         os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
+
     captured = capsys.readouterr()
 
     # make sure what we don't want isn't there
@@ -92,13 +96,14 @@ def test_filter_discard(request, capsys, extra):
 
 
 def test_filter_discard_multi(request, capsys, extra):
-    import wowdump
-    wowdump.main([
+    ret = wowdump.main([
         "--no-resolve",
         "--filter", "!/model/vertices",
         "--filter", "!/model/version",
         os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
+
     captured = capsys.readouterr()
 
     # basically a dupe of the non-multi version
@@ -115,13 +120,14 @@ def test_filter_discard_multi(request, capsys, extra):
 
 
 def test_filter_keep_discard(request, capsys, extra):
-    import wowdump
-    wowdump.main([
+    ret = wowdump.main([
         "--no-resolve",
         "--filter", "/model/texture_weights/0",
         "--filter", "!/model/texture_weights",
         os.path.join(request.config.rootdir, DATADIR, input_model),
     ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
+
     captured = capsys.readouterr()
 
     # Make sure we got the part we wanted to keep
