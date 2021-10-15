@@ -118,11 +118,11 @@ def t_reference_output(request, outputdir):
 
     return test
 
-
+@pytest.mark.order(-2)
 def test_references(request, t_reference_output, extra):
     assert True
 
-
+@pytest.mark.order(-2)
 def test_diff_references(request, t_reference_output, pytestconfig, extra):
     test = t_reference_output  # type: t
 
