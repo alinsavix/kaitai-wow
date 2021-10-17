@@ -99,4 +99,11 @@ listfile.csv
 output/
 outputs/
 
+tests/.coverage
+tests/htmlcov
+tests/report.html
+
 !.notempty
+
+.coverage
+.vscode/

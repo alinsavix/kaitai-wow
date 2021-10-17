@@ -1,5 +1,7 @@
+# simplifiers  for file ids of various types
 import sys
 from typing import Any, Optional, Dict, List, Callable
+import logging
 
 # We can run without, we'll just be slow
 try:
@@ -7,9 +9,11 @@ try:
 except ImportError:
     pass
 
-
-# simplify file ids of various types
 def simplify_fileid(id: id, _parent, cachecon, args) -> str:
+    logger = logging.getLogger("simplify")
+    logger.debug("using fileid simplifier")
+    logger.debug(f"type: {type(id)}   id: {id}")
+
     if not args.resolve or id <= 0:
         return f"{id}"
 

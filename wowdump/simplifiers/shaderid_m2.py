@@ -1,7 +1,12 @@
 # simplifier to simplify shaderids for m2 models
+import logging
+
 def simplify_shaderid_m2(d, parent, _cachecon, _args):
-    pixel = get_m2_pixel_shader(d, parent["texture_count"])
-    vertex = get_m2_vertex_shader(d, parent["texture_count"])
+    logger = logging.getLogger("simplify")
+    logger.debug("using shaderid (m2) simplifier")
+
+    pixel = get_m2_pixel_shader(d, parent.texture_count)
+    vertex = get_m2_vertex_shader(d, parent.texture_count)
 
     return f"{d}  # {pixel}, {vertex}"
 
@@ -139,7 +144,7 @@ def get_m2_vertex_shader(shader_id, op_count=2):
                         return "VS_Diffuse_T1_T1"
 
 
-shader_m2_re = r"^/batches/\d+/shader_id$"
+shader_m2_re = r"^/skin/batches/\d+/shader_id$"
 
 
 simplifiers = [

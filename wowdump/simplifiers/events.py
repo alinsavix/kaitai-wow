@@ -1,5 +1,10 @@
 # simplify event identifiers in events in m2 files
+import logging
+
 def simplify_events(d, _parent, _cachecon, _args):
+    logger = logging.getLogger("simplify")
+    logger.debug("using events simplifier")
+
     if d in m2_events:
         return f"{d}  # {m2_events[d]}"
     else:

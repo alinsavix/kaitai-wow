@@ -1,11 +1,31 @@
 types:
+    m2batch_flags:
+        seq:
+            # not sure of specifics of most of these
+            - id: materials_invert
+              type: b1  # 0x01
+            - id: transform
+              type: b1  # 0x02
+            - id: projected_texture
+              type: b1  # 0x04
+            - id: unknown1
+              type: b1  # 0x08
+            - id: batch_compatible
+              type: b1  # 0x10
+            - id: projected_texture2
+              type: b1  # 0x20
+            - id: transparency_no_multiply
+              type: b1  # 0x40
+            - id: unknown2
+              type: b1  # 0x80
+
     # FIXME: These fields could use *much* better animations
     m2batch:
         doc: "Texture Units"
         doc-ref: https://wowdev.wiki/M2/.skin#Texture_units
         seq:
             - id: flags
-              type: u1
+              type: m2batch_flags
               doc: |
                 Usually 16 for static textures, and 0 for animated textures.
 

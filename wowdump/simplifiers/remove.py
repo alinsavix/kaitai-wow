@@ -1,5 +1,9 @@
 # simplifier to just remove stuff
+import logging
+
 def simplify_remove(d, _parent, _cachecon, _args) -> str:
+    logger = logging.getLogger("simplify")
+    logger.debug("using remove simplifier")
     return None
 
 

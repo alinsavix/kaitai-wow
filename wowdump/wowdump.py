@@ -1,17 +1,19 @@
 #!/usr/local/bin/python3
 import argparse
 import csv
-import json
 import hashlib
+import json
 import os
 import re
 import sys
 import time
-from typing import Any, Optional, Dict, List, Callable
-from ppretty import ppretty
-import inspect
+from typing import Any, Callable, Dict, List, Optional, Union, TextIO
 
-from kaitaistruct import KaitaiStruct, KaitaiStream, BytesIO
+import logging
+from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct
+from ppretty import ppretty
+
+from .dumputil import ktype, kttree, whatis
 from .simplifiers import check_simplify
 
 # We can run without, we'll just be slow
@@ -27,101 +29,42 @@ except ImportError:
 #
 # Also, did I mention it's garbage?
 
+class DataOutput(object):
+    fileHandle: TextIO
+    is_stdout: bool
+
+    def __init__(self, fn: Optional[str]):
+        if fn is not None:
+            self.fileHandle = open(fn, "w")
+            self.is_stdout = False
+        else:
+            self.fileHandle = sys.stdout
+            self.is_stdout = True
+
+    def close(self):
+        # only close if not stdout
+        if not self.is_stdout:
+            self.fileHandle.close()
+
+    def write(self, outstr: str):
+        print(outstr, file=self.fileHandle, flush=self.is_stdout)
+
+
+import contextlib
+@contextlib.contextmanager
+def dataout(fn: Optional[str]):
+    output = DataOutput(fn)
+    yield output
+    output.close()
+
+
 # DEFAULT_TARGET = "testfiles/spectraltiger.m2"
 DEFAULT_TARGET = "testfiles/staff_2h_draenorcrafted_d_02_c.m2"
-#CASCDIR = None
+CASCDIR = None
 DATADIR = os.path.dirname(os.path.realpath(__file__))
 
-# FIXME: Turn these into proper verbosity flags
-do_verbose = 0
-do_debug = 0
-showtree = 0
-do_disposition = 0
 
 global args
-
-def log(text):
-    if do_verbose:
-        # print(text, file=sys.stderr)
-        print(text, flush=True)
-
-
-def debug(text):
-    if do_debug:
-        # print(text, file=sys.stderr)
-        print("DEBUG", text, flush=True)
-
-
-def disp(path, what):
-    if do_disposition:
-        print(f":: {path} --> {what}", flush=True)
-
-
-def treepath(path, key, value=None):
-    # log(f"treepath: {path}.{key} ({value})")
-    if not value:
-        # if key == "data":
-        #     return path
-
-        # else
-        return f"{path}.{key}"
-
-    # else
-    if showtree:
-        print(f"{path}.{key} == {value}", flush=True)
-
-
-def whatis(obj):
-    objis = []
-
-    if inspect.ismodule(obj):
-        objis.append("module")
-    if inspect.isclass(obj):
-        objis.append("class")
-    if inspect.ismethod(obj):
-        objis.append("method")
-    if inspect.isfunction(obj):
-        objis.append("function")
-    if inspect.isgeneratorfunction(obj):
-        objis.append("generatorfunction")
-    if inspect.isgenerator(obj):
-        objis.append("generator")
-    if inspect.iscoroutinefunction(obj):
-        objis.append("coroutinefunction")
-    if inspect.iscoroutine(obj):
-        objis.append("coroutine")
-    if inspect.isawaitable(obj):
-        objis.append("awaitable")
-    if inspect.isasyncgenfunction(obj):
-        objis.append("asyncgenfunction")
-    if inspect.isasyncgen(obj):
-        objis.append("asyncgen")
-    if inspect.istraceback(obj):
-        objis.append("traceback")
-    if inspect.isframe(obj):
-        objis.append("frame")
-    if inspect.iscode(obj):
-        objis.append("code")
-    if inspect.isbuiltin(obj):
-        objis.append("builtin")
-    if inspect.isroutine(obj):
-        objis.append("routine")
-    if inspect.isabstract(obj):
-        objis.append("abstract")
-    if inspect.ismethoddescriptor(obj):
-        objis.append("methoddescriptor")
-    if inspect.isdatadescriptor(obj):
-        objis.append("datadescriptor")
-    if inspect.isgetsetdescriptor(obj):
-        objis.append("getsetdescriptor")
-    if inspect.ismemberdescriptor(obj):
-        objis.append("memberdescriptor")
-
-    if isinstance(obj, KaitaiStruct):
-        objis.append("kaitaistruct")
-
-    return objis
-
 
 def get_contenthash(filename):
     with open(filename, "rb") as f:
@@ -138,95 +81,247 @@ def get_contenthash(filename):
 #   - next to original file
 #   - maybe some directory relative to original file
 #   - some configured CASC path
-def find_related(filepath, base):
-    if os.path.isfile(base):
-        base = os.path.dirname(base)
+# def find_related(filepath, base):
+#     if os.path.isfile(base):
+#         base = os.path.dirname(base)
 
-    filename = os.path.basename(filepath)
-    check = os.path.join(base, filename)
-    if os.path.isfile(check):
-        return check
+#     filename = os.path.basename(filepath)
+#     check = os.path.join(base, filename)
+#     if os.path.isfile(check):
+#         return check
 
-    if CASCDIR:
-        check = os.path.join(CASCDIR, filepath)
-        if os.path.isfile(check):
-            return check
+#     if CASCDIR:
+#         check = os.path.join(CASCDIR, filepath)
+#         if os.path.isfile(check):
+#             return check
 
-    return None
+#     return None
 
+# When dealing with big files with a lot of fields, we end up spending a
+# good bit of time filtering through the various attributes on each object
+# to find the ones we need to actually descend through and such. By pulling
+# that filtering logic into a separate funciton that caches the results, we
+# can gain some performance on big objects (and make the main walk function
+# a little easier to read). Some testing on `valeera.m2` suggests that on
+# large files dumped with `--geometry` save about 5% runtime. Definitely
+# not great, but no real downsides, either. At least, don't think so. All
+# the unit tests pass!
+#
+# FIXME: how much overhead to passing objects here? Is there any better way?
+attrcache = {}
 
-def to_tree(obj, path: str = ""):
-    r = {}
-    debug(f"in: path: {path}  type: {type(obj)} {whatis(obj)}")
+def cacheattrs(obj):
+    t = type(obj)
 
-    value = None
+    if t in attrcache:
+        return attrcache[t]
 
-    for k in dir(obj):
+    cacheentry = []
+
+    obj_keys = dir(obj)
+
+    for k in obj_keys:
         if k[0] == "_":
             continue
 
-        debug(f"getattr {k} from obj type {type(obj)}")
+        # FIXME: figure out what to do with m2track
+        if k == "m2array_type":
+            continue
+
         v = getattr(obj, k)
-        # t = type(v)
-        # debug(f"processing attribute {k} type {t}")
-        # if inspect.isclass(v) or inspect.ismethod(v):
 
-        if inspect.isclass(v):
-            # debug(f"is class, skipping")
-            pass
-        elif inspect.ismethod(v) or inspect.isbuiltin(v):
-            # debug(f"is method or builtin, skipping")
-            pass
-        elif isinstance(v, type):
-            # debug(f"defines a datatype, skipping")
-            pass
-        else:
-            if type(v) == type([]):
-                # if isinstance(v, list):
-                # debug("processing array type")
-                # log(f"array is: {ppretty(v)}")
-                disp(f"{path}.{k}[]", f"array processing (len {len(v)})")
-                value = []
-                for i, el in enumerate(v):
-                    # debug(f"appending {el}")
-                    if type(el) in [int, float, str]:
-                        disp(f"{path}[{i}]", f"final ({el})")
-                        value.append(el)
-                    else:
-                        disp(f"{path}[{i}]", "array descent")
-                        value.append(to_tree(el, treepath(path, k + f"[{i}]")))
-            elif isinstance(v, KaitaiStruct):
-                if k == "data":
-                    disp(f"{path}", "kaitai data descent")
-                    value = to_tree(v, treepath(path, k))
-                else:
-                    disp(f"{path}.{k}", "kaitai descent")
-                    # debug(f"recursing kaitai value, type: {type(k)}")
-                    value = to_tree(v, treepath(path, k))
+        # FIXME: Can we economize here, any?
+        kt = ktype(v)
+        if kt == "skip":  # class, method, datatype
+            continue
+
+        # looks like k is something we want to keep
+        cacheentry.append(k)
+
+    attrcache[t] = cacheentry
+    return cacheentry
+
+
+def pathwalk(out: DataOutput, obj, path: str, cachecon) -> None:
+    lgsimplify = logging.getLogger("simplify")
+    lgdisp = logging.getLogger("disposition")
+
+    logger = logging.getLogger()
+    logger.debug(f"in: path: {path}  type: {type(obj)} {whatis(obj)}")
+
+    # I don't thiiiiiiiink we get called with an object that isn't a
+    # kaitai type, so even though we used to have to figure out object
+    # type here, seems like we don't, at this point?
+    obj_keys = cacheattrs(obj)
+
+
+    # if path == "/skin/batches/0":
+    #     print("breakpoint")
+
+    for k in obj_keys:
+        workpath = f"{path}/{k}"
+
+        # if workpath == "/model/vertices":
+        #     print("breakpoint")
+
+        logger.debug(f"getattr {k} from obj type {type(obj)}")
+        v = getattr(obj, k)
+
+        kt = ktype(v)
+
+        logger.debug(f"checking for array elision for {workpath}")
+        # this is probably a code smell, if not worse. If our current level
+        # isn't geometry, but we add a '/0' to it and it is, that means it's
+        # the very top of a geometry tree, and we can save ourselves the
+        # effort of descending into it (and thus reading & parsing it) by
+        # just escaping now.
+        if not args.geometry and not geometry_path(workpath) and geometry_path(f"{workpath}/0"):
+            if not check_filtered(workpath):
+                out.write(
+                    f"{workpath}/... = [geometry data elided, use --geometry to include]")
+            continue
+
+        # if we have ofs_xxx or num_xxx, and *also* just have xxx,
+        # we don't need the offset/size anymore
+        if args.hide_unneeded and isinstance(k, str) and (k.startswith("ofs_") or k.startswith("num_")):
+            s = k[len("ofs_"):]
+            if s in obj_keys:
+                continue
+
+        # FIXME: Where is the best place for simplifiers? Here?
+        lgsimplify.debug(f"checking simplifier for {workpath}")
+        s = check_simplify(workpath) if args.simplify else None
+        if s:
+            lgsimplify.debug(f"using simplifier for {workpath}")
+
+            # if getting simplified, it's a "final" path, so check filtering
+            if check_filtered(workpath):
+                continue
+
+            # FIXME: this feels sloppy
+            if kt == "base" or kt == "list":
+                simplified = s(v, obj, cachecon, args)
             else:
-                # log(f"using plain value: {v} {whatis(v)}")
-                # debug(f"dir: {dir(v)}")
-                # print(ppretty(v))
+                simplified = s(v, obj, cachecon, args)
+            if simplified is not None:
+                out.write(f"{workpath} = {simplified}")
 
-                # treepath(path, k, v)
-                # print(f"{path}.{k} == {v}")
-                # value = v
-                # value = to_tree(v, treepath(path, k))
-                if type(v) in [int, float, str, bool]:
-                    disp(f"{path}.{k}", f"final ({v})")
-                    value = v
-                else:
-                    if k == "m2array_type" or k == "m2track_type":
-                        disp(f"{path}.{k}", "ignored")
+            # We either simplified w/ output, or simplified out of existence.
+            # either way, move on
+            continue
+
+        if kt == "list":
+            lgdisp.debug(f"{workpath}[] --> array processing (len {len(v)})")
+
+            # everything in an array shoooould have the same contents, so no
+            # benefit to checking for a simplifier match for each, just check
+            # for the first element and keep it
+            s = check_simplify(f"{workpath}/0") if args.simplify else None
+
+            for i, el in enumerate(v):
+                arraypath = f"{workpath}/{i}"
+                elt = ktype(el)
+
+                # if --geometry is specified, we still want to limit it to just
+                # our array limit of entries, unless we've set arraylimit=0
+                if geometry_path(arraypath) and args.arraylimit > 0 and i >= args.arraylimit:
+                    logger.debug(
+                        f"eliding remaining geometry entries for {workpath}")
+                    if not check_filtered(arraypath):
+                        remaining = len(v) - args.arraylimit
+                        out.write(
+                            f"{workpath}/... = [{remaining} elided of {len(v)} total]")
+                    break
+
+                # if we're going to elide all arrays (via --elide-all), check
+                # that, too, and bail if we've hit the limit
+                if args.elide_all and args.arraylimit > 0 and i >= args.arraylimit:
+                    logger.debug(
+                        f"eliding remaining array entries for {workpath}")
+                    if not check_filtered(arraypath):
+                        remaining = len(v) - args.arraylimit
+                        out.write(
+                            f"{workpath}/... = [{remaining} elided of {len(v)} total]")
+                    break
+
+                # FIXME: dedupe dedupe
+                # s = check_simplify(arraypath) if args.simplify else None
+                if s:
+                    lgsimplify.debug(f"using simplifier for {arraypath}")
+
+                    # if getting simplified, it's a "final" path, so check filtering
+                    if check_filtered(arraypath):
+                        continue
+
+                    lgsimplify.debug(
+                        f"array simplify type: {type(el)}   value: {el}")
+                    # FIXME: this feels sloppy
+                    if elt == "base" or elt == "list":
+                        simplified = s(el, v, cachecon, args)
                     else:
-                        disp(f"{path}.{k}", f"descend (type {type(v)}")
-                        value = to_tree(v, treepath(path, k))
+                        simplified = s(el, v, cachecon, args)
+                    if simplified is not None:
+                        out.write(f"{arraypath} = {simplified}")
 
-            if value is not None:
-                r[k] = value
+                    # We either simplified w/ output, or simplified out of existence.
+                    # either way, move on
+                    continue
 
-    debug(f"out:  returning {r}")
-    return r
+                # if elt in [int, float, str]:
+                if elt == "base":
+                    # we're at a final path, check filtering
+                    if check_filtered(workpath):
+                        continue
+
+                    if isinstance(el, str):
+                        el = el.rstrip("\0")
+                    lgdisp.debug(f"array {arraypath} --> final ({el})")
+                    out.write(f"{arraypath} = {el}")
+
+                    # print thing?
+                    # value.append(el)
+                else:
+                    lgdisp.debug(f"{arraypath} --> array descent")
+                    # value.append(to_tree(el, treepath(path, k + f"[{i}]")))
+                    pathwalk(out, el, arraypath, cachecon)
+
+        elif kt == "kaitai":
+            # FIXME: I think we're supposed to do one of these without the {k}
+            if k == "data":
+                lgdisp.debug(f"{workpath} --> kaitai data descent")
+                pathwalk(out, v, workpath, cachecon)
+            else:
+                lgdisp.debug(f"{workpath} --> kaitai descent type {type(k)}")
+                # debug(f"recursing kaitai value, type: {type(k)}")
+                pathwalk(out, v, workpath, cachecon)
+
+        elif kt == "base":
+            # we're at a final path, check filtering
+            if check_filtered(workpath):
+                continue
+
+            if isinstance(v, str):
+                v = v.rstrip("\0")
+
+            lgdisp.debug(f"{workpath} --> final ({v})")
+            # logger.debug(f"(output) {v}")
+            out.write(f"{workpath} = {v}")
+
+        else:
+            lgdisp.debug(f"{workpath} --> descend (type {type(v)}")
+            pathwalk(out, v, workpath, cachecon)
+
+# for maybe speeding up logging when a debug level is disabled:
+#
+# class Lazy(object):
+#     def __init__(self,func):
+#         self.func=func
+#     def __str__(self):
+#         return self.func()
+#
+# logger.debug(Lazy(lambda: time.sleep(20)))
+#
+# logger.info(Lazy(lambda: "Stupid log message " + ' '.join([str(i) for i in range(20)])))
 
 
 # Caching bits (yeah, they're ugly)
@@ -274,12 +369,6 @@ def cache_fileids(listfile: str, cachecon) -> None:
     runtime = time.time() - started
     print(
         f"INFO: fileid cache successfully rebuilt in {runtime:.2f}s", file=sys.stderr)
-
-
-
-
-
-
 
 
 # There's probably a way better way to do this.
@@ -350,79 +439,19 @@ def check_filtered(path: str) -> bool:
 # value).
 #
 # FIXME: It'd be great if we didn't have to maintain the regex list by hand.
-geom_path_re = re.compile(r"/(model|chunk_data)/(polys|indices|vertices|normals|tex_coords|bspnodes|vertex_colors|node_face_indices)/\d+$")
+geom_path_re = re.compile(
+    r"/(model|skin|chunk_data)/(bones|polys|indices|vertices|normals|tex_coords|bspnodes|vertex_colors|node_face_indices)/\d+$")
 
 def geometry_path(path):
     if geom_path_re.search(path):
         return True
-
-# FIXME: Can we manage the cache better than jut passing cachecon around?
-def pathdump(d, path: str, cachecon) -> None:
-    # This is kind of a lame way to get a loop that handles both lists
-    # and dicts, but is there a better way?
-    if isinstance(d, dict):
-        things = sorted(d.keys(), key=lambda x: (not (x == "chunk_size" or x == "chunk_type"), x))
-    elif isinstance(d, list):
-        things = range(0, len(d))
-
-    eject = False
-    for k in things:
-        if eject:
-            return
-
-        if isinstance(d, list) and (args.elide_all or geometry_path(f"{path}/{k}")) \
-            and args.arraylimit > 0 and k >= args.arraylimit:
-            remaining = len(d) - args.arraylimit
-            print(f"{path}/... = [{remaining-1} elided of {len(d)} total]")
-            k = things[-1]
-            eject = True
-            # return
-
-        workpath = f"{path}/{k}"
-        thing = d[k]
-
-        # if we have ofs_xxx or num_xxx, and *also* just have xxx,
-        # we don't need the offset/size anymore
-        if args.hide_unneeded and isinstance(k, str) and (k.startswith("ofs_") or k.startswith("num_")):
-            s = k[len("ofs_"):]
-            if s in things:
-                continue
-
-        # if check_filtered(workpath):
-        #     continue
-
-        # doublecheck to make sure check_simply doesn't get called if disabled
-        s = check_simplify(workpath) if args.simplify else None
-
-        if s:
-            # if it's simplified, we're at a 'final' path, so check filtering
-            if check_filtered(workpath):
-                continue
-            simplified = s(thing, d, cachecon, args)
-            if simplified is not None:
-                print(f"{workpath} = {simplified}")
-        elif isinstance(thing, dict) or isinstance(thing, list):
-            pathdump(thing, workpath, cachecon)
-        else:
-            # we're at a final path, so check filtering
-            if check_filtered(workpath):
-                continue
-
-            # FIXME: Not sure if this is a kaitai bug or what, but we're
-            # getting nulls at the end of strings right now. This cleans
-            # that up for now.
-            if isinstance(thing, str):
-                thing = thing.rstrip("\0")
-            print(f"{workpath} = {thing}")
-
-    return
 
 
 class NegateAction(argparse.Action):
     def __call__(self, parser, ns, values, option):
         setattr(ns, self.dest, option[2:4] != 'no')
 
-def parse_arguments():
+def parse_arguments(argv, loggers):
     parser = argparse.ArgumentParser(
         prog="wowdump",
         description="A tool for dumping the information out of WoW files",
@@ -433,7 +462,7 @@ def parse_arguments():
         action='store_const',
         const=True,
         default=False,
-        # help="Read objects and prepare them for decimation",
+        # help="help text",
     )
 
     parser.add_argument(
@@ -441,7 +470,23 @@ def parse_arguments():
         action='store_const',
         const=True,
         default=False,
-        # help="Read objects and prepare them for decimation",
+        # help="help text",
+    )
+
+    for lg in loggers:
+        parser.add_argument(
+            f"--debug-{lg}",
+            action="store_const",
+            const=True,
+            default=False,
+            #help = "whatever",
+        )
+
+    levels = ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')
+    parser.add_argument(
+        "--log-level",
+        default='INFO',
+        choices=levels,
     )
 
     parser.add_argument(
@@ -471,7 +516,7 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "--hide-unneeded"
+        "--hide-unneeded",
         "--no-hide-unneeded",
         dest="hide_unneeded",
         default=True,
@@ -493,7 +538,7 @@ def parse_arguments():
     parser.add_argument(
         "--listfile",
         default=f"{DATADIR}/listfile.csv",
-        help="specify listfile to use for fileids (default: %(default)s",
+        help="specify listfile to use for fileids (default: %(default)s)",
     )
 
     parser.add_argument(
@@ -501,7 +546,7 @@ def parse_arguments():
         dest="filters",
         default=[],
         action='append',
-        nargs="+",
+        nargs=1,
         help="filter results by path (can be used multiple times)",
     )
 
@@ -537,6 +582,18 @@ def parse_arguments():
         help="elide array contents after this many entries (0 disables elision)",
     )
 
+    # FIXME: Not sure this is the best way to handle this?
+    parser.add_argument(
+        "--geometry",
+        "--no-geometry",
+        dest="geometry",
+        default=False,
+        action=NegateAction,
+        nargs=0,
+
+        help="Decode individual vertexes and related fields"
+    )
+
     parser.add_argument(
         "--elide-all",
         action='store_true',
@@ -546,10 +603,20 @@ def parse_arguments():
 
     parser.add_argument(
         "--output_type",
+        "--output-type",
         "-t",
-        choices=["path", "json", "final", "raw", ],
-        default="path",
+        choices=["pathwalk", "json", "final", "raw", ],
+        default="pathwalk",
         help="select output type (default: %(default)s)",
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        default=None,
+
+        help="file to output results to",
     )
 
     parser.add_argument(
@@ -560,7 +627,10 @@ def parse_arguments():
         help="input file to be processed",
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
+
+    if args.debug:
+        args.log_level = 'DEBUG'
 
     # args.filters = [item for subl in args.filters for item in subl]
     # prep our filters
@@ -574,27 +644,39 @@ def parse_arguments():
     return args
 
 
-def main():
+def main(argv=None):
     global args
-    args = parse_arguments()
+    if not argv:
+        argv = sys.argv[1:]
+
+    LOGGER_LIST = ["disposition", "simplify", "kttree"]
+    args = parse_arguments(argv, loggers=LOGGER_LIST)
+
+    LOG_FORMAT = "[%(filename)s:%(lineno)s:%(funcName)s] (%(name)s) %(levelname)s: %(message)s"
+    logging.basicConfig(level=args.log_level, format=LOG_FORMAT)
+
+    for lg in LOGGER_LIST:
+        if getattr(args, f"debug_{lg}"):
+            l = logging.getLogger(lg)
+            l.setLevel(logging.DEBUG)
+
+    log = logging.getLogger()
+    # log.info("wowdump initialized")  # FIXME: remove me
 
     # if len(args.files) == 0:
     #     args.files = [DEFAULT_TARGET]
     #     print(
     #         f"WARNING: Using default target file {DEFAULT_TARGET}", flush=True, file=sys.stderr)
 
-    cache_current = False
-    cachefile = f"{args.listfile}.cache"
-
-    # FIXME: This is a bit deeply nested for my tastes.
     if not args.resolve:
         # print("INFO: not resolving, not initializing cache", file=sys.stderr)
         cachecon = None
     elif not os.path.exists(args.listfile):
-        print(
-            f"WARNING: {args.listfile} does not exist, not resolving fileids")
+        log.warning(
+            f"{args.listfile} does not exist, not resolving fileids")
         cachecon = None
     else:
+        cachefile = f"{args.listfile}.cache"
         if os.path.exists(cachefile) and (os.path.getmtime(args.listfile) <= os.path.getmtime(cachefile)):
             # print("INFO: fileid cache up to date, not updating", file=sys.stderr)
             cachecon = cache_open(cachefile)
@@ -604,6 +686,10 @@ def main():
 
     # FIXME: handle more than one file
     file = args.files[0]
+
+    if not os.path.isfile(file):
+        log.error(f"no such file: {file}")
+        return 66  # os.EX_NOINPUT
 
     name, ext = os.path.splitext(file)
     if ext == ".m2":
@@ -631,26 +717,29 @@ def main():
         from .filetypes.anim import Anim
         target = Anim.from_file(file)
     else:
-        print(f"ERROR: don't know how to parse tile type {ext}")
-        sys.exit(1)
+        print(
+            f"ERROR: don't know how to parse file type {ext}", file=sys.stderr)
+        return 65  # os.EX_DATAERR
 
-    if args.output_type == "path":
-        parsed = to_tree(target)
-        print(f"# path = {file}")
-        h = get_contenthash(file)
-        print(f"# contenthash = {h}")
+    with dataout(args.output) as out:
+        if args.output_type == "pathwalk":
+            # out.write(f"# path = {file}")
+            if not check_filtered("/contenthash"):
+                h = get_contenthash(file)
+                out.write(f"/contenthash = {h}")
+            pathwalk(out, target, "", cachecon)
+        elif args.output_type == "raw":
+            out.write(ppretty(target, depth=99, seq_length=100,))
+        elif args.output_type == "final":
+            parsed = kttree(target)
+            out.write(ppretty(parsed, depth=99, seq_length=100,))
+        # FIXME: re-enable json, make it use out.write()
+        elif args.output_type == "json":
+            parsed = kttree(target)
+            out.write(json.dumps(parsed, indent=2, sort_keys=True))
 
-        pathdump(parsed, "", cachecon)
-    elif args.output_type == "raw":
-        print(ppretty(target, depth=99, seq_length=100,))
-    elif args.output_type == "final":
-        parsed = to_tree(target)
-        print(ppretty(parsed, depth=99, seq_length=100,))
-    elif args.output_type == "json":
-        parsed = to_tree(target)
-        json.dump(parsed, fp=sys.stdout, indent=2, sort_keys=True)
-        print()  # newline at end
+    return 0  # os.EX_OK
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))
