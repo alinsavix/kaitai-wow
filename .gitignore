@@ -104,3 +104,6 @@ tests/htmlcov
 tests/report.html
 
 !.notempty
+
+.coverage
+.vscode/

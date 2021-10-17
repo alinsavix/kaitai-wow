@@ -11,8 +11,8 @@ log_cli = false
 addopts = [
     "--tb=short",
     "--strict-markers",
-    "--html=report.html", "--css=report.css", "--self-contained-html",
-    "--cov=wowdump", "--cov-report=html:htmlcov",
+    "--html=@rootdir@/tests/report.html", "--css=@rootdir@/tests/report.css", "--self-contained-html",
+    "--cov=wowdump", "--cov-report=html:@rootdir@/tests/htmlcov",
 ]
 
 console_output_style = "count"
