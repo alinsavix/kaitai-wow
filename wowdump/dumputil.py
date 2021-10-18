@@ -12,7 +12,7 @@ from ppretty import ppretty
 
 # "kaitai type"
 def ktype(v):
-    logger = logging.getLogger()
+    logger = logging.getLogger("ktype")
     if inspect.isclass(v):
         logger.debug("var is type class, skipping")
         return "skip"
