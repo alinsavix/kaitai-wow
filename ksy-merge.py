@@ -291,6 +291,100 @@ def recurse_merge(yaml_data: Dict[Any, Any], path: str):
             merge_file(yaml_data, os.path.join(path, fp.name))
 
 
+# We get 'data' after everything has basically been flattened. The places
+# used types could be mentioned are limited to:
+#   data.types.[name].seq[0..n].type
+#   data.types.[name].instances.[name].type
+#
+# type can be either 'str', or can be: type.cases.[string]
+def norm_type(t):
+    n = re.sub(r"\(.*\)", "", t)
+
+    return n
+
+
+def get_used_types_from_seq(data):
+    used_types = set()
+
+    # seq is always a list
+    for f in data:
+        if "type" not in f:
+            continue
+
+        field = f["type"]
+        if isinstance(field, str):
+            used_types.add(norm_type(field))
+            continue
+
+        # otherwise this is a case statement (or... others? dunno)
+        if "cases" in field:
+            for k, v in field["cases"].items():
+                used_types.add(norm_type(v))
+
+    return used_types
+
+
+def get_used_types_from_instances(data):
+    used_types = set()
+
+    for _, f in data.items():
+        if "type" not in f:
+            continue
+
+        field = f["type"]
+        if isinstance(field, str):
+            used_types.add(norm_type(field))
+            continue
+
+        # otherwise case statement (etc)
+        if "cases" in field:
+            for _, v in field["cases"].items():
+                used_types.add(norm_type(v))
+
+    return used_types
+
+
+def get_used_types(data):
+    a = get_used_types_from_seq(data["seq"]) if "seq" in data else set()
+    b = get_used_types_from_instances(data["instances"]) if "instances" in data else set()
+
+    return a | b
+
+
+# Starting from a top level sequence (should have 'seq' or 'instances' keys,
+# and a 'types' key with all the various parts)
+def get_used_types_recurse(top):
+    # starting point
+    used_types = get_used_types(top)
+
+    # if there's no further types listed in the file, we have nothing
+    # else to do, just bail
+    if "types" not in top:
+        return used_types
+
+    # and everything used by the starting pint is new, of course
+    new_types = set()
+    new_types.update(used_types)
+
+    # convenient shortcut to all available types
+    typemap = top["types"]
+
+    # keep digging out new types until we run out of new types
+    while len(new_types) > 0:
+        new_new_types = set()
+        for t in new_types:
+            if t in typemap:
+                new_new_types.update(get_used_types(typemap[t]))
+
+        # our actual new types are what doesn't actually show as used
+        new_types = new_new_types - used_types
+
+        # add anything we found to the master list
+        used_types.update(new_types)
+
+    return used_types
+
+
 # VERY simple yaml merge. Everything is a deep merge. Conflicts resolve
 # nondeterministically.
 def parse_arguments():
@@ -357,6 +451,12 @@ def main():
 
     dict_descent(data, False, data)
 
+    if "types" in data:
+        used_types = get_used_types_recurse(data)
+        to_delete = data["types"].keys() - used_types
+        for d in to_delete:
+            del data["types"][d]
+
     # The kaitai IDE can't cope with yaml multiline strings, so width=9999
     # will stop it from wrapping those lines when processing long heredocs
     if not args.deps_only:
@@ -369,6 +469,7 @@ def main():
             handled = " \\\n    ".join(paths_handled)
             print(f"{args.deps_target}: \\", file=f)
             print("    " + handled, file=f)
+
 
 if __name__ == "__main__":
     sys.exit(main())
