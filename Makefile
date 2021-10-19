@@ -123,7 +123,7 @@ depend:
 
 .PHONY: test
 test: wowdump
-	cd tests ; pytest
+	pytest
 
 
 .PHONY: benchmark

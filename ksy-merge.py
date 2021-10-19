@@ -6,7 +6,7 @@ import sys
 import yaml
 from ppretty import ppretty
 
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Tuple, Set
 
 verbose = 0
 
@@ -297,17 +297,21 @@ def recurse_merge(yaml_data: Dict[Any, Any], path: str):
 #   data.types.[name].instances.[name].type
 #
 # type can be either 'str', or can be: type.cases.[string]
-def norm_type(t):
+def norm_type(t: str) -> str:
     n = re.sub(r"\(.*\)", "", t)
 
     return n
 
 
-def get_used_types_from_seq(data):
+def get_used_from_seq(data) -> Tuple[Set[str], Set[str]]:
     used_types = set()
+    used_enums = set()
 
     # seq is always a list
     for f in data:
+        if "enum" in f:
+            used_enums.add(f["enum"])
+
         if "type" not in f:
             continue
 
@@ -321,13 +325,18 @@ def get_used_types_from_seq(data):
             for k, v in field["cases"].items():
                 used_types.add(norm_type(v))
 
-    return used_types
+    return used_types, used_enums
 
 
-def get_used_types_from_instances(data):
+# FIXME: Can we dedupe w/ the above?
+def get_used_from_instances(data) -> Tuple[Set[str], Set[str]]:
     used_types = set()
+    used_enums = set()
 
     for _, f in data.items():
+        if "enum" in f:
+            used_enums.add(f["enum"])
+
         if "type" not in f:
             continue
 
@@ -341,26 +350,28 @@ def get_used_types_from_instances(data):
             for _, v in field["cases"].items():
                 used_types.add(norm_type(v))
 
-    return used_types
+    return used_types, used_enums
 
 
-def get_used_types(data):
-    a = get_used_types_from_seq(data["seq"]) if "seq" in data else set()
-    b = get_used_types_from_instances(data["instances"]) if "instances" in data else set()
+def get_used(data) -> Tuple[Set[str], Set[str]]:
+    nulls = (set(), set())
+    a, aa = get_used_from_seq(data["seq"]) if "seq" in data else nulls
+    b, bb = get_used_from_seq(data["params"]) if "params" in data else nulls
+    c, cc = get_used_from_instances(data["instances"]) if "instances" in data else nulls
 
-    return a | b
+    return a | b | c, aa | bb | cc
 
 
 # Starting from a top level sequence (should have 'seq' or 'instances' keys,
 # and a 'types' key with all the various parts)
-def get_used_types_recurse(top):
+def get_used_recurse(top) -> Tuple[Set[str], Set[str]]:
     # starting point
-    used_types = get_used_types(top)
+    used_types, used_enums = get_used(top)
 
     # if there's no further types listed in the file, we have nothing
     # else to do, just bail
     if "types" not in top:
-        return used_types
+        return used_types, used_enums
 
     # and everything used by the starting pint is new, of course
     new_types = set()
@@ -374,7 +385,9 @@ def get_used_types_recurse(top):
         new_new_types = set()
         for t in new_types:
             if t in typemap:
-                new_new_types.update(get_used_types(typemap[t]))
+                nt, ne = get_used(typemap[t])
+                new_new_types.update(nt)
+                used_enums.update(ne)
 
         # our actual new types are what doesn't actually show as used
         new_types = new_new_types - used_types
@@ -382,7 +395,7 @@ def get_used_types_recurse(top):
         # add anything we found to the master list
         used_types.update(new_types)
 
-    return used_types
+    return used_types, used_enums
 
 
 # VERY simple yaml merge. Everything is a deep merge. Conflicts resolve
@@ -452,10 +465,16 @@ def main():
     dict_descent(data, False, data)
 
     if "types" in data:
-        used_types = get_used_types_recurse(data)
+        used_types, used_enums = get_used_recurse(data)
         to_delete = data["types"].keys() - used_types
         for d in to_delete:
             del data["types"][d]
+
+        if "enums" in data:
+            to_delete = data["enums"].keys() - used_enums
+            for d in to_delete:
+                # print(f"not needed enum: {d}")
+                del data["enums"][d]
 
     # The kaitai IDE can't cope with yaml multiline strings, so width=9999
     # will stop it from wrapping those lines when processing long heredocs
