@@ -1,0 +1,2 @@
+- name: never commit
+  pattern: 'FIXME NOW'
