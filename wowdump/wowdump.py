@@ -6,10 +6,11 @@ import os
 import re
 import sys
 import time
-from typing import Any, Callable, Dict, List, Optional, Union, TextIO
+
+from kaitaistruct import KaitaiStruct
+from typing import Union, Optional, Iterable, TextIO
 
 import logging
-from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct
 from ppretty import ppretty
 
 from .filetypes import load_wowfile
@@ -33,7 +34,7 @@ class DataOutput(object):
     fileHandle: TextIO
     is_stdout: bool
 
-    def __init__(self, fn: Optional[str]):
+    def __init__(self, fn: Optional[Union[str, os.PathLike]]):
         if fn is not None:
             self.fileHandle = open(fn, "w")
             self.is_stdout = False
@@ -66,7 +67,7 @@ DATADIR = os.path.dirname(os.path.realpath(__file__))
 
 global args
 
-def get_contenthash(filename):
+def get_contenthash(filename: Union[str, os.PathLike]):
     with open(filename, "rb") as f:
         h = hashlib.md5()
         chunk = f.read(8192)
@@ -142,7 +143,7 @@ def cacheattrs(obj):
     return cacheentry
 
 
-def pathwalk(out: DataOutput, obj, path: str, cachecon) -> None:
+def pathwalk(obj: KaitaiStruct, path: str, cachecon) -> Iterable[str]:
     lgsimplify = logging.getLogger("simplify")
     lgdisp = logging.getLogger("disposition")
 
@@ -177,8 +178,7 @@ def pathwalk(out: DataOutput, obj, path: str, cachecon) -> None:
         # just escaping now.
         if not args.geometry and not geometry_path(workpath) and geometry_path(f"{workpath}/0"):
             if not check_filtered(workpath):
-                out.write(
-                    f"{workpath}/... = [geometry data elided, use --geometry to include]")
+                yield f"{workpath}/... = [geometry data elided, use --geometry to include]"
             continue
 
         # if we have ofs_xxx or num_xxx, and *also* just have xxx,
@@ -204,7 +204,7 @@ def pathwalk(out: DataOutput, obj, path: str, cachecon) -> None:
             else:
                 simplified = s(v, obj, cachecon, args)
             if simplified is not None:
-                out.write(f"{workpath} = {simplified}")
+                yield f"{workpath} = {simplified}"
 
             # We either simplified w/ output, or simplified out of existence.
             # either way, move on
@@ -229,8 +229,7 @@ def pathwalk(out: DataOutput, obj, path: str, cachecon) -> None:
                         f"eliding remaining geometry entries for {workpath}")
                     if not check_filtered(arraypath):
                         remaining = len(v) - args.arraylimit
-                        out.write(
-                            f"{workpath}/... = [{remaining} elided of {len(v)} total]")
+                        yield f"{workpath}/... = [{remaining} elided of {len(v)} total]"
                     break
 
                 # if we're going to elide all arrays (via --elide-all), check
@@ -240,8 +239,7 @@ def pathwalk(out: DataOutput, obj, path: str, cachecon) -> None:
                         f"eliding remaining array entries for {workpath}")
                     if not check_filtered(arraypath):
                         remaining = len(v) - args.arraylimit
-                        out.write(
-                            f"{workpath}/... = [{remaining} elided of {len(v)} total]")
+                        yield f"{workpath}/... = [{remaining} elided of {len(v)} total]"
                     break
 
                 # FIXME: dedupe dedupe
@@ -261,7 +259,7 @@ def pathwalk(out: DataOutput, obj, path: str, cachecon) -> None:
                     else:
                         simplified = s(el, v, cachecon, args)
                     if simplified is not None:
-                        out.write(f"{arraypath} = {simplified}")
+                        yield f"{arraypath} = {simplified}"
 
                     # We either simplified w/ output, or simplified out of existence.
                     # either way, move on
@@ -276,24 +274,20 @@ def pathwalk(out: DataOutput, obj, path: str, cachecon) -> None:
                     if isinstance(el, str):
                         el = el.rstrip("\0")
                     lgdisp.debug(f"array {arraypath} --> final ({el})")
-                    out.write(f"{arraypath} = {el}")
-
-                    # print thing?
-                    # value.append(el)
+                    yield f"{arraypath} = {el}"
                 else:
                     lgdisp.debug(f"{arraypath} --> array descent")
-                    # value.append(to_tree(el, treepath(path, k + f"[{i}]")))
-                    pathwalk(out, el, arraypath, cachecon)
+                    yield from pathwalk(el, arraypath, cachecon)
 
         elif kt == "kaitai":
             # FIXME: I think we're supposed to do one of these without the {k}
             if k == "data":
                 lgdisp.debug(f"{workpath} --> kaitai data descent")
-                pathwalk(out, v, workpath, cachecon)
+                yield from pathwalk(v, workpath, cachecon)
             else:
                 lgdisp.debug(f"{workpath} --> kaitai descent type {type(k)}")
                 # debug(f"recursing kaitai value, type: {type(k)}")
-                pathwalk(out, v, workpath, cachecon)
+                yield from pathwalk(v, workpath, cachecon)
 
         elif kt == "base":
             # we're at a final path, check filtering
@@ -304,12 +298,11 @@ def pathwalk(out: DataOutput, obj, path: str, cachecon) -> None:
                 v = v.rstrip("\0")
 
             lgdisp.debug(f"{workpath} --> final ({v})")
-            # logger.debug(f"(output) {v}")
-            out.write(f"{workpath} = {v}")
+            yield f"{workpath} = {v}"
 
         else:
             lgdisp.debug(f"{workpath} --> descend (type {type(v)}")
-            pathwalk(out, v, workpath, cachecon)
+            yield from pathwalk(v, workpath, cachecon)
 
 # for maybe speeding up logging when a debug level is disabled:
 #
@@ -328,7 +321,7 @@ def pathwalk(out: DataOutput, obj, path: str, cachecon) -> None:
 # or maybe type of os.PathLike for cache_open
 # FIXME: move caching bits to separate module
 # FIXME: needs locking for cache rebuild
-def cache_open(dbfile: str):
+def cache_open(dbfile: Union[str, os.PathLike]):
     if "sqlite3" not in sys.modules:
         print("WARNING: sqlite not available, caching disabled", file=sys.stderr)
         return None
@@ -339,7 +332,7 @@ def cache_open(dbfile: str):
     return cachecon
 
 
-def cache_fileids(listfile: str, cachecon) -> None:
+def cache_fileids(listfile: Union[str, os.PathLike], cachecon) -> None:
     # Don't have the cache open, so can't cache anything
     if not cachecon:
         return
@@ -479,7 +472,7 @@ def parse_arguments(argv, loggers):
             action="store_const",
             const=True,
             default=False,
-            #help = "whatever",
+            # help = "whatever",
         )
 
     levels = ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')
@@ -537,7 +530,7 @@ def parse_arguments(argv, loggers):
 
     parser.add_argument(
         "--listfile",
-        default=f"{DATADIR}/listfile.csv",
+        default=os.path.join(DATADIR, "listfile.csv"),
         help="specify listfile to use for fileids (default: %(default)s)",
     )
 
@@ -657,8 +650,8 @@ def main(argv=None):
 
     for lg in LOGGER_LIST:
         if getattr(args, f"debug_{lg}"):
-            l = logging.getLogger(lg)
-            l.setLevel(logging.DEBUG)
+            x = logging.getLogger(lg)
+            x.setLevel(logging.DEBUG)
 
     log = logging.getLogger()
     # log.info("wowdump initialized")  # FIXME: remove me
@@ -699,7 +692,9 @@ def main(argv=None):
             if not check_filtered("/contenthash"):
                 h = get_contenthash(file)
                 out.write(f"/contenthash = {h}")
-            pathwalk(out, target, "", cachecon)
+
+            for line in pathwalk(target, "", cachecon):
+                out.write(line)
         elif args.output_type == "raw":
             out.write(ppretty(target, depth=99, seq_length=100,))
         elif args.output_type == "final":
