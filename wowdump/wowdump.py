@@ -12,6 +12,7 @@ import logging
 from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct
 from ppretty import ppretty
 
+from .filetypes import load_wowfile
 from .dumputil import ktype, kttree, whatis
 from .simplifiers import check_simplify
 
@@ -686,38 +687,10 @@ def main(argv=None):
     # FIXME: handle more than one file
     file = args.files[0]
 
-    if not os.path.isfile(file):
-        log.error(f"no such file: {file}")
-        return 66  # os.EX_NOINPUT
-
-    name, ext = os.path.splitext(file)
-    if ext == ".m2":
-        from .filetypes.m2 import M2
-        target = M2.from_file(file)
-    elif ext == ".skin":
-        from .filetypes.skin import Skin
-        target = Skin.from_file(file)
-    elif ext == ".skel":
-        from .filetypes.skel import Skel
-        target = Skel.from_file(file)
-    elif ext == ".blp":
-        from .filetypes.blp import Blp
-        target = Blp.from_file(file)
-    elif ext == ".bls":
-        from .filetypes.bls import Bls
-        target = Bls.from_file(file)
-    elif ext == ".wmo":
-        from .filetypes.wmo import Wmo
-        target = Wmo.from_file(file)
-    elif ext == ".wdt":
-        from .filetypes.wdt import Wdt
-        target = Wdt.from_file(file)
-    elif ext == ".anim":
-        from .filetypes.anim import Anim
-        target = Anim.from_file(file)
-    else:
-        print(
-            f"ERROR: don't know how to parse file type {ext}", file=sys.stderr)
+    try:
+        target = load_wowfile(file)
+    except (ValueError, OSError) as e:
+        print(f"ERROR: {e}", file=sys.stderr)
         return 65  # os.EX_DATAERR
 
     with dataout(args.output) as out:

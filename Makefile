@@ -3,6 +3,7 @@ OUTDIR=outputs
 
 PYTHON_BIN ?= python3
 PIP_BIN ?= pip3
+BASH ?= bash
 KSY_COMPILER ?= kaitai-struct-compiler
 KSY_MERGE=$(PYTHON_BIN) ./ksy-merge.py
 
@@ -49,14 +50,19 @@ $(PYTHON_OUTDIR)/%.py: $(KSY_OUTDIR)/%.ksy
 # wowdump
 #
 WOWDUMP_OUTDIR = wowdump/filetypes
-WOWDUMP_TARGETS = $(addprefix $(WOWDUMP_OUTDIR)/, $(addsuffix .py, $(FILETYPES)))
+WOWDUMP_FILETYPE_TARGETS = $(addprefix $(WOWDUMP_OUTDIR)/, $(addsuffix .py, $(FILETYPES)))
+WOWDUMP_TARGETS = $(WOWDUMP_OUTDIR)/__init__.py $(WOWDUMP_FILETYPE_TARGETS)
 
 wowdump: $(WOWDUMP_TARGETS)
+
+$(WOWDUMP_OUTDIR)/__init__.py: $(WOWDUMP_FILETYPE_TARGETS)
+	@mkdir -p $(WOWDUMP_OUTDIR)
+	bash gen_wowdump_filetypes.sh $(FILETYPES) >"$@"
+
 
 $(WOWDUMP_OUTDIR)/%.py: $(PYTHON_OUTDIR)/%.py
 	@mkdir -p $(WOWDUMP_OUTDIR)
 	cp "$<" "$@"
-
 
 #
 # svg
