@@ -26,3 +26,20 @@ cat <<EOF
     # else
     raise ValueError(f"unknown file type {ext}: {file}")
 EOF
+
+
+cat <<EOF
+
+
+def get_supported():
+    return {
+EOF
+for type in "$@"; do
+    cat <<EOF
+        "${type}",
+EOF
+done
+
+cat <<EOF
+    }
+EOF

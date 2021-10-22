@@ -55,7 +55,7 @@ WOWDUMP_TARGETS = $(WOWDUMP_OUTDIR)/__init__.py $(WOWDUMP_FILETYPE_TARGETS)
 
 wowdump: $(WOWDUMP_TARGETS)
 
-$(WOWDUMP_OUTDIR)/__init__.py: $(WOWDUMP_FILETYPE_TARGETS)
+$(WOWDUMP_OUTDIR)/__init__.py: $(WOWDUMP_FILETYPE_TARGETS) gen_wowdump_filetypes.sh
 	@mkdir -p $(WOWDUMP_OUTDIR)
 	bash gen_wowdump_filetypes.sh $(FILETYPES) >"$@"
 

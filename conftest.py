@@ -1,14 +1,7 @@
 import os
 
-def pytest_addoption(parser):
-    parser.addoption(
-        "--diff-lines",
-        action='store',
-        default=200,
-    )
 
-
-# deprecated hook
+# deprecated hook, but it works
 def pytest_cmdline_preparse(config, args):
     for i, arg in enumerate(args):
         if "@rootdir@" in arg:
