@@ -13,7 +13,7 @@ def load_wowfile(file):
 EOF
 
 for type in "$@"; do
-    uctype=${type^}
+    uctype=$(echo $type | awk '{print toupper(substr($0,0,1))tolower(substr($0,2))}')
     cat <<EOF
     if ext == "$type":
         from .$type import $uctype
