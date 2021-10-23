@@ -106,3 +106,5 @@ tests/report.html
 
 .coverage
 .vscode/
+.tox
+*.prof
