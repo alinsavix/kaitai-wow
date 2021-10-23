@@ -46,7 +46,7 @@ wmo_shader_table = [
 
 
 # FIXME: this could be way, way better
-shader_wmo_re = r"^/chunks/\d+/chunk_data/materials/\d+/shader$"
+shader_wmo_re = r"^/chunks/\d+/chunk_data/materials/\d+/shader_id$"
 
 
 simplifiers = [

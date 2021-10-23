@@ -21,8 +21,7 @@
 /chunks/1/chunk_data/materials/0/flags2 = 0
 /chunks/1/chunk_data/materials/0/foreign_key = 4
 /chunks/1/chunk_data/materials/0/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/0/shader_id/name = opaque
-/chunks/1/chunk_data/materials/0/shader_id/value = 4
+/chunks/1/chunk_data/materials/0/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/0/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/0/texture1_file_data_id = 893853
 /chunks/1/chunk_data/materials/0/texture2_file_data_id = 0
@@ -34,8 +33,7 @@
 /chunks/1/chunk_data/materials/1/flags2 = 0
 /chunks/1/chunk_data/materials/1/foreign_key = 2
 /chunks/1/chunk_data/materials/1/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/1/shader_id/name = opaque
-/chunks/1/chunk_data/materials/1/shader_id/value = 4
+/chunks/1/chunk_data/materials/1/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/1/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/1/texture1_file_data_id = 976034
 /chunks/1/chunk_data/materials/1/texture2_file_data_id = 0
@@ -47,8 +45,7 @@
 /chunks/1/chunk_data/materials/2/flags2 = 0
 /chunks/1/chunk_data/materials/2/foreign_key = 2
 /chunks/1/chunk_data/materials/2/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/2/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/2/shader_id/value = 13
+/chunks/1/chunk_data/materials/2/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/2/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/2/texture1_file_data_id = 979124
 /chunks/1/chunk_data/materials/2/texture2_file_data_id = 903711
@@ -60,8 +57,7 @@
 /chunks/1/chunk_data/materials/3/flags2 = 0
 /chunks/1/chunk_data/materials/3/foreign_key = 2
 /chunks/1/chunk_data/materials/3/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/3/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/3/shader_id/value = 13
+/chunks/1/chunk_data/materials/3/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/3/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/3/texture1_file_data_id = 979293
 /chunks/1/chunk_data/materials/3/texture2_file_data_id = 903711
@@ -73,8 +69,7 @@
 /chunks/1/chunk_data/materials/4/flags2 = 0
 /chunks/1/chunk_data/materials/4/foreign_key = 2
 /chunks/1/chunk_data/materials/4/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/4/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/4/shader_id/value = 13
+/chunks/1/chunk_data/materials/4/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/4/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/4/texture1_file_data_id = 979293
 /chunks/1/chunk_data/materials/4/texture2_file_data_id = 971596
@@ -86,8 +81,7 @@
 /chunks/1/chunk_data/materials/5/flags2 = 0
 /chunks/1/chunk_data/materials/5/foreign_key = 2
 /chunks/1/chunk_data/materials/5/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/5/shader_id/name = opaque
-/chunks/1/chunk_data/materials/5/shader_id/value = 4
+/chunks/1/chunk_data/materials/5/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/5/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/5/texture1_file_data_id = 971442
 /chunks/1/chunk_data/materials/5/texture2_file_data_id = 0
@@ -99,8 +93,7 @@
 /chunks/1/chunk_data/materials/6/flags2 = 0
 /chunks/1/chunk_data/materials/6/foreign_key = 2
 /chunks/1/chunk_data/materials/6/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/6/shader_id/name = opaque
-/chunks/1/chunk_data/materials/6/shader_id/value = 4
+/chunks/1/chunk_data/materials/6/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/6/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/6/texture1_file_data_id = 971446
 /chunks/1/chunk_data/materials/6/texture2_file_data_id = 0
@@ -112,8 +105,7 @@
 /chunks/1/chunk_data/materials/7/flags2 = 0
 /chunks/1/chunk_data/materials/7/foreign_key = 2
 /chunks/1/chunk_data/materials/7/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/7/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/7/shader_id/value = 13
+/chunks/1/chunk_data/materials/7/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/7/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/7/texture1_file_data_id = 970912
 /chunks/1/chunk_data/materials/7/texture2_file_data_id = 976034
@@ -125,8 +117,7 @@
 /chunks/1/chunk_data/materials/8/flags2 = 0
 /chunks/1/chunk_data/materials/8/foreign_key = 2
 /chunks/1/chunk_data/materials/8/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/8/shader_id/name = opaque
-/chunks/1/chunk_data/materials/8/shader_id/value = 4
+/chunks/1/chunk_data/materials/8/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/8/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/8/texture1_file_data_id = 972501
 /chunks/1/chunk_data/materials/8/texture2_file_data_id = 0
@@ -138,8 +129,7 @@
 /chunks/1/chunk_data/materials/9/flags2 = 0
 /chunks/1/chunk_data/materials/9/foreign_key = 2
 /chunks/1/chunk_data/materials/9/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/9/shader_id/name = opaque
-/chunks/1/chunk_data/materials/9/shader_id/value = 4
+/chunks/1/chunk_data/materials/9/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/9/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/9/texture1_file_data_id = 971448
 /chunks/1/chunk_data/materials/9/texture2_file_data_id = 0
@@ -151,8 +141,7 @@
 /chunks/1/chunk_data/materials/10/flags2 = 0
 /chunks/1/chunk_data/materials/10/foreign_key = 2
 /chunks/1/chunk_data/materials/10/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/10/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/10/shader_id/value = 13
+/chunks/1/chunk_data/materials/10/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/10/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/10/texture1_file_data_id = 971447
 /chunks/1/chunk_data/materials/10/texture2_file_data_id = 976034
@@ -164,8 +153,7 @@
 /chunks/1/chunk_data/materials/11/flags2 = 0
 /chunks/1/chunk_data/materials/11/foreign_key = 2
 /chunks/1/chunk_data/materials/11/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/11/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/11/shader_id/value = 13
+/chunks/1/chunk_data/materials/11/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/11/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/11/texture1_file_data_id = 971594
 /chunks/1/chunk_data/materials/11/texture2_file_data_id = 971595
@@ -177,8 +165,7 @@
 /chunks/1/chunk_data/materials/12/flags2 = 0
 /chunks/1/chunk_data/materials/12/foreign_key = 2
 /chunks/1/chunk_data/materials/12/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/12/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/12/shader_id/value = 13
+/chunks/1/chunk_data/materials/12/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/12/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/12/texture1_file_data_id = 971591
 /chunks/1/chunk_data/materials/12/texture2_file_data_id = 903711
@@ -190,8 +177,7 @@
 /chunks/1/chunk_data/materials/13/flags2 = 0
 /chunks/1/chunk_data/materials/13/foreign_key = 2
 /chunks/1/chunk_data/materials/13/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/13/shader_id/name = opaque
-/chunks/1/chunk_data/materials/13/shader_id/value = 4
+/chunks/1/chunk_data/materials/13/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/13/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/13/texture1_file_data_id = 971593
 /chunks/1/chunk_data/materials/13/texture2_file_data_id = 0
@@ -203,8 +189,7 @@
 /chunks/1/chunk_data/materials/14/flags2 = 0
 /chunks/1/chunk_data/materials/14/foreign_key = 2
 /chunks/1/chunk_data/materials/14/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/14/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/14/shader_id/value = 13
+/chunks/1/chunk_data/materials/14/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/14/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/14/texture1_file_data_id = 971596
 /chunks/1/chunk_data/materials/14/texture2_file_data_id = 903711
@@ -216,8 +201,7 @@
 /chunks/1/chunk_data/materials/15/flags2 = 0
 /chunks/1/chunk_data/materials/15/foreign_key = 2
 /chunks/1/chunk_data/materials/15/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/15/shader_id/name = opaque
-/chunks/1/chunk_data/materials/15/shader_id/value = 4
+/chunks/1/chunk_data/materials/15/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/15/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/15/texture1_file_data_id = 971596
 /chunks/1/chunk_data/materials/15/texture2_file_data_id = 0
@@ -229,8 +213,7 @@
 /chunks/1/chunk_data/materials/16/flags2 = 0
 /chunks/1/chunk_data/materials/16/foreign_key = 3
 /chunks/1/chunk_data/materials/16/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/16/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/16/shader_id/value = 13
+/chunks/1/chunk_data/materials/16/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/16/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/16/texture1_file_data_id = 971592
 /chunks/1/chunk_data/materials/16/texture2_file_data_id = 903711
@@ -242,8 +225,7 @@
 /chunks/1/chunk_data/materials/17/flags2 = 0
 /chunks/1/chunk_data/materials/17/foreign_key = 2
 /chunks/1/chunk_data/materials/17/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/17/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/17/shader_id/value = 13
+/chunks/1/chunk_data/materials/17/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/17/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/17/texture1_file_data_id = 970910
 /chunks/1/chunk_data/materials/17/texture2_file_data_id = 903711
@@ -255,8 +237,7 @@
 /chunks/1/chunk_data/materials/18/flags2 = 0
 /chunks/1/chunk_data/materials/18/foreign_key = 4
 /chunks/1/chunk_data/materials/18/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/18/shader_id/name = opaque
-/chunks/1/chunk_data/materials/18/shader_id/value = 4
+/chunks/1/chunk_data/materials/18/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/18/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/18/texture1_file_data_id = 973364
 /chunks/1/chunk_data/materials/18/texture2_file_data_id = 0
@@ -268,8 +249,7 @@
 /chunks/1/chunk_data/materials/19/flags2 = 0
 /chunks/1/chunk_data/materials/19/foreign_key = 2
 /chunks/1/chunk_data/materials/19/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/19/shader_id/name = opaque
-/chunks/1/chunk_data/materials/19/shader_id/value = 4
+/chunks/1/chunk_data/materials/19/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/19/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/19/texture1_file_data_id = 970911
 /chunks/1/chunk_data/materials/19/texture2_file_data_id = 0
@@ -281,8 +261,7 @@
 /chunks/1/chunk_data/materials/20/flags2 = 0
 /chunks/1/chunk_data/materials/20/foreign_key = 2
 /chunks/1/chunk_data/materials/20/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/20/shader_id/name = opaque
-/chunks/1/chunk_data/materials/20/shader_id/value = 4
+/chunks/1/chunk_data/materials/20/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/20/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/20/texture1_file_data_id = 450730
 /chunks/1/chunk_data/materials/20/texture2_file_data_id = 0
@@ -294,8 +273,7 @@
 /chunks/1/chunk_data/materials/21/flags2 = 0
 /chunks/1/chunk_data/materials/21/foreign_key = 2
 /chunks/1/chunk_data/materials/21/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/21/shader_id/name = opaque
-/chunks/1/chunk_data/materials/21/shader_id/value = 4
+/chunks/1/chunk_data/materials/21/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/21/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/21/texture1_file_data_id = 974941
 /chunks/1/chunk_data/materials/21/texture2_file_data_id = 0
@@ -307,8 +285,7 @@
 /chunks/1/chunk_data/materials/22/flags2 = 0
 /chunks/1/chunk_data/materials/22/foreign_key = 2
 /chunks/1/chunk_data/materials/22/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/22/shader_id/name = opaque
-/chunks/1/chunk_data/materials/22/shader_id/value = 4
+/chunks/1/chunk_data/materials/22/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/22/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/22/texture1_file_data_id = 971444
 /chunks/1/chunk_data/materials/22/texture2_file_data_id = 0
@@ -320,8 +297,7 @@
 /chunks/1/chunk_data/materials/23/flags2 = 0
 /chunks/1/chunk_data/materials/23/foreign_key = 2
 /chunks/1/chunk_data/materials/23/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/23/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/23/shader_id/value = 13
+/chunks/1/chunk_data/materials/23/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/23/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/23/texture1_file_data_id = 974941
 /chunks/1/chunk_data/materials/23/texture2_file_data_id = 903711
@@ -333,8 +309,7 @@
 /chunks/1/chunk_data/materials/24/flags2 = 0
 /chunks/1/chunk_data/materials/24/foreign_key = 10
 /chunks/1/chunk_data/materials/24/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/24/shader_id/name = opaque
-/chunks/1/chunk_data/materials/24/shader_id/value = 4
+/chunks/1/chunk_data/materials/24/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/24/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/24/texture1_file_data_id = 903711
 /chunks/1/chunk_data/materials/24/texture2_file_data_id = 0
@@ -346,8 +321,7 @@
 /chunks/1/chunk_data/materials/25/flags2 = 0
 /chunks/1/chunk_data/materials/25/foreign_key = 10
 /chunks/1/chunk_data/materials/25/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/25/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/25/shader_id/value = 13
+/chunks/1/chunk_data/materials/25/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/25/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/25/texture1_file_data_id = 971442
 /chunks/1/chunk_data/materials/25/texture2_file_data_id = 971443
@@ -359,8 +333,7 @@
 /chunks/1/chunk_data/materials/26/flags2 = 0
 /chunks/1/chunk_data/materials/26/foreign_key = 2
 /chunks/1/chunk_data/materials/26/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/26/shader_id/name = two_layer_diffuse
-/chunks/1/chunk_data/materials/26/shader_id/value = 6
+/chunks/1/chunk_data/materials/26/shader_id = 6  # MapObjTwoLayerDiffuse, MapObjDiffuse_Comp   ("TwoLayerDiffuse")
 /chunks/1/chunk_data/materials/26/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/26/texture1_file_data_id = 979124
 /chunks/1/chunk_data/materials/26/texture2_file_data_id = 903711
@@ -372,8 +345,7 @@
 /chunks/1/chunk_data/materials/27/flags2 = 0
 /chunks/1/chunk_data/materials/27/foreign_key = 2
 /chunks/1/chunk_data/materials/27/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/27/shader_id/name = two_layer_diffuse
-/chunks/1/chunk_data/materials/27/shader_id/value = 6
+/chunks/1/chunk_data/materials/27/shader_id = 6  # MapObjTwoLayerDiffuse, MapObjDiffuse_Comp   ("TwoLayerDiffuse")
 /chunks/1/chunk_data/materials/27/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/27/texture1_file_data_id = 976034
 /chunks/1/chunk_data/materials/27/texture2_file_data_id = 971442
@@ -385,8 +357,7 @@
 /chunks/1/chunk_data/materials/28/flags2 = 0
 /chunks/1/chunk_data/materials/28/foreign_key = 10
 /chunks/1/chunk_data/materials/28/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/28/shader_id/name = opaque
-/chunks/1/chunk_data/materials/28/shader_id/value = 4
+/chunks/1/chunk_data/materials/28/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/28/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/28/texture1_file_data_id = 979127
 /chunks/1/chunk_data/materials/28/texture2_file_data_id = 0
@@ -398,8 +369,7 @@
 /chunks/1/chunk_data/materials/29/flags2 = 0
 /chunks/1/chunk_data/materials/29/foreign_key = 2
 /chunks/1/chunk_data/materials/29/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/29/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/29/shader_id/value = 13
+/chunks/1/chunk_data/materials/29/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/29/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/29/texture1_file_data_id = 929866
 /chunks/1/chunk_data/materials/29/texture2_file_data_id = 852712
@@ -411,8 +381,7 @@
 /chunks/1/chunk_data/materials/30/flags2 = 0
 /chunks/1/chunk_data/materials/30/foreign_key = 2
 /chunks/1/chunk_data/materials/30/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/30/shader_id/name = opaque
-/chunks/1/chunk_data/materials/30/shader_id/value = 4
+/chunks/1/chunk_data/materials/30/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/30/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/30/texture1_file_data_id = 971443
 /chunks/1/chunk_data/materials/30/texture2_file_data_id = 0
@@ -424,8 +393,7 @@
 /chunks/1/chunk_data/materials/31/flags2 = 0
 /chunks/1/chunk_data/materials/31/foreign_key = 10
 /chunks/1/chunk_data/materials/31/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/31/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/31/shader_id/value = 13
+/chunks/1/chunk_data/materials/31/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/31/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/31/texture1_file_data_id = 979128
 /chunks/1/chunk_data/materials/31/texture2_file_data_id = 971594
@@ -437,8 +405,7 @@
 /chunks/1/chunk_data/materials/32/flags2 = 0
 /chunks/1/chunk_data/materials/32/foreign_key = 2
 /chunks/1/chunk_data/materials/32/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/32/shader_id/name = two_layer_diffuse
-/chunks/1/chunk_data/materials/32/shader_id/value = 6
+/chunks/1/chunk_data/materials/32/shader_id = 6  # MapObjTwoLayerDiffuse, MapObjDiffuse_Comp   ("TwoLayerDiffuse")
 /chunks/1/chunk_data/materials/32/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/32/texture1_file_data_id = 979124
 /chunks/1/chunk_data/materials/32/texture2_file_data_id = 979127
@@ -450,8 +417,7 @@
 /chunks/1/chunk_data/materials/33/flags2 = 0
 /chunks/1/chunk_data/materials/33/foreign_key = 2
 /chunks/1/chunk_data/materials/33/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/33/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/33/shader_id/value = 13
+/chunks/1/chunk_data/materials/33/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/33/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/33/texture1_file_data_id = 979125
 /chunks/1/chunk_data/materials/33/texture2_file_data_id = 979127
@@ -463,8 +429,7 @@
 /chunks/1/chunk_data/materials/34/flags2 = 0
 /chunks/1/chunk_data/materials/34/foreign_key = 2
 /chunks/1/chunk_data/materials/34/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/34/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/34/shader_id/value = 13
+/chunks/1/chunk_data/materials/34/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/34/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/34/texture1_file_data_id = 979294
 /chunks/1/chunk_data/materials/34/texture2_file_data_id = 971442
@@ -476,8 +441,7 @@
 /chunks/1/chunk_data/materials/35/flags2 = 0
 /chunks/1/chunk_data/materials/35/foreign_key = 2
 /chunks/1/chunk_data/materials/35/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/35/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/35/shader_id/value = 13
+/chunks/1/chunk_data/materials/35/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/35/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/35/texture1_file_data_id = 978268
 /chunks/1/chunk_data/materials/35/texture2_file_data_id = 903711
@@ -489,8 +453,7 @@
 /chunks/1/chunk_data/materials/36/flags2 = 0
 /chunks/1/chunk_data/materials/36/foreign_key = 2
 /chunks/1/chunk_data/materials/36/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/36/shader_id/name = opaque
-/chunks/1/chunk_data/materials/36/shader_id/value = 4
+/chunks/1/chunk_data/materials/36/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/36/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/36/texture1_file_data_id = 978268
 /chunks/1/chunk_data/materials/36/texture2_file_data_id = 0
@@ -502,8 +465,7 @@
 /chunks/1/chunk_data/materials/37/flags2 = 0
 /chunks/1/chunk_data/materials/37/foreign_key = 2
 /chunks/1/chunk_data/materials/37/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/37/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/37/shader_id/value = 13
+/chunks/1/chunk_data/materials/37/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/37/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/37/texture1_file_data_id = 979125
 /chunks/1/chunk_data/materials/37/texture2_file_data_id = 903711
@@ -515,8 +477,7 @@
 /chunks/1/chunk_data/materials/38/flags2 = 0
 /chunks/1/chunk_data/materials/38/foreign_key = 2
 /chunks/1/chunk_data/materials/38/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/38/shader_id/name = opaque
-/chunks/1/chunk_data/materials/38/shader_id/value = 4
+/chunks/1/chunk_data/materials/38/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/38/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/38/texture1_file_data_id = 979126
 /chunks/1/chunk_data/materials/38/texture2_file_data_id = 0
@@ -528,8 +489,7 @@
 /chunks/1/chunk_data/materials/39/flags2 = 0
 /chunks/1/chunk_data/materials/39/foreign_key = 4
 /chunks/1/chunk_data/materials/39/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/39/shader_id/name = opaque
-/chunks/1/chunk_data/materials/39/shader_id/value = 4
+/chunks/1/chunk_data/materials/39/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/39/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/39/texture1_file_data_id = 450732
 /chunks/1/chunk_data/materials/39/texture2_file_data_id = 0
@@ -541,8 +501,7 @@
 /chunks/1/chunk_data/materials/40/flags2 = 0
 /chunks/1/chunk_data/materials/40/foreign_key = 2
 /chunks/1/chunk_data/materials/40/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/40/shader_id/name = opaque
-/chunks/1/chunk_data/materials/40/shader_id/value = 4
+/chunks/1/chunk_data/materials/40/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/40/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/40/texture1_file_data_id = 979294
 /chunks/1/chunk_data/materials/40/texture2_file_data_id = 0
@@ -554,8 +513,7 @@
 /chunks/1/chunk_data/materials/41/flags2 = 0
 /chunks/1/chunk_data/materials/41/foreign_key = 2
 /chunks/1/chunk_data/materials/41/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/41/shader_id/name = opaque
-/chunks/1/chunk_data/materials/41/shader_id/value = 4
+/chunks/1/chunk_data/materials/41/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/41/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/41/texture1_file_data_id = 979296
 /chunks/1/chunk_data/materials/41/texture2_file_data_id = 0
@@ -567,8 +525,7 @@
 /chunks/1/chunk_data/materials/42/flags2 = 0
 /chunks/1/chunk_data/materials/42/foreign_key = 2
 /chunks/1/chunk_data/materials/42/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/42/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/42/shader_id/value = 13
+/chunks/1/chunk_data/materials/42/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/42/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/42/texture1_file_data_id = 971480
 /chunks/1/chunk_data/materials/42/texture2_file_data_id = 979127
@@ -580,8 +537,7 @@
 /chunks/1/chunk_data/materials/43/flags2 = 0
 /chunks/1/chunk_data/materials/43/foreign_key = 10
 /chunks/1/chunk_data/materials/43/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/43/shader_id/name = opaque
-/chunks/1/chunk_data/materials/43/shader_id/value = 4
+/chunks/1/chunk_data/materials/43/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/43/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/43/texture1_file_data_id = 879922
 /chunks/1/chunk_data/materials/43/texture2_file_data_id = 0
@@ -593,8 +549,7 @@
 /chunks/1/chunk_data/materials/44/flags2 = 0
 /chunks/1/chunk_data/materials/44/foreign_key = 2
 /chunks/1/chunk_data/materials/44/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/44/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/44/shader_id/value = 13
+/chunks/1/chunk_data/materials/44/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/44/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/44/texture1_file_data_id = 979296
 /chunks/1/chunk_data/materials/44/texture2_file_data_id = 979295
@@ -606,8 +561,7 @@
 /chunks/1/chunk_data/materials/45/flags2 = 0
 /chunks/1/chunk_data/materials/45/foreign_key = 10
 /chunks/1/chunk_data/materials/45/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/45/shader_id/name = opaque
-/chunks/1/chunk_data/materials/45/shader_id/value = 4
+/chunks/1/chunk_data/materials/45/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/45/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/45/texture1_file_data_id = 982511
 /chunks/1/chunk_data/materials/45/texture2_file_data_id = 0
@@ -619,8 +573,7 @@
 /chunks/1/chunk_data/materials/46/flags2 = 0
 /chunks/1/chunk_data/materials/46/foreign_key = 2
 /chunks/1/chunk_data/materials/46/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/46/shader_id/name = opaque
-/chunks/1/chunk_data/materials/46/shader_id/value = 4
+/chunks/1/chunk_data/materials/46/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/46/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/46/texture1_file_data_id = 971591
 /chunks/1/chunk_data/materials/46/texture2_file_data_id = 0
@@ -632,8 +585,7 @@
 /chunks/1/chunk_data/materials/47/flags2 = 0
 /chunks/1/chunk_data/materials/47/foreign_key = 2
 /chunks/1/chunk_data/materials/47/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/47/shader_id/name = opaque
-/chunks/1/chunk_data/materials/47/shader_id/value = 4
+/chunks/1/chunk_data/materials/47/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/47/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/47/texture1_file_data_id = 979293
 /chunks/1/chunk_data/materials/47/texture2_file_data_id = 0
@@ -645,8 +597,7 @@
 /chunks/1/chunk_data/materials/48/flags2 = 0
 /chunks/1/chunk_data/materials/48/foreign_key = 2
 /chunks/1/chunk_data/materials/48/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/48/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/48/shader_id/value = 13
+/chunks/1/chunk_data/materials/48/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/48/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/48/texture1_file_data_id = 971596
 /chunks/1/chunk_data/materials/48/texture2_file_data_id = 971442
@@ -658,8 +609,7 @@
 /chunks/1/chunk_data/materials/49/flags2 = 0
 /chunks/1/chunk_data/materials/49/foreign_key = 2
 /chunks/1/chunk_data/materials/49/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/49/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/49/shader_id/value = 13
+/chunks/1/chunk_data/materials/49/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/49/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/49/texture1_file_data_id = 971596
 /chunks/1/chunk_data/materials/49/texture2_file_data_id = 979125
@@ -671,8 +621,7 @@
 /chunks/1/chunk_data/materials/50/flags2 = 0
 /chunks/1/chunk_data/materials/50/foreign_key = 2
 /chunks/1/chunk_data/materials/50/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/50/shader_id/name = opaque
-/chunks/1/chunk_data/materials/50/shader_id/value = 4
+/chunks/1/chunk_data/materials/50/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/50/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/50/texture1_file_data_id = 978663
 /chunks/1/chunk_data/materials/50/texture2_file_data_id = 0
@@ -684,8 +633,7 @@
 /chunks/1/chunk_data/materials/51/flags2 = 0
 /chunks/1/chunk_data/materials/51/foreign_key = 2
 /chunks/1/chunk_data/materials/51/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/51/shader_id/name = diffuse
-/chunks/1/chunk_data/materials/51/shader_id/value = 0
+/chunks/1/chunk_data/materials/51/shader_id = 0  # MapObjDiffuse, MapObjDiffuse_T1   ("Diffuse")
 /chunks/1/chunk_data/materials/51/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/51/texture1_file_data_id = 978663
 /chunks/1/chunk_data/materials/51/texture2_file_data_id = 0
@@ -697,8 +645,7 @@
 /chunks/1/chunk_data/materials/52/flags2 = 0
 /chunks/1/chunk_data/materials/52/foreign_key = 2
 /chunks/1/chunk_data/materials/52/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/52/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/52/shader_id/value = 13
+/chunks/1/chunk_data/materials/52/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/52/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/52/texture1_file_data_id = 971480
 /chunks/1/chunk_data/materials/52/texture2_file_data_id = 903711
@@ -710,8 +657,7 @@
 /chunks/1/chunk_data/materials/53/flags2 = 0
 /chunks/1/chunk_data/materials/53/foreign_key = 2
 /chunks/1/chunk_data/materials/53/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/53/shader_id/name = two_layer_diffuse_opaque
-/chunks/1/chunk_data/materials/53/shader_id/value = 13
+/chunks/1/chunk_data/materials/53/shader_id = 13  # MapObjTwoLayerDiffuseOpaque, MapObjDiffuse_Comp   ("TwoLayerDiffuseOpaque")
 /chunks/1/chunk_data/materials/53/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/53/texture1_file_data_id = 971443
 /chunks/1/chunk_data/materials/53/texture2_file_data_id = 971442
@@ -723,8 +669,7 @@
 /chunks/1/chunk_data/materials/54/flags2 = 0
 /chunks/1/chunk_data/materials/54/foreign_key = 2
 /chunks/1/chunk_data/materials/54/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/54/shader_id/name = opaque
-/chunks/1/chunk_data/materials/54/shader_id/value = 4
+/chunks/1/chunk_data/materials/54/shader_id = 4  # MapObjOpaque, MapObjDiffuse_T1   ("Opaque")
 /chunks/1/chunk_data/materials/54/sidn_color = rgba(0, 0, 0, 255)  # 000000ff
 /chunks/1/chunk_data/materials/54/texture1_file_data_id = 970910
 /chunks/1/chunk_data/materials/54/texture2_file_data_id = 0
@@ -736,8 +681,7 @@
 /chunks/1/chunk_data/materials/55/flags2 = 0
 /chunks/1/chunk_data/materials/55/foreign_key = 0
 /chunks/1/chunk_data/materials/55/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/55/shader_id/name = diffuse
-/chunks/1/chunk_data/materials/55/shader_id/value = 0
+/chunks/1/chunk_data/materials/55/shader_id = 0  # MapObjDiffuse, MapObjDiffuse_T1   ("Diffuse")
 /chunks/1/chunk_data/materials/55/sidn_color = rgba(127, 127, 127, 255)  # 7f7f7fff
 /chunks/1/chunk_data/materials/55/texture1_file_data_id = 3069838
 /chunks/1/chunk_data/materials/55/texture2_file_data_id = 0
@@ -749,8 +693,7 @@
 /chunks/1/chunk_data/materials/56/flags2 = 0
 /chunks/1/chunk_data/materials/56/foreign_key = 0
 /chunks/1/chunk_data/materials/56/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/56/shader_id/name = lod
-/chunks/1/chunk_data/materials/56/shader_id/value = 21
+/chunks/1/chunk_data/materials/56/shader_id = 21  # MapObjLod, MapObjDiffuse_T1   ("Lod")
 /chunks/1/chunk_data/materials/56/sidn_color = rgba(127, 127, 127, 255)  # 7f7f7fff
 /chunks/1/chunk_data/materials/56/texture1_file_data_id = 3069839
 /chunks/1/chunk_data/materials/56/texture2_file_data_id = 3069840
@@ -762,8 +705,7 @@
 /chunks/1/chunk_data/materials/57/flags2 = 0
 /chunks/1/chunk_data/materials/57/foreign_key = 0
 /chunks/1/chunk_data/materials/57/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/57/shader_id/name = lod
-/chunks/1/chunk_data/materials/57/shader_id/value = 21
+/chunks/1/chunk_data/materials/57/shader_id = 21  # MapObjLod, MapObjDiffuse_T1   ("Lod")
 /chunks/1/chunk_data/materials/57/sidn_color = rgba(127, 127, 127, 255)  # 7f7f7fff
 /chunks/1/chunk_data/materials/57/texture1_file_data_id = 3069841
 /chunks/1/chunk_data/materials/57/texture2_file_data_id = 3069842
@@ -775,8 +717,7 @@
 /chunks/1/chunk_data/materials/58/flags2 = 0
 /chunks/1/chunk_data/materials/58/foreign_key = 0
 /chunks/1/chunk_data/materials/58/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/58/shader_id/name = lod
-/chunks/1/chunk_data/materials/58/shader_id/value = 21
+/chunks/1/chunk_data/materials/58/shader_id = 21  # MapObjLod, MapObjDiffuse_T1   ("Lod")
 /chunks/1/chunk_data/materials/58/sidn_color = rgba(127, 127, 127, 255)  # 7f7f7fff
 /chunks/1/chunk_data/materials/58/texture1_file_data_id = 3069843
 /chunks/1/chunk_data/materials/58/texture2_file_data_id = 3069844
@@ -788,8 +729,7 @@
 /chunks/1/chunk_data/materials/59/flags2 = 0
 /chunks/1/chunk_data/materials/59/foreign_key = 0
 /chunks/1/chunk_data/materials/59/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/59/shader_id/name = lod
-/chunks/1/chunk_data/materials/59/shader_id/value = 21
+/chunks/1/chunk_data/materials/59/shader_id = 21  # MapObjLod, MapObjDiffuse_T1   ("Lod")
 /chunks/1/chunk_data/materials/59/sidn_color = rgba(127, 127, 127, 255)  # 7f7f7fff
 /chunks/1/chunk_data/materials/59/texture1_file_data_id = 3069845
 /chunks/1/chunk_data/materials/59/texture2_file_data_id = 3069846
@@ -801,8 +741,7 @@
 /chunks/1/chunk_data/materials/60/flags2 = 0
 /chunks/1/chunk_data/materials/60/foreign_key = 0
 /chunks/1/chunk_data/materials/60/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/60/shader_id/name = diffuse
-/chunks/1/chunk_data/materials/60/shader_id/value = 0
+/chunks/1/chunk_data/materials/60/shader_id = 0  # MapObjDiffuse, MapObjDiffuse_T1   ("Diffuse")
 /chunks/1/chunk_data/materials/60/sidn_color = rgba(127, 127, 127, 255)  # 7f7f7fff
 /chunks/1/chunk_data/materials/60/texture1_file_data_id = 3069847
 /chunks/1/chunk_data/materials/60/texture2_file_data_id = 0
@@ -814,8 +753,7 @@
 /chunks/1/chunk_data/materials/61/flags2 = 0
 /chunks/1/chunk_data/materials/61/foreign_key = 0
 /chunks/1/chunk_data/materials/61/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/61/shader_id/name = lod
-/chunks/1/chunk_data/materials/61/shader_id/value = 21
+/chunks/1/chunk_data/materials/61/shader_id = 21  # MapObjLod, MapObjDiffuse_T1   ("Lod")
 /chunks/1/chunk_data/materials/61/sidn_color = rgba(127, 127, 127, 255)  # 7f7f7fff
 /chunks/1/chunk_data/materials/61/texture1_file_data_id = 3069848
 /chunks/1/chunk_data/materials/61/texture2_file_data_id = 3069849
@@ -827,8 +765,7 @@
 /chunks/1/chunk_data/materials/62/flags2 = 0
 /chunks/1/chunk_data/materials/62/foreign_key = 0
 /chunks/1/chunk_data/materials/62/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/62/shader_id/name = lod
-/chunks/1/chunk_data/materials/62/shader_id/value = 21
+/chunks/1/chunk_data/materials/62/shader_id = 21  # MapObjLod, MapObjDiffuse_T1   ("Lod")
 /chunks/1/chunk_data/materials/62/sidn_color = rgba(127, 127, 127, 255)  # 7f7f7fff
 /chunks/1/chunk_data/materials/62/texture1_file_data_id = 3069850
 /chunks/1/chunk_data/materials/62/texture2_file_data_id = 3069851
@@ -840,8 +777,7 @@
 /chunks/1/chunk_data/materials/63/flags2 = 0
 /chunks/1/chunk_data/materials/63/foreign_key = 0
 /chunks/1/chunk_data/materials/63/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/63/shader_id/name = lod
-/chunks/1/chunk_data/materials/63/shader_id/value = 21
+/chunks/1/chunk_data/materials/63/shader_id = 21  # MapObjLod, MapObjDiffuse_T1   ("Lod")
 /chunks/1/chunk_data/materials/63/sidn_color = rgba(127, 127, 127, 255)  # 7f7f7fff
 /chunks/1/chunk_data/materials/63/texture1_file_data_id = 3069852
 /chunks/1/chunk_data/materials/63/texture2_file_data_id = 3069853
@@ -853,8 +789,7 @@
 /chunks/1/chunk_data/materials/64/flags2 = 0
 /chunks/1/chunk_data/materials/64/foreign_key = 0
 /chunks/1/chunk_data/materials/64/frame_sidn_color = rgba(0, 0, 0, 0)  # 00000000
-/chunks/1/chunk_data/materials/64/shader_id/name = lod
-/chunks/1/chunk_data/materials/64/shader_id/value = 21
+/chunks/1/chunk_data/materials/64/shader_id = 21  # MapObjLod, MapObjDiffuse_T1   ("Lod")
 /chunks/1/chunk_data/materials/64/sidn_color = rgba(127, 127, 127, 255)  # 7f7f7fff
 /chunks/1/chunk_data/materials/64/texture1_file_data_id = 3069854
 /chunks/1/chunk_data/materials/64/texture2_file_data_id = 3069855
