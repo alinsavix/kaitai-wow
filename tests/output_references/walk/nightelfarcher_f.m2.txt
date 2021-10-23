@@ -1058,8 +1058,7 @@
 /model/events/27/eventid = $SHR  # ExchangeSheathedWeaponR
 /model/events/27/position = xyz(-0.0, 0.0, 0.0)
 /model/flags = unk_0x100000, unk_0x2000, unk_0x200000, unk_0x80
-/model/materials/0/blending_mode/name = m2blend_alpha_key
-/model/materials/0/blending_mode/value = 1
+/model/materials/0/blending_mode = 1  # m2blend_alpha_key
 /model/materials/0/flags = none
 /model/name = NightElfArcher_F
 /model/num_skin_profiles = 1
@@ -1089,10 +1088,9 @@
 /model/texture_weights/0/weight/values/values/0/offset = 3143888
 /model/texture_weights/0/weight/values/values/0/values/0/value = 1.0
 /model/texture_weights/0/weight/values/values/0/values/0/value_raw = 32767
-/model/textures/0/filename =
+/model/textures/0/filename = 
 /model/textures/0/flags = none
-/model/textures/0/type/name = component_monster_1
-/model/textures/0/type/value = 11
+/model/textures/0/type = 11  # component_monster_1
 /model/uvanimlookup/0 = -1
 /model/version = 274  # legion
 /model/vertices/... = [geometry data elided, use --geometry to include]

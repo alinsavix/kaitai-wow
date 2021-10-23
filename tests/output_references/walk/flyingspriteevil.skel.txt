@@ -21,8 +21,7 @@
 /skel/1/data/sequences/0/duration = 1600
 /skel/1/data/sequences/0/flags = is_primary, unused1
 /skel/1/data/sequences/0/frequency = 32767
-/skel/1/data/sequences/0/id/name = stand
-/skel/1/data/sequences/0/id/value = 0
+/skel/1/data/sequences/0/id = 0  # stand
 /skel/1/data/sequences/0/movespeed = 0.0
 /skel/1/data/sequences/0/padding = 0
 /skel/1/data/sequences/0/replay/maximum = 0

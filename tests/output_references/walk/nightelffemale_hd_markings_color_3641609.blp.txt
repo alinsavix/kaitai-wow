@@ -1,7 +1,6 @@
 /contenthash = de0ec037aed38dece07303494a7302ae
 /alpha_channel_bit_depth = 8
-/color_encoding/name = color_dxt
-/color_encoding/value = 2
+/color_encoding = 2  # color_dxt
 /flag_unknown = False
 /height = 512
 /mip_offsets/0 = 1172
@@ -1061,6 +1060,5 @@
 /palette/255/g = 0
 /palette/255/pad = 0
 /palette/255/r = 0
-/preferred_format/name = pixel_dxt5
-/preferred_format/value = 7
+/preferred_format = 7  # pixel_dxt5
 /width = 512
