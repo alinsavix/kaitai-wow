@@ -60,7 +60,7 @@ pathwalk_tests = [
 ]
 
 json_tests = [
-    t("levelup00.skin", "json", "json", ["--output-type", "json"]),
+    t("levelup00.skin", "json", "json", ["--json"]),
 ]
 
 all_tests = pathwalk_tests + json_tests

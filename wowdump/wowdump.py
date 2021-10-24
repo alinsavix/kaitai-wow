@@ -332,6 +332,27 @@ def cache_open(dbfile: Union[str, os.PathLike]):
     return cachecon
 
 
+def cache_prepare(args):
+    log = logging.getLogger()
+
+    if not args.resolve:
+        # print("INFO: not resolving, not initializing cache", file=sys.stderr)
+        return None
+    elif not os.path.exists(args.listfile):
+        log.warning(
+            f"{args.listfile} does not exist, not resolving fileids")
+        return None
+    else:
+        cachefile = f"{args.listfile}.cache"
+        if os.path.exists(cachefile) and (os.path.getmtime(args.listfile) <= os.path.getmtime(cachefile)):
+            # print("INFO: fileid cache up to date, not updating", file=sys.stderr)
+            return cache_open(cachefile)
+        else:
+            cachecon = cache_open(cachefile)
+            cache_fileids(args.listfile, cachecon)
+            return cachecon
+
+
 def cache_fileids(listfile: Union[str, os.PathLike], cachecon) -> None:
     # Don't have the cache open, so can't cache anything
     if not cachecon:
@@ -448,6 +469,32 @@ def parse_arguments(argv, loggers):
     parser = argparse.ArgumentParser(
         prog="wowdump",
         description="A tool for dumping the information out of WoW files",
+    )
+
+    cmdgroup = parser.add_argument_group(title="execution modes")
+    cmdgroup.add_argument(
+        '--pathwalk',
+        action='store_const',
+        const="pathwalk",
+        dest="mode",
+        default="pathwalk",
+        help="pathwalk mode (default)",
+    )
+
+    cmdgroup.add_argument(
+        '--json',
+        action='store_const',
+        const="json",
+        dest="mode",
+        help="json dump",
+    )
+
+    cmdgroup.add_argument(
+        '--raw',
+        action='store_const',
+        const="raw",
+        dest="mode",
+        help="raw kaitai dump",
     )
 
     parser.add_argument(
@@ -595,15 +642,6 @@ def parse_arguments(argv, loggers):
     )
 
     parser.add_argument(
-        "--output_type",
-        "--output-type",
-        "-t",
-        choices=["pathwalk", "json", "final", "raw", ],
-        default="pathwalk",
-        help="select output type (default: %(default)s)",
-    )
-
-    parser.add_argument(
         "-o",
         "--output",
         type=str,
@@ -653,29 +691,7 @@ def main(argv=None):
             x = logging.getLogger(lg)
             x.setLevel(logging.DEBUG)
 
-    log = logging.getLogger()
-    # log.info("wowdump initialized")  # FIXME: remove me
-
-    # if len(args.files) == 0:
-    #     args.files = [DEFAULT_TARGET]
-    #     print(
-    #         f"WARNING: Using default target file {DEFAULT_TARGET}", flush=True, file=sys.stderr)
-
-    if not args.resolve:
-        # print("INFO: not resolving, not initializing cache", file=sys.stderr)
-        cachecon = None
-    elif not os.path.exists(args.listfile):
-        log.warning(
-            f"{args.listfile} does not exist, not resolving fileids")
-        cachecon = None
-    else:
-        cachefile = f"{args.listfile}.cache"
-        if os.path.exists(cachefile) and (os.path.getmtime(args.listfile) <= os.path.getmtime(cachefile)):
-            # print("INFO: fileid cache up to date, not updating", file=sys.stderr)
-            cachecon = cache_open(cachefile)
-        else:
-            cachecon = cache_open(cachefile)
-            cache_fileids(args.listfile, cachecon)
+    cachecon = cache_prepare(args)
 
     # FIXME: handle more than one file
     file = args.files[0]
@@ -687,7 +703,7 @@ def main(argv=None):
         return 65  # os.EX_DATAERR
 
     with dataout(args.output) as out:
-        if args.output_type == "pathwalk":
+        if args.mode == "pathwalk":
             # out.write(f"# path = {file}")
             if not check_filtered("/contenthash"):
                 h = get_contenthash(file)
@@ -695,13 +711,15 @@ def main(argv=None):
 
             for line in pathwalk(target, "", cachecon):
                 out.write(line)
-        elif args.output_type == "raw":
+
+        elif args.mode == "raw":
             out.write(ppretty(target, depth=99, seq_length=100,))
-        elif args.output_type == "final":
+
+        elif args.mode == "final":  # not currently enabled in args
             parsed = kttree(target)
             out.write(ppretty(parsed, depth=99, seq_length=100,))
-        # FIXME: re-enable json, make it use out.write()
-        elif args.output_type == "json":
+
+        elif args.mode == "json":
             parsed = kttree(target)
             out.write(json.dumps(parsed, indent=2, sort_keys=True))
 
