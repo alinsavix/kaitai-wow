@@ -471,6 +471,9 @@ def parse_arguments(argv, loggers):
         description="A tool for dumping the information out of WoW files",
     )
 
+    #
+    # commands
+    #
     cmdgroup = parser.add_argument_group(title="execution modes")
     cmdgroup.add_argument(
         '--pathwalk',
@@ -479,6 +482,14 @@ def parse_arguments(argv, loggers):
         dest="mode",
         default="pathwalk",
         help="pathwalk mode (default)",
+    )
+
+    cmdgroup.add_argument(
+        '--batchwalk',
+        action='store_const',
+        const="batchwalk",
+        dest="mode",
+        help="batch output pathwalk",
     )
 
     cmdgroup.add_argument(
@@ -496,6 +507,10 @@ def parse_arguments(argv, loggers):
         dest="mode",
         help="raw kaitai dump",
     )
+
+    #
+    # everything else
+    #
 
     parser.add_argument(
         "--verbose",
@@ -651,10 +666,10 @@ def parse_arguments(argv, loggers):
     )
 
     parser.add_argument(
-        "files",
+        "file",
         action='store',
-        nargs='+',
-        default=[],
+        # nargs='+',
+        # default=[],
         help="input file to be processed",
     )
 
@@ -675,7 +690,63 @@ def parse_arguments(argv, loggers):
     return args
 
 
+def fileparse(file):
+    # FIXME: commented out code is previous error handling, figure out if
+    # we need that still, and how, and where
+    # try:
+    #     target = load_wowfile(file)
+    # except (ValueError, OSError) as e:
+    #     print(f"ERROR: {e}", file=sys.stderr)
+    #     return 65  # os.EX_DATAERR
+    return load_wowfile(file)
+
+
+def cmd_pathwalk(args):
+    # FIXME: better error handling (or error handling at all)
+    cachecon = cache_prepare(args)
+    with dataout(args.output) as out:
+        target = fileparse(args.file)
+
+        # out.write(f"# path = {file}")
+        if not check_filtered("/contenthash"):
+            h = get_contenthash(args.file)
+            out.write(f"/contenthash = {h}")
+
+        for line in pathwalk(target, "", cachecon):
+            out.write(line)
+
+
+def cmd_raw(args):
+    with dataout(args.output) as out:
+        target = fileparse(args.file)
+        out.write(ppretty(target, depth=99, seq_length=100,))
+
+
+def cmd_final(args):
+    with dataout(args.output) as out:
+        target = fileparse(args.file)
+        parsed = kttree(target)
+        out.write(ppretty(parsed, depth=99, seq_length=100,))
+
+
+def cmd_json(args):
+    with dataout(args.output) as out:
+        target = fileparse(args.file)
+        parsed = kttree(target)
+        out.write(json.dumps(parsed, indent=2, sort_keys=True))
+
+
+# FIXME: Make argparse pull from here
+cmds = {
+    "pathwalk": cmd_pathwalk,
+    "raw": cmd_raw,
+    "final": cmd_final,
+    "json": cmd_json,
+}
+
+
 def main(argv=None):
+    # arg parsing
     global args
     if not argv:
         argv = sys.argv[1:]
@@ -683,6 +754,8 @@ def main(argv=None):
     LOGGER_LIST = ["disposition", "simplify", "kttree"]
     args = parse_arguments(argv, loggers=LOGGER_LIST)
 
+
+    # Logging setup
     LOG_FORMAT = "[%(filename)s:%(lineno)s:%(funcName)s] (%(name)s) %(levelname)s: %(message)s"
     logging.basicConfig(level=args.log_level, format=LOG_FORMAT)
 
@@ -691,37 +764,13 @@ def main(argv=None):
             x = logging.getLogger(lg)
             x.setLevel(logging.DEBUG)
 
-    cachecon = cache_prepare(args)
 
-    # FIXME: handle more than one file
-    file = args.files[0]
-
-    try:
-        target = load_wowfile(file)
-    except (ValueError, OSError) as e:
-        print(f"ERROR: {e}", file=sys.stderr)
-        return 65  # os.EX_DATAERR
-
-    with dataout(args.output) as out:
-        if args.mode == "pathwalk":
-            # out.write(f"# path = {file}")
-            if not check_filtered("/contenthash"):
-                h = get_contenthash(file)
-                out.write(f"/contenthash = {h}")
-
-            for line in pathwalk(target, "", cachecon):
-                out.write(line)
-
-        elif args.mode == "raw":
-            out.write(ppretty(target, depth=99, seq_length=100,))
-
-        elif args.mode == "final":  # not currently enabled in args
-            parsed = kttree(target)
-            out.write(ppretty(parsed, depth=99, seq_length=100,))
-
-        elif args.mode == "json":
-            parsed = kttree(target)
-            out.write(json.dumps(parsed, indent=2, sort_keys=True))
+    # Actual commands
+    if args.mode in cmds:
+        cmds[args.mode](args)
+    else:
+        print(f"ERROR: unknown mode {args.mode} (this shouldn't happen)")
+        return 70  # os.EX_SOFTWARE
 
     return 0  # os.EX_OK
 
