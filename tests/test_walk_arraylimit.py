@@ -1,11 +1,5 @@
 import os
 
-from typing import List
-
-import pytest
-from pytest_html import extras
-
-from testutil import util
 import wowdump
 
 DATADIR = os.path.join("tests", "test_data")
@@ -55,3 +49,23 @@ def test_arraylimit_all(request, capsys, extra):
 
     # make sure we get our elision message
     assert "/model/bone_lookup/... = [39 elided of 64 total]" in captured.out
+
+
+# Make sure that arraylimit doesn't limit when arraylimit=0
+def test_geometry_arraylimit_zero(request, capsys, extra):
+    ret = wowdump.main([
+        "--no-resolve", "--geometry", "--arraylimit", "0",
+        os.path.join(request.config.rootdir, DATADIR, input_model),
+    ])
+    assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
+
+    captured = capsys.readouterr()
+
+    # Make sure we don't get the geometry elision message (might be overkill)
+    assert "geometry data elided, use --geometry to include" not in captured.out
+
+    # verify we get all the geometry data (levelup.m2 has 100 verts, 0 - 99)
+    assert "/model/vertices/99" in captured.out
+
+    # verify we don't get an elision message at all
+    assert "/model/vertices/..." not in captured.out

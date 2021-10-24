@@ -1,4 +1,3 @@
-
 types:
     chunk_mods:
         doc: "Map Object Doodad Sets"
@@ -9,7 +8,7 @@ types:
               type: doodad_set_list
               repeat: eos
 
-    doodad_set_list:  # FIXME: originally SMODoodadSet
+    doodad_set_list: # FIXME: originally SMODoodadSet
         seq:
             - id: name
               type: strz

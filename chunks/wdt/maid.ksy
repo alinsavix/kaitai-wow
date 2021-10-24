@@ -1,4 +1,3 @@
-
 types:
     chunk_maid:
         doc: "Map fileid table. Needs to contain 64x64 (4096) entries"
@@ -8,7 +7,6 @@ types:
             - id: map_fileids
               type: map_file_data_id_set
               repeat: eos
-
 
     # FIXME: originally MapFileDataIDs
     # FIXME: find a file we can actually test this with

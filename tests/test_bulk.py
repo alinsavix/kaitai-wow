@@ -1,20 +1,10 @@
-import collections
-import csv
 import os
-import posixpath
-import pprint
 import random
-import re
-import subprocess
-import sys
-
-from typing import List
 
 import pytest
-from pytest_html import extras
 
-from testutil import util
 import wowdump
+import wowdump.filetypes
 
 DATADIR = os.path.join("tests", "test_data")
 

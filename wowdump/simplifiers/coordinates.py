@@ -1,6 +1,5 @@
 # simplifier to display coordinates as (x,y) or similar
 import logging
-from ..dumputil import kttree
 
 def simplify_xyz(d, _parent, _cachecon, args) -> str:
     logger = logging.getLogger("simplify")

@@ -1,12 +1,5 @@
-import logging
 import os
 
-from typing import List
-
-import pytest
-from pytest_html import extras
-
-from testutil import util
 import wowdump
 
 DATADIR = os.path.join("tests", "test_data")

@@ -26,7 +26,7 @@ emitter_rgb_re = r"^/model/particle_emitters/\d+/old/p/colors/values/values/\d+$
 ambient_rgba_re = r"^/chunks/\d+/chunk_data/amb_color$"
 wmomat_rgba_re = r"^/chunks/\d+/chunk_data/materials/\d+/(diff_color|sidn_color|frame_sidn_color)$"
 wmomat_vertex_rgba_re = r"/chunks/\d+/chunk_data/vertex_colors/\d+$"
-wmomat_header_rgba_re =  r"/chunks/\d+/chunk_data/header_color_replacement$"
+wmomat_header_rgba_re = r"/chunks/\d+/chunk_data/header_color_replacement$"
 
 
 simplifiers = [

@@ -1,4 +1,3 @@
-
 types:
     chunk_main:
         doc: "Map tile table. Needs to contain 64x64 (4096) entries"

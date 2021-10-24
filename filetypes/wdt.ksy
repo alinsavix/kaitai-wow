@@ -19,8 +19,8 @@ meta:
 seq:
     # This shooooould always be first
     - id: mvermagic
-      contents: "REVM"  # MVER backwards
-    - id: chunksize  # We know the size, no need to store it
+      contents: "REVM" # MVER backwards
+    - id: chunksize # We know the size, no need to store it
       type: u4
 
     - id: ver
@@ -30,7 +30,6 @@ seq:
     - id: chunks
       type: wdt_chunk
       repeat: eos
-
 
 
 types:
@@ -49,19 +48,19 @@ types:
               type:
                   switch-on: chunk_type_raw.reverse
                   cases:
-                    '"MPHD"': chunk_mphd
-                    '"MAIN"': chunk_main
-                    '"MAID"': chunk_maid
-                    '"MPL3"': chunk_mpl3
-                    '"MSLT"': chunk_mslt
-                    '"MLTA"': chunk_mlta
-                    '"PVMI"': chunk_pvmi
-                    '"PVBD"': chunk_pvbd
-                    '"PVPD"': chunk_pvpd
-                    '"MAOI"': chunk_maoi
-                    '"MAOH"': chunk_maoh
+                      '"MPHD"': chunk_mphd
+                      '"MAIN"': chunk_main
+                      '"MAID"': chunk_maid
+                      '"MPL3"': chunk_mpl3
+                      '"MSLT"': chunk_mslt
+                      '"MLTA"': chunk_mlta
+                      '"PVMI"': chunk_pvmi
+                      '"PVBD"': chunk_pvbd
+                      '"PVPD"': chunk_pvpd
+                      '"MAOI"': chunk_maoi
+                      '"MAOH"': chunk_maoh
 
-                    _: noop
+                      _: noop
 
         instances:
             chunk_type:

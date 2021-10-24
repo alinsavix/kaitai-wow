@@ -1,7 +1,8 @@
 # simplifier to just remove stuff
 import logging
+from typing import Optional
 
-def simplify_remove(d, _parent, _cachecon, _args) -> str:
+def simplify_remove(d, _parent, _cachecon, _args) -> Optional[str]:
     logger = logging.getLogger("simplify")
     logger.debug("using remove simplifier")
     return None

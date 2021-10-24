@@ -3,7 +3,7 @@
 # FIXME: get info about what to simplify from ksy metadata instead
 import re
 from importlib import import_module
-import wowdump.simplifiers
+# import wowdump.simplifiers
 
 simplifiers = set()
 
@@ -23,7 +23,7 @@ simplifier_list = frozenset([
 for s in simplifier_list:
     # We need to specify ourselves as package= for relative imports to work
     ss = import_module("." + s, package="wowdump.simplifiers")
-    for sss in ss.simplifiers:
+    for sss in ss.simplifiers:  # type: ignore
         compiled_re = re.compile(sss[0], re.VERBOSE)
         simplifiers.add((compiled_re, sss[1]))
 

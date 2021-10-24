@@ -4,7 +4,7 @@ import os
 import re
 import sys
 import yaml
-from ppretty import ppretty
+# from ppretty import ppretty
 
 from typing import Any, Dict, List, Tuple, Set
 
@@ -19,13 +19,13 @@ def log(text: str):
 # That needs to turn into, at the same level:
 #
 #   id: num_name
-#   type: uint32
+#   #type: uint32
 #   id: ofs_name
-#   type: uint32
+#   #type: uint32
 # instances:
 #   name:
 #     pos: ofs_name
-#     type: type
+#     #type: type
 #     repeat: expr
 #     repeat-expr: num_name
 # def massage_m2array(d):
@@ -90,7 +90,7 @@ def list_descent(d: List[Any], parent: Any, top: Dict[str, Any]):
             r = dict_descent(v, True, top)
             log(f"r is {r}")
             if r is not None:
-                log(f"r return, doing replacement string")
+                log("r return, doing replacement string")
                 d[i] = r
                 replacements = 1
         elif isinstance(v, list):

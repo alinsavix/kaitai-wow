@@ -1,6 +1,7 @@
-# simplifiers  for file ids of various types
+# simplifiers for file ids of various types
+import csv
 import sys
-from typing import Any, Optional, Dict, List, Callable
+from typing import Optional, Union
 import logging
 
 # We can run without, we'll just be slow
@@ -9,7 +10,7 @@ try:
 except ImportError:
     pass
 
-def simplify_fileid(id: id, _parent, cachecon, args) -> str:
+def simplify_fileid(id: int, _parent, cachecon, args) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using fileid simplifier")
     logger.debug(f"type: {type(id)}   id: {id}")
@@ -30,7 +31,7 @@ def simplify_fileid(id: id, _parent, cachecon, args) -> str:
 
 
 # FIXME: Should this be somewhere else?
-def cache_getfileid(id: int, cachecon) -> Optional[str]:
+def cache_getfileid(id: int, cachecon) -> Optional[Union[str, bool]]:
     if not cachecon:
         return None
 
@@ -53,13 +54,15 @@ def cache_getfileid(id: int, cachecon) -> Optional[str]:
 
 # FIXME: Where should we -actually- look for this file?
 def csv_getfileid(id: int):
+    # FIXME
+    return False
     try:
         with open("listfile.csv", 'r', newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=";")
             for row in reader:
                 if int(row[0]) == id:
                     return f"{id}  # {row[1]}"
-    except:
+    except OSError:
         pass
 
     return False

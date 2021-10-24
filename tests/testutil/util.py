@@ -1,14 +1,12 @@
 import os
-import posixpath
-import pprint
-import re
 import subprocess
-import sys
+
+from typing import Union
 
 # from typing import List
 
 # Other args to consider: --ignore-case,  --ignore-all-space
-def filediff(reference: os.PathLike, testfile: os.PathLike,
+def filediff(reference: Union[str, os.PathLike], testfile: Union[str, os.PathLike],
              limit: int = 200) -> int:
     exe = "diff"
     args = [
@@ -24,11 +22,11 @@ def filediff(reference: os.PathLike, testfile: os.PathLike,
                           stdin=subprocess.DEVNULL,
                           ) as proc:
         linecount = 0
-        line = proc.stdout.readline()
+        line = proc.stdout.readline()  # type: ignore
         while line and (limit == 0 or linecount < limit):
             linecount += 1
             print(line, end="")
-            line = proc.stdout.readline()
+            line = proc.stdout.readline()  # type: ignore
 
         # if we're here we either ran out of lines, or got too many lines
         # consume any extra lines
@@ -39,7 +37,7 @@ def filediff(reference: os.PathLike, testfile: os.PathLike,
         extra = 0
         while line:
             extra += 1
-            line = proc.stdout.readline()
+            line = proc.stdout.readline()  # type: ignore
 
 
         if extra > 0:

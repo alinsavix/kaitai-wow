@@ -41,10 +41,13 @@ SOON.
 This document won't go too deeply into how kaitai-struct itself is used, because that's an entire discussion unto itself, but basically: kaitai-struct is a compiler. You feed it a `ksy` file, and tell it what languages you want to use, and it will export a module that can then be used with that language to read files of a given type.
 
 For example, we have the m2 file format defined in a `m2.ksy` file. If we want to use that in python, you would compile it like this:
+
 ```
 $ kaitai-struct-compiler --target python output/m2.ksy
 ```
+
 This will (silently, if there are no problems) create an output file for use with your language of choice (in this case, `m2.py` gets created). You can then use that output file in your language. Again in python:
+
 ```
 from m2 import M2
 m2_struct = M2.from_file("spectraltiger.m2")
@@ -78,6 +81,7 @@ Currently, kaitai-struct does not have a good way to split these configurations 
 The project ships with a simple `Makefile` that can handle this automatically; if you can't/don't use GNU make or a similar build tool, you can look in the Makefile to see how the commands are intended to be used.
 
 The abbreviated form of what is in the Makefile is, e.g.:
+
 ```
 $ python3 ./ksy-merge.py filetypes/m2.ksy >output/m2.ksy
 $ kaitai-struct-compiler --outdir output --target python output/m2.ksy

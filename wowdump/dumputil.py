@@ -1,13 +1,7 @@
 import inspect
-import os
-import re
-import sys
-import time
-from typing import Any, Callable, Dict, List, Optional
 
 import logging
-from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct
-from ppretty import ppretty
+from kaitaistruct import KaitaiStruct
 
 
 # "kaitai type"
@@ -43,7 +37,7 @@ def ktype(v):
     return "dict"
 
 
-def kttree(obj, path: str=""):
+def kttree(obj, path: str = ""):
     r = {}
     lgkttree = logging.getLogger("kttree")
     lgkttree.debug(f"kttree path: {path}")
@@ -68,7 +62,7 @@ def kttree(obj, path: str=""):
             # debug(f"defines a datatype, skipping")
             pass
         else:
-            if type(v) == type([]):
+            if isinstance(v, list):
                 # disp(f"{path}/{k}[]", f"array processing (len {len(v)})")
                 value = []
                 for i, el in enumerate(v):

@@ -10,6 +10,7 @@ def simplify_events(d, _parent, _cachecon, _args):
     else:
         return d
 
+
 m2_events = {
     "$AH0": "PlaySoundKit (customAttack[0])",
     "$AH1": "PlaySoundKit (customAttack[1])",

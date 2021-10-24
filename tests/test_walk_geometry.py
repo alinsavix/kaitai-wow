@@ -1,11 +1,5 @@
 import os
 
-from typing import List
-
-import pytest
-from pytest_html import extras
-
-from testutil import util
 import wowdump
 
 DATADIR = os.path.join("tests", "test_data")
@@ -37,7 +31,7 @@ def test_geometry_arraylimit(request, capsys, extra):
 
 
 # Make sure that arraylimit doesn't limit when arraylimit=0
-def test_geometry_arraylimit(request, capsys, extra):
+def test_geometry_arraylimit_zero(request, capsys, extra):
     ret = wowdump.main([
         "--no-resolve", "--geometry", "--arraylimit", "0",
         os.path.join(request.config.rootdir, DATADIR, input_model),

@@ -5,5 +5,5 @@ types:
 
         seq:
             - id: vertex_colors
-              type:  cimvector
+              type: cimvector
               repeat: eos

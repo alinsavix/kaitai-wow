@@ -44,7 +44,6 @@ types:
               type: b1  # 0x8000
 
 
-
     m2sequence:
         seq:
             - id: id

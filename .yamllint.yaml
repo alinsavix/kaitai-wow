@@ -14,9 +14,12 @@ rules:
 
     # it's 2021, can't we at least use -wide- dumb terminals as a
     # default for screen width?
-    line-length:
-        max: 132
-        level: warning
+    line-length: disable
+    #     max: 132
+    #    level: warning
+
+    indentation:
+        spaces: 4
 
     # spacing inside brackets and braces is good, yo
     brackets:
@@ -28,3 +31,10 @@ rules:
     # Sometimes a tiny extra bit of spacing is useful
     empty-lines:
         max: 2
+
+    # don't check line endings, git will take care of it
+    new-lines: disable
+
+    # default of VSCode, why argue?
+    comments:
+        min-spaces-from-content: 1

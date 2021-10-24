@@ -1,16 +1,6 @@
-import collections
-import csv
 import os
-import posixpath
-import pprint
-import re
-import subprocess
-import sys
-
-from typing import List
 
 import pytest
-from pytest_html import extras
 
 from testutil import util
 import wowdump
@@ -128,8 +118,10 @@ def test_references(request, t_reference_output, extra):
 def test_diff_references(request, t_reference_output, pytestconfig, extra):
     test = t_reference_output  # type: t
 
-    refpath = os.path.join(request.config.rootdir, REFERENCEDIR, test.type, f"{test.infile}.{test.ext}")
-    outpath = os.path.join(request.config.rootdir, OUTPUTDIR, test.type, f"{test.infile}.{test.ext}")
+    refpath = os.path.join(request.config.rootdir, REFERENCEDIR,
+                           test.type, f"{test.infile}.{test.ext}")
+    outpath = os.path.join(request.config.rootdir, OUTPUTDIR,
+                           test.type, f"{test.infile}.{test.ext}")
 
     assert util.filediff(refpath, outpath, limit=int(
         pytestconfig.getoption("diff_lines"))) == 0, "output file differences found"

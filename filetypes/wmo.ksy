@@ -44,39 +44,39 @@ types:
               type:
                   switch-on: chunk_type_raw.reverse
                   cases:
-                    '"GFID"': chunk_gfid
-                    '"MDAL"': chunk_mdal
-                    '"MFOG"': chunk_mfog
-                    '"MLIQ"': chunk_mliq
-                    '"MOBA"': chunk_moba
-                    '"MOBN"': chunk_mobn
-                    '"MOBR"': chunk_mobr
-                    '"MOBS"': chunk_mobs
-                    '"MOCV"': chunk_mocv
-                    '"MODD"': chunk_modd
-                    '"MODI"': chunk_modi
-                    '"MODR"': chunk_modr
-                    '"MODS"': chunk_mods
-                    '"MOGI"': chunk_mogi
-                    '"MOGN"': chunk_mogn
-                    '"MOGP"': chunk_mogp
-                    '"MOHD"': chunk_mohd
-                    '"MOLP"': chunk_molp
-                    '"MOLT"': chunk_molt
-                    '"MOMT"': chunk_momt
-                    '"MONR"': chunk_monr
-                    '"MOPR"': chunk_mopr
-                    '"MOPT"': chunk_mopt
-                    '"MOPV"': chunk_mopv
-                    '"MOPY"': chunk_mopy
-                    '"MOSB"': chunk_mosb
-                    '"MOTA"': chunk_mota
-                    '"MOTV"': chunk_motv
-                    '"MOVI"': chunk_movi
-                    '"MOVT"': chunk_movt
-                    '"MOVV"': chunk_movv
+                      '"GFID"': chunk_gfid
+                      '"MDAL"': chunk_mdal
+                      '"MFOG"': chunk_mfog
+                      '"MLIQ"': chunk_mliq
+                      '"MOBA"': chunk_moba
+                      '"MOBN"': chunk_mobn
+                      '"MOBR"': chunk_mobr
+                      '"MOBS"': chunk_mobs
+                      '"MOCV"': chunk_mocv
+                      '"MODD"': chunk_modd
+                      '"MODI"': chunk_modi
+                      '"MODR"': chunk_modr
+                      '"MODS"': chunk_mods
+                      '"MOGI"': chunk_mogi
+                      '"MOGN"': chunk_mogn
+                      '"MOGP"': chunk_mogp
+                      '"MOHD"': chunk_mohd
+                      '"MOLP"': chunk_molp
+                      '"MOLT"': chunk_molt
+                      '"MOMT"': chunk_momt
+                      '"MONR"': chunk_monr
+                      '"MOPR"': chunk_mopr
+                      '"MOPT"': chunk_mopt
+                      '"MOPV"': chunk_mopv
+                      '"MOPY"': chunk_mopy
+                      '"MOSB"': chunk_mosb
+                      '"MOTA"': chunk_mota
+                      '"MOTV"': chunk_motv
+                      '"MOVI"': chunk_movi
+                      '"MOVT"': chunk_movt
+                      '"MOVV"': chunk_movv
 
-                    _: unknown_chunk
+                      _: unknown_chunk
 
         instances:
             chunk_type:
