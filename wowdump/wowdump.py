@@ -3,6 +3,7 @@ import csv
 import hashlib
 import json
 import os
+import pathlib
 import re
 import sys
 import time
@@ -13,7 +14,8 @@ from typing import Union, Optional, Iterable, TextIO
 import logging
 from ppretty import ppretty
 
-from .filetypes import load_wowfile
+from . import filetypes
+# from .filetypes import load_wowfile, get_supported
 from .dumputil import ktype, kttree, whatis
 from .simplifiers import check_simplify
 
@@ -53,7 +55,7 @@ class DataOutput(object):
 
 import contextlib
 @contextlib.contextmanager
-def dataout(fn: Optional[str]):
+def dataout(fn: Optional[Union[str, os.PathLike]]):
     output = DataOutput(fn)
     yield output
     output.close()
@@ -156,7 +158,7 @@ def pathwalk(obj: KaitaiStruct, path: str, cachecon) -> Iterable[str]:
     obj_keys = cacheattrs(obj)
 
 
-    # if path == "/skin/batches/0":
+    # if path == "/skin/bulkes/0":
     #     print("breakpoint")
 
     for k in obj_keys:
@@ -485,11 +487,11 @@ def parse_arguments(argv, loggers):
     )
 
     cmdgroup.add_argument(
-        '--batchwalk',
+        '--bulkwalk',
         action='store_const',
-        const="batchwalk",
+        const="bulkwalk",
         dest="mode",
-        help="batch output pathwalk",
+        help="bulk output pathwalk",
     )
 
     cmdgroup.add_argument(
@@ -657,6 +659,22 @@ def parse_arguments(argv, loggers):
     )
 
     parser.add_argument(
+        "--bulk-overwrite",
+        action='store_true',
+        default=False,
+        help="Allow 'bulkwalk' to overwrite existing output files,"
+    )
+
+    # FIXME: Allow multiple types
+    parser.add_argument(
+        "--bulk-type",
+        action='store',
+        type=str,
+        default=None,
+        help="Limit bulkwalk to processing only this type",
+    )
+
+    parser.add_argument(
         "-o",
         "--output",
         type=str,
@@ -698,7 +716,7 @@ def fileparse(file):
     # except (ValueError, OSError) as e:
     #     print(f"ERROR: {e}", file=sys.stderr)
     #     return 65  # os.EX_DATAERR
-    return load_wowfile(file)
+    return filetypes.load_wowfile(file)
 
 
 def cmd_pathwalk(args):
@@ -715,11 +733,83 @@ def cmd_pathwalk(args):
         for line in pathwalk(target, "", cachecon):
             out.write(line)
 
+    return 0
+
+
+# FIXME: Refactor
+# FIXME: How do we deal with errors and such?
+def cmd_bulkwalk(args):
+    logger = logging.getLogger("bulkwalk")
+
+    if not args.output:
+        print("ERROR: bulkwalk requires --output be specified", file=sys.stderr)
+        return 64  # os.EX_USAGE
+
+    # FIXME: Should we just create it if it doesn't exist?
+    outdir = pathlib.Path(args.output)
+    if not outdir.exists() or not outdir.is_dir():
+        print(f"ERROR: doesn't exist or isn't a directory: {outdir}")
+        return 65  # os.EX_DATAERR
+
+    indir = pathlib.Path(args.file)
+    if not indir.exists() or not indir.is_dir():
+        print(f"ERROR: doesn't exist or isn't a directory: {indir}")
+        return 65  # os.EX_DATAERR
+
+    cachecon = cache_prepare(args)
+    supported = filetypes.get_supported()
+
+    for dirpath, _dirs, files in os.walk(indir):
+        for file in files:
+            inpath = indir / file
+            ext = inpath.suffix[1:].lower()
+            if ext not in supported:
+                logger.debug(f"skipping file with unknown type: {inpath}")
+                continue
+
+            if args.bulk_type and args.bulk_type != ext:
+                logger.debug(f"skipping file with non-requested type: {inpath}")
+                continue
+
+            inpath = indir / file
+
+            # supported filetype!
+            inpath = pathlib.Path(dirpath) / file
+
+            out_file = inpath.name + ".txt"
+            outsubpath = pathlib.Path(*inpath.parts[1:])  # drop the first bit
+            outpath = outdir / outsubpath.parent / out_file
+
+            # FIXME: Optionally allow overwrite
+            if not args.bulk_overwrite and outpath.exists():
+                logger.debug(f"skipping due to existing output file: {inpath}")
+                continue
+
+            # FIXME: hoist this out of the file loop (do once per output dir)
+            outpath.parent.mkdir(parents=True, exist_ok=True)
+
+            # Ugh, finally done with path juggling, maybe we can actually,
+            # y'know, process something?
+            logger.debug(f"bulk processing input file: {inpath}")
+            with dataout(outpath) as out:
+                target = fileparse(inpath)
+
+                if not check_filtered("/contenthash"):
+                    h = get_contenthash(inpath)
+                    out.write(f"/contenthash = {h}")
+
+                for line in pathwalk(target, "", cachecon):
+                    out.write(line)
+
+    return 0
+
 
 def cmd_raw(args):
     with dataout(args.output) as out:
         target = fileparse(args.file)
         out.write(ppretty(target, depth=99, seq_length=100,))
+
+    return 0
 
 
 def cmd_final(args):
@@ -728,6 +818,8 @@ def cmd_final(args):
         parsed = kttree(target)
         out.write(ppretty(parsed, depth=99, seq_length=100,))
 
+    return 0
+
 
 def cmd_json(args):
     with dataout(args.output) as out:
@@ -735,10 +827,13 @@ def cmd_json(args):
         parsed = kttree(target)
         out.write(json.dumps(parsed, indent=2, sort_keys=True))
 
+    return 0
+
 
 # FIXME: Make argparse pull from here
 cmds = {
     "pathwalk": cmd_pathwalk,
+    "bulkwalk": cmd_bulkwalk,
     "raw": cmd_raw,
     "final": cmd_final,
     "json": cmd_json,
@@ -767,7 +862,8 @@ def main(argv=None):
 
     # Actual commands
     if args.mode in cmds:
-        cmds[args.mode](args)
+        # FIXME: should we just be using exceptions for all our exit paths?
+        return cmds[args.mode](args)
     else:
         print(f"ERROR: unknown mode {args.mode} (this shouldn't happen)")
         return 70  # os.EX_SOFTWARE
