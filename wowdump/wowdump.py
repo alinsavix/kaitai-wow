@@ -784,12 +784,12 @@ def cmd_bulkwalk(args):
     for dirpath, _dirs, files in os.walk(indir):
         for file in files:
             inpath = indir / file
-            ext = inpath.suffix[1:].lower()
+            ext = inpath.suffix.lower()
             if ext not in supported:
                 logger.debug(f"skipping file with unknown type: {inpath}")
                 continue
 
-            if args.bulk_type and args.bulk_type != ext:
+            if args.bulk_type and f".{args.bulk_type}" != ext:
                 logger.debug(f"skipping file with non-requested type: {inpath}")
                 continue
 

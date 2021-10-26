@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import random
 
 import pytest
@@ -30,11 +31,13 @@ def t_bulk_list(bulkdir=BULKDIR, bulkcount=BULKCOUNT, bulkseed=BULKSEED):
     # bulkcount = 0?
     possible_tests = []
     for dirpath, _dirs, files in os.walk(bulkdir):
+        dirpath = Path(dirpath)
         for file in files:
-            _, ext = os.path.splitext(file)
-            ext = ext[1:].lower()
+            file = Path(file)
+            ext = file.suffix.lower()
+
             if ext in supported:
-                possible_tests.append(pytest.param(os.path.join(dirpath, file), id=file))
+                possible_tests.append(pytest.param(dirpath / file, id=file.name))
 
     # Should we fail instead of just not doing tests, if someone specifies a
     # bulkdir but no files are valid types?
@@ -42,10 +45,8 @@ def t_bulk_list(bulkdir=BULKDIR, bulkcount=BULKCOUNT, bulkseed=BULKSEED):
         return [pytest.param("no_bulk_tests", id="no_bulk_tests")]
 
     # If we didn't specify a bulkcount, return everything
-    if not bulkcount:
+    if not bulkcount or int(bulkcount) >= len(possible_tests):
         return possible_tests
-
-
 
     # otherwise, pick a random set of tests
     if bulkseed:
@@ -56,7 +57,7 @@ def t_bulk_list(bulkdir=BULKDIR, bulkcount=BULKCOUNT, bulkseed=BULKSEED):
 
 @pytest.fixture(params=t_bulk_list())
 def t_bulk(request, extra):
-    fn = request.param  # type: str
+    fn = request.param  # type: Path
 
     if fn == "no_bulk_tests":
         return
@@ -64,7 +65,7 @@ def t_bulk(request, extra):
     ret = wowdump.main([
         "--no-resolve",
         "-o", "scratch.txt",
-        fn,
+        str(fn),
     ])
     assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
 
