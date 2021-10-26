@@ -8,7 +8,7 @@ import re
 import sys
 import time
 
-from kaitaistruct import KaitaiStruct
+from kaitaistruct import KaitaiStruct, KaitaiStructError
 from typing import Union, Optional, Iterable, TextIO
 
 import logging
@@ -33,32 +33,32 @@ except ImportError:
 # Also, did I mention it's garbage?
 
 class DataOutput(object):
+    fileName: Optional[Union[str, os.PathLike]] = None
     fileHandle: TextIO
     is_stdout: bool
 
     def __init__(self, fn: Optional[Union[str, os.PathLike]]):
-        if fn is not None:
-            self.fileHandle = open(fn, "w")
+        self.fileName = fn
+
+    def __enter__(self):
+        if self.fileName is not None:
+            self.fileHandle = open(self.fileName, "w")
             self.is_stdout = False
         else:
             self.fileHandle = sys.stdout
             self.is_stdout = True
 
-    def close(self):
+        return self
+
+    def __exit__(self, _ex_type, _ex_value, _ex_traceback):
         # only close if not stdout
         if not self.is_stdout:
             self.fileHandle.close()
 
+        return False
+
     def write(self, outstr: str):
         print(outstr, file=self.fileHandle, flush=self.is_stdout)
-
-
-import contextlib
-@contextlib.contextmanager
-def dataout(fn: Optional[Union[str, os.PathLike]]):
-    output = DataOutput(fn)
-    yield output
-    output.close()
 
 
 # DEFAULT_TARGET = "testfiles/spectraltiger.m2"
@@ -719,10 +719,33 @@ def fileparse(file):
     return filetypes.load_wowfile(file)
 
 
+def walk_file(args, infile: pathlib.Path, outfile: pathlib.Path, overwrite: bool, cachecon):
+    logger = logging.getLogger("pathwalk")
+
+    if not overwrite and outfile.exists():
+        logger.debug(f"skipping due to existing output file: {infile}")
+        return
+
+    outfile.parent.mkdir(parents=True, exist_ok=True)
+
+    logger.debug(f"processing input file: {infile}")
+    if args.verbose:
+        print(f"processing: {infile}", file=sys.stderr)
+
+    target = fileparse(infile)
+    with DataOutput(outfile) as out:
+        if not check_filtered("/contenthash"):
+            h = get_contenthash(infile)
+            out.write(f"/contenthash = {h}")
+
+        for line in pathwalk(target, "", cachecon):
+            out.write(line)
+
+
 def cmd_pathwalk(args):
     # FIXME: better error handling (or error handling at all)
     cachecon = cache_prepare(args)
-    with dataout(args.output) as out:
+    with DataOutput(args.output) as out:
         target = fileparse(args.file)
 
         # out.write(f"# path = {file}")
@@ -736,7 +759,6 @@ def cmd_pathwalk(args):
     return 0
 
 
-# FIXME: Refactor
 # FIXME: How do we deal with errors and such?
 def cmd_bulkwalk(args):
     logger = logging.getLogger("bulkwalk")
@@ -771,41 +793,26 @@ def cmd_bulkwalk(args):
                 logger.debug(f"skipping file with non-requested type: {inpath}")
                 continue
 
-            inpath = indir / file
-
-            # supported filetype!
+            # supported/requested filetype, so process it
             inpath = pathlib.Path(dirpath) / file
 
             out_file = inpath.name + ".txt"
             outsubpath = pathlib.Path(*inpath.parts[1:])  # drop the first bit
             outpath = outdir / outsubpath.parent / out_file
 
-            # FIXME: Optionally allow overwrite
-            if not args.bulk_overwrite and outpath.exists():
-                logger.debug(f"skipping due to existing output file: {inpath}")
-                continue
-
-            # FIXME: hoist this out of the file loop (do once per output dir)
-            outpath.parent.mkdir(parents=True, exist_ok=True)
-
             # Ugh, finally done with path juggling, maybe we can actually,
             # y'know, process something?
-            logger.debug(f"bulk processing input file: {inpath}")
-            with dataout(outpath) as out:
-                target = fileparse(inpath)
-
-                if not check_filtered("/contenthash"):
-                    h = get_contenthash(inpath)
-                    out.write(f"/contenthash = {h}")
-
-                for line in pathwalk(target, "", cachecon):
-                    out.write(line)
+            try:
+                walk_file(args, inpath, outpath, args.bulk_overwrite, cachecon)
+            except (OSError, EOFError, KaitaiStructError) as e:
+                logger.warning(f"error while processing: {e}")
+                outpath.unlink(missing_ok=True)
 
     return 0
 
 
 def cmd_raw(args):
-    with dataout(args.output) as out:
+    with DataOutput(args.output) as out:
         target = fileparse(args.file)
         out.write(ppretty(target, depth=99, seq_length=100,))
 
@@ -813,7 +820,7 @@ def cmd_raw(args):
 
 
 def cmd_final(args):
-    with dataout(args.output) as out:
+    with DataOutput(args.output) as out:
         target = fileparse(args.file)
         parsed = kttree(target)
         out.write(ppretty(parsed, depth=99, seq_length=100,))
@@ -822,7 +829,7 @@ def cmd_final(args):
 
 
 def cmd_json(args):
-    with dataout(args.output) as out:
+    with DataOutput(args.output) as out:
         target = fileparse(args.file)
         parsed = kttree(target)
         out.write(json.dumps(parsed, indent=2, sort_keys=True))
