@@ -1,10 +1,14 @@
 import argparse
 import hashlib
 import json
+import multiprocessing as mp
 import os
 from pathlib import Path
+import queue
 import re
 import sys
+
+import traceback
 
 from kaitaistruct import KaitaiStruct, KaitaiStructError
 from typing import Union, Optional, Iterable, TextIO
@@ -140,7 +144,7 @@ def cacheattrs(obj):
     return cacheentry
 
 
-def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
+def pathwalk(args, obj: KaitaiStruct, path: str) -> Iterable[str]:
     lgsimplify = logging.getLogger("simplify")
     lgdisp = logging.getLogger("disposition")
 
@@ -151,7 +155,6 @@ def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
     # kaitai type, so even though we used to have to figure out object
     # type here, seems like we don't, at this point?
     obj_keys = cacheattrs(obj)
-
 
     # if path == "/skin/bulkes/0":
     #     print("breakpoint")
@@ -174,7 +177,7 @@ def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
         # effort of descending into it (and thus reading & parsing it) by
         # just escaping now.
         if not args.geometry and not geometry_path(workpath) and geometry_path(f"{workpath}/0"):
-            if not check_filtered(workpath):
+            if not check_filtered(args, workpath):
                 yield f"{workpath}/... = [geometry data elided, use --geometry to include]"
             continue
 
@@ -192,7 +195,7 @@ def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
             lgsimplify.debug(f"using simplifier for {workpath}")
 
             # if getting simplified, it's a "final" path, so check filtering
-            if check_filtered(workpath):
+            if check_filtered(args, workpath):
                 continue
 
             # FIXME: this feels sloppy
@@ -224,7 +227,7 @@ def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
                 if geometry_path(arraypath) and args.arraylimit > 0 and i >= args.arraylimit:
                     logger.debug(
                         f"eliding remaining geometry entries for {workpath}")
-                    if not check_filtered(arraypath):
+                    if not check_filtered(args, arraypath):
                         remaining = len(v) - args.arraylimit
                         yield f"{workpath}/... = [{remaining} elided of {len(v)} total]"
                     break
@@ -234,7 +237,7 @@ def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
                 if args.elide_all and args.arraylimit > 0 and i >= args.arraylimit:
                     logger.debug(
                         f"eliding remaining array entries for {workpath}")
-                    if not check_filtered(arraypath):
+                    if not check_filtered(args, arraypath):
                         remaining = len(v) - args.arraylimit
                         yield f"{workpath}/... = [{remaining} elided of {len(v)} total]"
                     break
@@ -245,7 +248,7 @@ def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
                     lgsimplify.debug(f"using simplifier for {arraypath}")
 
                     # if getting simplified, it's a "final" path, so check filtering
-                    if check_filtered(arraypath):
+                    if check_filtered(args, arraypath):
                         continue
 
                     lgsimplify.debug(
@@ -265,7 +268,7 @@ def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
                 # if elt in [int, float, str]:
                 if elt == "base":
                     # we're at a final path, check filtering
-                    if check_filtered(workpath):
+                    if check_filtered(args, workpath):
                         continue
 
                     if isinstance(el, str):
@@ -274,21 +277,21 @@ def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
                     yield f"{arraypath} = {el}"
                 else:
                     lgdisp.debug(f"{arraypath} --> array descent")
-                    yield from pathwalk(el, arraypath)
+                    yield from pathwalk(args, el, arraypath)
 
         elif kt == "kaitai":
             # FIXME: I think we're supposed to do one of these without the {k}
             if k == "data":
                 lgdisp.debug(f"{workpath} --> kaitai data descent")
-                yield from pathwalk(v, workpath)
+                yield from pathwalk(args, v, workpath)
             else:
                 lgdisp.debug(f"{workpath} --> kaitai descent type {type(k)}")
                 # debug(f"recursing kaitai value, type: {type(k)}")
-                yield from pathwalk(v, workpath)
+                yield from pathwalk(args, v, workpath)
 
         elif kt == "base":
             # we're at a final path, check filtering
-            if check_filtered(workpath):
+            if check_filtered(args, workpath):
                 continue
 
             if isinstance(v, str):
@@ -299,7 +302,7 @@ def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
 
         else:
             lgdisp.debug(f"{workpath} --> descend (type {type(v)}")
-            yield from pathwalk(v, workpath)
+            yield from pathwalk(args, v, workpath)
 
 # for maybe speeding up logging when a debug level is disabled:
 #
@@ -337,7 +340,7 @@ def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
 # only keep -- discard all but matching
 # only discard --  keep all but matching
 # both -- allow 'keep' matches, then discard all matching, then allow remaining
-def check_filtered(path: str) -> bool:
+def check_filtered(args, path: str) -> bool:
     if len(args.filters_keep) == 0 and len(args.filters_discard) == 0:
         return False
 
@@ -647,6 +650,59 @@ def fileparse(file):
     return filetypes.load_wowfile(file)
 
 
+class WalkWorker(mp.Process):
+    def __init__(self, task_queue, result_queue):
+        mp.Process.__init__(self)
+        self.task_queue = task_queue
+        self.result_queue = result_queue
+
+    def run(self):
+        proc_name = self.name
+        next_task = None
+        while True:
+            try:
+                next_task = self.task_queue.get(timeout=15.0)
+            except queue.Empty:
+                print(f"{proc_name}: Timeout, exiting", file=sys.stderr)
+                self.result_queue.put(f"error: {proc_name} timed out")
+
+            if next_task is None:
+                # Time to exit
+                print(f"{proc_name}: Exiting", file=sys.stderr)
+                self.task_queue.task_done()
+                break
+
+            answer = next_task()
+            self.task_queue.task_done()
+            if answer:
+                self.result_queue.put(answer)
+
+class WalkTask:
+    def __init__(self, args, infile: Path, outfile: Path, overwrite: bool):
+        self.args = args
+        self.infile = infile
+        self.outfile = outfile
+        self.overwrite = overwrite
+
+    def __call__(self):
+        self.args.resolve = False
+        try:
+            walk_file(self.args, self.infile, self.outfile, self.overwrite)
+
+            # return f"ok: {self.infile}"
+            return None
+        except (OSError, EOFError, KaitaiStructError) as e:
+            # logger.warning(f"error while processing: {e}")
+            self.outfile.unlink(missing_ok=True)
+            return f"fail: {self.infile} - {e}"
+        except Exception:
+            tb = traceback.format_exc()
+            return f"unknown: {self.infile} - {tb}"
+
+    def __str__(self):
+        return str(self.infile)
+
+
 def walk_file(args, infile: Path, outfile: Path, overwrite: bool):
     logger = logging.getLogger("pathwalk")
 
@@ -662,13 +718,12 @@ def walk_file(args, infile: Path, outfile: Path, overwrite: bool):
 
     target = fileparse(infile)
     with DataOutput(outfile) as out:
-        if not check_filtered("/contenthash"):
+        if not check_filtered(args, "/contenthash"):
             h = get_contenthash(infile)
             out.write(f"/contenthash = {h}")
 
-        for line in pathwalk(target, ""):
+        for line in pathwalk(args, target, ""):
             out.write(line)
-
 
 def cmd_pathwalk(args):
     # FIXME: Should we just blanket-initialize this in main()?
@@ -683,11 +738,11 @@ def cmd_pathwalk(args):
         target = fileparse(args.file)
 
         # out.write(f"# path = {file}")
-        if not check_filtered("/contenthash"):
+        if not check_filtered(args, "/contenthash"):
             h = get_contenthash(args.file)
             out.write(f"/contenthash = {h}")
 
-        for line in pathwalk(target, ""):
+        for line in pathwalk(args, target, ""):
             out.write(line)
 
     return 0
@@ -720,6 +775,17 @@ def cmd_bulkwalk(args):
 
     supported = filetypes.get_supported()
 
+    tasks = mp.JoinableQueue(maxsize=500)
+    results = mp.Queue()
+
+    num_workers = mp.cpu_count() * 1
+
+    print(f"Creating {num_workers}...", file=sys.stderr)
+    workers = [WalkWorker(tasks, results) for i in range(num_workers)]
+
+    for w in workers:
+        w.start()
+
     for dirpath, _dirs, files in os.walk(indir):
         dp = Path(dirpath)
         outsubpath = dp.relative_to(indir)
@@ -742,11 +808,28 @@ def cmd_bulkwalk(args):
 
             # Ugh, finally done with path juggling, maybe we can actually,
             # y'know, process something?
-            try:
-                walk_file(args, inpath, outpath, args.bulk_overwrite)
-            except (OSError, EOFError, KaitaiStructError) as e:
-                logger.warning(f"error while processing: {e}")
-                outpath.unlink(missing_ok=True)
+            # try:
+            #     walk_file(args, inpath, outpath, args.bulk_overwrite, cachecon)
+            # except (OSError, EOFError, KaitaiStructError) as e:
+            #     logger.warning(f"error while processing: {e}")
+            #     outpath.unlink(missing_ok=True)
+            tasks.put(WalkTask(args, inpath, outpath, args.bulk_overwrite))
+
+    # Tell each consumer to die, since we're out of stuff
+    # for i in range(num_workers):
+    #     tasks.put(None)
+
+    # wait for them all to finish
+    tasks.join()
+
+    while True:
+        try:
+            result = results.get_nowait()
+        except queue.Empty:
+            break
+
+        print(f"Result: {result}", file=sys.stderr)
+
 
     return 0
 
@@ -795,7 +878,6 @@ def main(argv=None):
 
     LOGGER_LIST = ["disposition", "simplify", "kttree", "csvcache"]
     args = parse_arguments(argv, loggers=LOGGER_LIST)
-
 
     # Logging setup
     LOG_FORMAT = "[%(filename)s:%(lineno)s:%(funcName)s] (%(name)s) %(levelname)s: %(message)s"
