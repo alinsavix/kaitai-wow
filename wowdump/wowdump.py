@@ -3,7 +3,7 @@ import csv
 import hashlib
 import json
 import os
-import pathlib
+from pathlib import Path
 import re
 import sys
 import time
@@ -719,7 +719,7 @@ def fileparse(file):
     return filetypes.load_wowfile(file)
 
 
-def walk_file(args, infile: pathlib.Path, outfile: pathlib.Path, overwrite: bool, cachecon):
+def walk_file(args, infile: Path, outfile: Path, overwrite: bool, cachecon):
     logger = logging.getLogger("pathwalk")
 
     if not overwrite and outfile.exists():
@@ -768,12 +768,12 @@ def cmd_bulkwalk(args):
         return 64  # os.EX_USAGE
 
     # FIXME: Should we just create it if it doesn't exist?
-    outdir = pathlib.Path(args.output)
+    outdir = Path(args.output).resolve(strict=False)
     if not outdir.exists() or not outdir.is_dir():
         print(f"ERROR: doesn't exist or isn't a directory: {outdir}")
         return 65  # os.EX_DATAERR
 
-    indir = pathlib.Path(args.file)
+    indir = Path(args.file).resolve(strict=False)
     if not indir.exists() or not indir.is_dir():
         print(f"ERROR: doesn't exist or isn't a directory: {indir}")
         return 65  # os.EX_DATAERR
@@ -782,9 +782,13 @@ def cmd_bulkwalk(args):
     supported = filetypes.get_supported()
 
     for dirpath, _dirs, files in os.walk(indir):
+        dp = Path(dirpath)
+        outsubpath = dp.relative_to(indir)
+
         for file in files:
-            inpath = indir / file
+            inpath = dp / file
             ext = inpath.suffix.lower()
+
             if ext not in supported:
                 logger.debug(f"skipping file with unknown type: {inpath}")
                 continue
@@ -794,11 +798,8 @@ def cmd_bulkwalk(args):
                 continue
 
             # supported/requested filetype, so process it
-            inpath = pathlib.Path(dirpath) / file
-
             out_file = inpath.name + ".txt"
-            outsubpath = pathlib.Path(*inpath.parts[1:])  # drop the first bit
-            outpath = outdir / outsubpath.parent / out_file
+            outpath = outdir / outsubpath / out_file
 
             # Ugh, finally done with path juggling, maybe we can actually,
             # y'know, process something?
