@@ -659,6 +659,7 @@ class WalkWorker(mp.Process):
     def run(self):
         proc_name = self.name
         next_task = None
+
         while True:
             try:
                 next_task = self.task_queue.get(timeout=15.0)
@@ -677,7 +678,7 @@ class WalkWorker(mp.Process):
             if answer:
                 self.result_queue.put(answer)
 
-class WalkTask:
+class WalkTask(object):
     def __init__(self, args, infile: Path, outfile: Path, overwrite: bool):
         self.args = args
         self.infile = infile
@@ -775,6 +776,7 @@ def cmd_bulkwalk(args):
 
     supported = filetypes.get_supported()
 
+    mp.set_start_method('spawn')
     tasks = mp.JoinableQueue(maxsize=500)
     results = mp.Queue()
 
@@ -816,8 +818,8 @@ def cmd_bulkwalk(args):
             tasks.put(WalkTask(args, inpath, outpath, args.bulk_overwrite))
 
     # Tell each consumer to die, since we're out of stuff
-    # for i in range(num_workers):
-    #     tasks.put(None)
+    for i in range(num_workers):
+        tasks.put(None)
 
     # wait for them all to finish
     tasks.join()
