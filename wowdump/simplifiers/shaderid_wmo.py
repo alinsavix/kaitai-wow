@@ -2,7 +2,7 @@
 import logging
 
 # FIXME: deal with out-of-range values
-def simplify_shaderid_wmo(d, _parent, _cachecon, _args):
+def simplify_shaderid_wmo(d, _parent, _args):
     logger = logging.getLogger("simplify")
     logger.debug("using shaderid (wmo) simplifier")
 

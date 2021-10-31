@@ -1,12 +1,10 @@
 import argparse
-import csv
 import hashlib
 import json
 import os
 from pathlib import Path
 import re
 import sys
-import time
 
 from kaitaistruct import KaitaiStruct, KaitaiStructError
 from typing import Union, Optional, Iterable, TextIO
@@ -15,15 +13,12 @@ import logging
 from ppretty import ppretty
 
 from . import filetypes
+from . import csvcache
 # from .filetypes import load_wowfile, get_supported
 from .dumputil import ktype, kttree, whatis
 from .simplifiers import check_simplify
 
-# We can run without, we'll just be slow
-try:
-    import sqlite3
-except ImportError:
-    pass
+
 
 # This script is what's known as "awful". It's brute force. It does
 # everything wrong. It probably doesn't even taste like chocolate.
@@ -145,7 +140,7 @@ def cacheattrs(obj):
     return cacheentry
 
 
-def pathwalk(obj: KaitaiStruct, path: str, cachecon) -> Iterable[str]:
+def pathwalk(obj: KaitaiStruct, path: str) -> Iterable[str]:
     lgsimplify = logging.getLogger("simplify")
     lgdisp = logging.getLogger("disposition")
 
@@ -202,9 +197,9 @@ def pathwalk(obj: KaitaiStruct, path: str, cachecon) -> Iterable[str]:
 
             # FIXME: this feels sloppy
             if kt == "base" or kt == "list":
-                simplified = s(v, obj, cachecon, args)
+                simplified = s(v, obj, args)
             else:
-                simplified = s(v, obj, cachecon, args)
+                simplified = s(v, obj, args)
             if simplified is not None:
                 yield f"{workpath} = {simplified}"
 
@@ -257,9 +252,9 @@ def pathwalk(obj: KaitaiStruct, path: str, cachecon) -> Iterable[str]:
                         f"array simplify type: {type(el)}   value: {el}")
                     # FIXME: this feels sloppy
                     if elt == "base" or elt == "list":
-                        simplified = s(el, v, cachecon, args)
+                        simplified = s(el, v, args)
                     else:
-                        simplified = s(el, v, cachecon, args)
+                        simplified = s(el, v, args)
                     if simplified is not None:
                         yield f"{arraypath} = {simplified}"
 
@@ -279,17 +274,17 @@ def pathwalk(obj: KaitaiStruct, path: str, cachecon) -> Iterable[str]:
                     yield f"{arraypath} = {el}"
                 else:
                     lgdisp.debug(f"{arraypath} --> array descent")
-                    yield from pathwalk(el, arraypath, cachecon)
+                    yield from pathwalk(el, arraypath)
 
         elif kt == "kaitai":
             # FIXME: I think we're supposed to do one of these without the {k}
             if k == "data":
                 lgdisp.debug(f"{workpath} --> kaitai data descent")
-                yield from pathwalk(v, workpath, cachecon)
+                yield from pathwalk(v, workpath)
             else:
                 lgdisp.debug(f"{workpath} --> kaitai descent type {type(k)}")
                 # debug(f"recursing kaitai value, type: {type(k)}")
-                yield from pathwalk(v, workpath, cachecon)
+                yield from pathwalk(v, workpath)
 
         elif kt == "base":
             # we're at a final path, check filtering
@@ -304,7 +299,7 @@ def pathwalk(obj: KaitaiStruct, path: str, cachecon) -> Iterable[str]:
 
         else:
             lgdisp.debug(f"{workpath} --> descend (type {type(v)}")
-            yield from pathwalk(v, workpath, cachecon)
+            yield from pathwalk(v, workpath)
 
 # for maybe speeding up logging when a debug level is disabled:
 #
@@ -318,73 +313,6 @@ def pathwalk(obj: KaitaiStruct, path: str, cachecon) -> Iterable[str]:
 #
 # logger.info(Lazy(lambda: "Stupid log message " + ' '.join([str(i) for i in range(20)])))
 
-
-# Caching bits (yeah, they're ugly)
-# or maybe type of os.PathLike for cache_open
-# FIXME: move caching bits to separate module
-# FIXME: needs locking for cache rebuild
-def cache_open(dbfile: Union[str, os.PathLike]):
-    if "sqlite3" not in sys.modules:
-        print("WARNING: sqlite not available, caching disabled", file=sys.stderr)
-        return None
-
-    # FIXME: can we do better than a global variable?
-    cachecon = sqlite3.connect(dbfile)
-
-    return cachecon
-
-
-def cache_prepare(args):
-    log = logging.getLogger()
-
-    if not args.resolve:
-        # print("INFO: not resolving, not initializing cache", file=sys.stderr)
-        return None
-    elif not os.path.exists(args.listfile):
-        log.warning(
-            f"{args.listfile} does not exist, not resolving fileids")
-        return None
-    else:
-        cachefile = f"{args.listfile}.cache"
-        if os.path.exists(cachefile) and (os.path.getmtime(args.listfile) <= os.path.getmtime(cachefile)):
-            # print("INFO: fileid cache up to date, not updating", file=sys.stderr)
-            return cache_open(cachefile)
-        else:
-            cachecon = cache_open(cachefile)
-            cache_fileids(args.listfile, cachecon)
-            return cachecon
-
-
-def cache_fileids(listfile: Union[str, os.PathLike], cachecon) -> None:
-    # Don't have the cache open, so can't cache anything
-    if not cachecon:
-        return
-
-    print("INFO: newer listfile available, updating fileid cache", file=sys.stderr)
-    started = time.time()
-
-    cur = cachecon.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS file_ids (
-            id INTEGER NOT NULL PRIMARY KEY,
-            name VARCHAR
-        );
-        """)
-
-    # Make sure it's empty -- it's probably faster to just reload everything
-    # rather than check if each indiviual row needs updating anyhow
-    cur.execute("DELETE FROM file_ids;")
-
-    with open(listfile, 'r') as csvfile:
-        reader = csv.reader(csvfile, delimiter=";")
-        to_db = [(row[0], row[1]) for row in reader]
-
-    cur.executemany("INSERT INTO file_ids (id, name) VALUES (?, ?);", to_db)
-    cachecon.commit()
-
-    runtime = time.time() - started
-    print(
-        f"INFO: fileid cache successfully rebuilt in {runtime:.2f}s", file=sys.stderr)
 
 
 # There's probably a way better way to do this.
@@ -719,7 +647,7 @@ def fileparse(file):
     return filetypes.load_wowfile(file)
 
 
-def walk_file(args, infile: Path, outfile: Path, overwrite: bool, cachecon):
+def walk_file(args, infile: Path, outfile: Path, overwrite: bool):
     logger = logging.getLogger("pathwalk")
 
     if not overwrite and outfile.exists():
@@ -738,13 +666,19 @@ def walk_file(args, infile: Path, outfile: Path, overwrite: bool, cachecon):
             h = get_contenthash(infile)
             out.write(f"/contenthash = {h}")
 
-        for line in pathwalk(target, "", cachecon):
+        for line in pathwalk(target, ""):
             out.write(line)
 
 
 def cmd_pathwalk(args):
+    # FIXME: Should we just blanket-initialize this in main()?
+    # Path(args.listfile).unlink(missing_ok=True)
+    if args.resolve:
+        csvcache.init("listfile", args.listfile)
+    else:
+        csvcache.init("listfile", None)
+
     # FIXME: better error handling (or error handling at all)
-    cachecon = cache_prepare(args)
     with DataOutput(args.output) as out:
         target = fileparse(args.file)
 
@@ -753,7 +687,7 @@ def cmd_pathwalk(args):
             h = get_contenthash(args.file)
             out.write(f"/contenthash = {h}")
 
-        for line in pathwalk(target, "", cachecon):
+        for line in pathwalk(target, ""):
             out.write(line)
 
     return 0
@@ -778,7 +712,12 @@ def cmd_bulkwalk(args):
         print(f"ERROR: doesn't exist or isn't a directory: {indir}")
         return 65  # os.EX_DATAERR
 
-    cachecon = cache_prepare(args)
+    # Path(args.listfile).unlink(missing_ok=True)
+    if args.resolve:
+        csvcache.init("listfile", args.listfile)
+    else:
+        csvcache.init("listfile", None)
+
     supported = filetypes.get_supported()
 
     for dirpath, _dirs, files in os.walk(indir):
@@ -804,7 +743,7 @@ def cmd_bulkwalk(args):
             # Ugh, finally done with path juggling, maybe we can actually,
             # y'know, process something?
             try:
-                walk_file(args, inpath, outpath, args.bulk_overwrite, cachecon)
+                walk_file(args, inpath, outpath, args.bulk_overwrite)
             except (OSError, EOFError, KaitaiStructError) as e:
                 logger.warning(f"error while processing: {e}")
                 outpath.unlink(missing_ok=True)
@@ -854,7 +793,7 @@ def main(argv=None):
     if not argv:
         argv = sys.argv[1:]
 
-    LOGGER_LIST = ["disposition", "simplify", "kttree"]
+    LOGGER_LIST = ["disposition", "simplify", "kttree", "csvcache"]
     args = parse_arguments(argv, loggers=LOGGER_LIST)
 
 
@@ -863,7 +802,7 @@ def main(argv=None):
     logging.basicConfig(level=args.log_level, format=LOG_FORMAT)
 
     for lg in LOGGER_LIST:
-        if getattr(args, f"debug_{lg}"):
+        if getattr(args, f"debug_{lg}") or os.getenv(f"DEBUG_{lg}") is not None:
             x = logging.getLogger(lg)
             x.setLevel(logging.DEBUG)
 

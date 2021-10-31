@@ -1,7 +1,7 @@
 # simplify event identifiers in events in m2 files
 import logging
 
-def simplify_events(d, _parent, _cachecon, _args):
+def simplify_events(d, _parent, _args):
     logger = logging.getLogger("simplify")
     logger.debug("using events simplifier")
 

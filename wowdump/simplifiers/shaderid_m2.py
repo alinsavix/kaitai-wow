@@ -1,7 +1,7 @@
 # simplifier to simplify shaderids for m2 models
 import logging
 
-def simplify_shaderid_m2(d, parent, _cachecon, _args):
+def simplify_shaderid_m2(d, parent, _args):
     logger = logging.getLogger("simplify")
     logger.debug("using shaderid (m2) simplifier")
 

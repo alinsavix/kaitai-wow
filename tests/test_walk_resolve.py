@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 
 import wowdump
 
@@ -71,8 +72,8 @@ def test_resolve_missing_listfile(request, capsys, caplog, extra):
     captured = capsys.readouterr()
 
     # verify we get our warning for the missing listfile
-    assert ("root", logging.WARNING,
-            "/this/does/not/exist does not exist, not resolving fileids") in caplog.record_tuples
+    assert ("csvcache", logging.WARNING,
+            str(Path("/this/does/not/exist")) + " does not exist, not resolving fileids") in caplog.record_tuples
 
     # make sure we're correctly; showing things as "unresolved"
     # FIXME: Do we want 'unresolved', or nothing?

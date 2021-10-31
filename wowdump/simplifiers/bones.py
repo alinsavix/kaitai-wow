@@ -1,12 +1,12 @@
 # simplifiers for bone-related things (when we have them)
 import logging
 
-def simplify_fourbone(d, _parent, _cachecon, _args) -> str:
+def simplify_fourbone(d, _parent, _args) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using fourbone simplifier")
     return f"[ {d[0]}, {d[1]}, {d[2]}, {d[3]} ]"
 
-def simplify_fourbone_m2arr(d, _parent, _cachecon, _args) -> str:
+def simplify_fourbone_m2arr(d, _parent, _args) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using fourbone m2arr simplifier")
     return f"[ {d.value[0]}, {d.value[1]}, {d.value[2]}, {d.value[3]} ]"

@@ -1,7 +1,7 @@
 # simplifier to display coordinates as (x,y) or similar
 import logging
 
-def simplify_xyz(d, _parent, _cachecon, args) -> str:
+def simplify_xyz(d, _parent, args) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using xyz simplifier")
 
@@ -11,7 +11,7 @@ def simplify_xyz(d, _parent, _cachecon, args) -> str:
     return f"xyz({x}, {y}, {z})"
 
 
-def simplify_wxyz(d, _parent, _cachecon, args) -> str:
+def simplify_wxyz(d, _parent, args) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using wxyz simplifier")
 
@@ -22,7 +22,7 @@ def simplify_wxyz(d, _parent, _cachecon, args) -> str:
     return f"wxyz({w}, {x}, {y}, {z})"
 
 
-def simplify_xy(d, _parent, _cachecon, args) -> str:
+def simplify_xy(d, _parent, args) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using xy simplifier")
 
@@ -31,7 +31,7 @@ def simplify_xy(d, _parent, _cachecon, args) -> str:
     return f"xy({x}, {y})"
 
 
-def simplify_nested_xy(d, _parent, _cachecon, _args) -> str:
+def simplify_nested_xy(d, _parent, _args) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using nested xy simplifier")
 

@@ -3,7 +3,7 @@ import logging
 from ..dumputil import kttree
 
 # FIXME: Should the output be inside { } or something?
-def simplify_flags(d, _parent, _cachecon, _args):
+def simplify_flags(d, _parent, _args):
     logger = logging.getLogger("simplify")
     logger.debug("using flags simplifier")
 

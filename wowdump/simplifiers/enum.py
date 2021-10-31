@@ -1,7 +1,7 @@
 # simplifiers for enum values
 import logging
 
-def simplify_enum(d, _parent, _cachecon, _args):
+def simplify_enum(d, _parent, _args):
     logger = logging.getLogger("simplify")
     logger.debug("using enum simplifier")
 
