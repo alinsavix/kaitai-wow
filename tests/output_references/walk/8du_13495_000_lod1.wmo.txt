@@ -34,9 +34,9 @@
 /chunks/0/chunk_data/chunks/4/chunk_type = MOBA
 /chunks/0/chunk_data/chunks/5/chunk_data/shadow_batches/0/field2 = 0
 /chunks/0/chunk_data/chunks/5/chunk_data/shadow_batches/0/field6 = 31926
-/chunks/0/chunk_data/chunks/5/chunk_data/shadow_batches/0/flag_thing = 130
-/chunks/0/chunk_data/chunks/5/chunk_data/shadow_batches/0/material_id_big = 55
-/chunks/0/chunk_data/chunks/5/chunk_data/shadow_batches/0/material_id_small = 0
+/chunks/0/chunk_data/chunks/5/chunk_data/shadow_batches/0/flags = unused1, use_material_id_large
+/chunks/0/chunk_data/chunks/5/chunk_data/shadow_batches/0/material_id = 0
+/chunks/0/chunk_data/chunks/5/chunk_data/shadow_batches/0/material_id_large = 55
 /chunks/0/chunk_data/chunks/5/chunk_data/shadow_batches/0/unknown1/0 = 0
 /chunks/0/chunk_data/chunks/5/chunk_data/shadow_batches/0/unknown1/1 = 0
 /chunks/0/chunk_data/chunks/5/chunk_data/shadow_batches/0/unknown1/2 = 0
@@ -63,7 +63,7 @@
 /chunks/0/chunk_data/descriptive_group_name = 0
 /chunks/0/chunk_data/ext_batch_count = 1
 /chunks/0/chunk_data/flags = exterior, has_doodads, l_o_d, unknown4
-/chunks/0/chunk_data/flags2 = 0
+/chunks/0/chunk_data/flags2 = none
 /chunks/0/chunk_data/fog_ids/0 = 1
 /chunks/0/chunk_data/fog_ids/1 = 0
 /chunks/0/chunk_data/fog_ids/2 = 0
@@ -72,10 +72,10 @@
 /chunks/0/chunk_data/group_liquid = 0
 /chunks/0/chunk_data/group_name = 2
 /chunks/0/chunk_data/int_batch_count = 0
+/chunks/0/chunk_data/other_batch_count = 0
 /chunks/0/chunk_data/portal_count = 5
 /chunks/0/chunk_data/portal_start = 0
 /chunks/0/chunk_data/trans_batch_count = 0
-/chunks/0/chunk_data/unknown1 = 0
 /chunks/0/chunk_size = 361212
 /chunks/0/chunk_type = MOGP
 /chunksize = 4

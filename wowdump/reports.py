@@ -418,7 +418,12 @@ def wmo_report_batches(args, mats, moba, out):
     for i, bat in enumerate(moba.batches):
         # out.write(f"  {i}    {mat}")
         # from MOMT in root
-        out.write(f"  BATCH index {i}     material id: {bat.material_id_large}")
+        if bat.flags.use_material_id_large:
+            material_id = bat.material_id_large
+        else:
+            material_id = bat.material_id
+
+        out.write(f"  BATCH index {i}     material id: {material_id}")
         flags = simplify_flags(bat.flags, None, args)
         out.write(f"    flags: {flags}")
 
@@ -427,7 +432,7 @@ def wmo_report_batches(args, mats, moba, out):
         vert_chunks = bat.max_index - bat.min_index + 1
         out.write(
             f"    first face: {bat.start_index}    vert chunks: {vert_chunks}    vert chunk start: {bat.min_index}    tris: {tri_count}")
-        wmo_print_material_info(mats, bat.material_id_large, out, "  ")
+        wmo_print_material_info(mats, material_id, out, "  ")
 
 
 def wmo_report_shadow_batches(args, mats, mobs, out):
@@ -437,10 +442,15 @@ def wmo_report_shadow_batches(args, mats, mobs, out):
     for i, bat in enumerate(mobs.shadow_batches):
         # out.write(f"  {i}    {mat}")
         # from MOMT in root
-        out.write(f"  SHADOW BATCH index {i}     material id: {bat.material_id_large}")
+        if bat.flags.use_material_id_large:
+            material_id = bat.material_id_large
+        else:
+            material_id = bat.material_id
+        out.write(f"  SHADOW BATCH index {i}     material id: {material_id}")
         flags = simplify_flags(bat.flags, None, args)
         out.write(f"    flags: {flags}")
-        wmo_print_material_info(mats, bat.material_id_large, out, "  ")
+        wmo_print_material_info(mats, material_id, out, "  ")
+
 
 # FIXME: needs root wmo
 def wmo_report_doodads(args, modr, out):

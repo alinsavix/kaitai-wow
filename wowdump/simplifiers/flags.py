@@ -27,7 +27,7 @@ def simplify_flags(d, _parent, _args):
     return ", ".join(flags)
 
 
-flags_re = r"/(global_)?flags$"
+flags_re = r"/(global_)?flags(2)?$"
 
 
 simplifiers = [
