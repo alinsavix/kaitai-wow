@@ -1,5 +1,4 @@
 import argparse
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -14,8 +13,9 @@ from ppretty import ppretty
 
 from . import filetypes
 from . import csvcache
+from . import reports
 # from .filetypes import load_wowfile, get_supported
-from .dumputil import ktype, kttree, whatis
+from .dumputil import ktype, kttree, whatis, get_contenthash
 from .simplifiers import check_simplify
 
 
@@ -63,16 +63,6 @@ DATADIR = os.path.dirname(os.path.realpath(__file__))
 
 
 global args
-
-def get_contenthash(filename: Union[str, os.PathLike]):
-    with open(filename, "rb") as f:
-        h = hashlib.md5()
-        chunk = f.read(8192)
-        while chunk:
-            h.update(chunk)
-            chunk = f.read(8192)
-
-    return h.hexdigest()
 
 
 # places to look for file:
@@ -438,6 +428,14 @@ def parse_arguments(argv, loggers):
         help="raw kaitai dump",
     )
 
+    cmdgroup.add_argument(
+        '--report',
+        action='store_const',
+        const="report",
+        dest="mode",
+        help="human-readable simplified file report"
+    )
+
     #
     # everything else
     #
@@ -458,6 +456,7 @@ def parse_arguments(argv, loggers):
         # help="help text",
     )
 
+    # FIXME: The way we handle logger configs sucks
     for lg in loggers:
         parser.add_argument(
             f"--debug-{lg}",
@@ -777,6 +776,13 @@ def cmd_json(args):
     return 0
 
 
+def cmd_report(args):
+    with DataOutput(args.output) as out:
+        reports.wmo(args, args.file, out)
+
+    return 0
+
+
 # FIXME: Make argparse pull from here
 cmds = {
     "pathwalk": cmd_pathwalk,
@@ -784,6 +790,7 @@ cmds = {
     "raw": cmd_raw,
     "final": cmd_final,
     "json": cmd_json,
+    "report": cmd_report,
 }
 
 

@@ -4,6 +4,7 @@ types:
         doc-ref: https://wowdev.wiki/WMO#MOGN_chunk
 
         seq:
-            - id: group_names
-              type: strz
-              repeat: eos
+            - id: group_names_blob
+            #   type: strz
+            #   repeat: eos
+              size-eos: true

@@ -52,25 +52,64 @@ enums:
             id: parallax
             doc: "SH_PARALLAX_ICE"
 
+
+    momt_blend_modes:
+        0:
+            id: opaque
+        1:
+            id: alpha_key
+        2:
+            id: alpha
+        3:
+            id: add
+        4:
+            id: mod
+        5:
+            id: mod2x
+        6:
+            id: mod_add
+        7:
+            id: inv_src_alpha_add
+        8:
+            id: inv_src_alpha_opaque
+        9:
+            id: src_alpha_opaque
+        10:
+            id: no_alpha_add
+        11:
+            id: constant_alpha
+        12:
+            id: screen
+        13:
+            id: blend_add
+
 types:
     momt_flags:
         seq:
             - id: unlit
               type: b1  # 0x01
+              doc: "disable lighting logic (can still use vertex colors)"
             - id: unfogged
               type: b1  # 0x02
+              doc: "disable fog shading (rarely used)"
             - id: unculled
               type: b1  # 0x04
+              doc: "two sided"
             - id: extlight
               type: b1  # 0x08
+              doc: "darkened (internal faces of windows are flagged)"
             - id: sidn
               type: b1  # 0x10
+              doc: "self-illuminated day/night (bright at night, unshaded)"
             - id: window
               type: b1  # 0x20
+              doc: "(something lighting related)"
             - id: clamp_s
               type: b1  # 0x40
+              doc: "texture clamp S"
             - id: clamp_t
               type: b1  # 0x80
+              doc: "texture clamp T"
             - id: flag_0x100
               type: b1  # 0x0100
             - id: unused1
@@ -95,21 +134,24 @@ types:
               enum: momt_shaders
             - id: blend_mode
               type: u4
-            - id: texture1_file_data_id
+              enum: momt_blend_modes
+            - id: texture1_fdid
               type: u4
             - id: sidn_color
               type: cimvector
+              doc: "Self-illuminated day/night"
             - id: frame_sidn_color
               type: cimvector
+              doc: "set at runtime"
 
-            - id: texture2_file_data_id
+            - id: texture2_fdid
               type: u4
             - id: diff_color
               type: cargb
             - id: foreign_key
               type: u4  # FIXME: Is this right?
 
-            - id: texture3_file_data_id
+            - id: texture3_fdid
               type: u4
             - id: color2
               type: u4
