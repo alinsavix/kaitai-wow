@@ -102,7 +102,25 @@ You can install this tool with either `make install` or `make localdev`, where i
 
 If you use this tool, please don't use it as part of some complex workflow -- it is experimental at best, *very* much a work in progress, and just about every aspect of it can (and will) change without warning. It is also rather crap code in a number of places. Patches to make it less garbage are gladly accepted.
 
+edit: The above is still largely true, but everything *is* getting slowly better and the code is becoming very slightly less crap. There are also now some (relatively good) unit tests, which have a secondary function of also helping to verify the kaitai code itself. You can run `pytest` directly, or `make test` from the root directory.
+
 
 ## Other warnings
 
 This is very much still a work in progress. The data structures defined by the kaitai-struct code can and will change, possibly drastically. We will *try* to call out those breaking changes when they happen, but until we reach a more stable place with the development of this, you may have to regularly update your code when you update your copy of kaitai-wow. Sorry about that. It'll get better.
+
+
+## Credits
+
+Almost none of the information encapsulated by this library is our original work; as with many things in the computer world (and even moreso the reverse engineering world), we stand on the shoulders of the giants that have come before us. Many thousands of hours have been spent, by tens or hundreds of people, to understand these file structures and how to make them useful.
+
+Some of the work we have referenced, in no particular order:
+
+* [wowdev.wiki](https://wowdev.wiki), and the many many people who have contributed to the almost overwhelming amount of knowledge contained there.
+* [https://wow.tools](https://wow.tools/), created and maintained by [Marlamin](https://github.com/Marlamin)
+* [WebWowViewerCpp](https://github.com/Deamon87/WebWowViewerCpp) by [Deamon](https://github.com/Deamon87)
+* [wow.export](https://github.com/Kruithne/wow.export), courtesy of the eternally patient [Kruithne](https://github.com/Kruithne)
+* [Wow Model Viewer](https://wowmodelviewer.net/) by Jeromnimo
+* Probably many others we are unintentionally forgetting
+
+Thank all of you for all of the work you have done for this community. :green_heart:
