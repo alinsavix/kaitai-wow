@@ -6,6 +6,8 @@ from pathlib import Path
 import re
 import sys
 
+import requests
+
 from kaitaistruct import KaitaiStruct, KaitaiStructError
 from typing import Union, Optional, Iterable, TextIO
 
@@ -18,7 +20,7 @@ from . import csvcache
 from .dumputil import ktype, kttree, whatis
 from .simplifiers import check_simplify
 
-
+DEFAULT_LISTFILE = str(Path.home() / ".wowdump_listfile.csv")
 
 # This script is what's known as "awful". It's brute force. It does
 # everything wrong. It probably doesn't even taste like chocolate.
@@ -390,6 +392,32 @@ def geometry_path(path):
     if geom_path_re.search(path):
         return True
 
+def download_listfile(dest: Union[str, os.PathLike], url):
+    logger = logging.getLogger()
+
+    dest = Path(dest)
+    tmpfile = dest.with_suffix(".tmp")
+
+    if dest.exists() and not dest.is_file():
+        raise ValueError(f"{dest} exists but isn't a file")
+
+    # for whatever reason, cloudflare blocks this if it's just the normal
+    # python 'requests' user agent
+    headers = {
+        'User-Agent': 'wowdump/1.0',
+    }
+
+    logger.debug("requesting new listfile from {url}")
+
+    with tmpfile.open(mode="wb") as outfile:
+        r = requests.get(url, stream=True, headers=headers)
+        if r.status_code != 200:
+            raise ValueError(
+                f"couldn't download listfile: {r.status_code} {r.reason} (url: {url})")
+        outfile.write(r.content)
+
+    tmpfile.replace(dest)
+
 
 class NegateAction(argparse.Action):
     def __call__(self, parser, ns, values, option):
@@ -475,22 +503,6 @@ def parse_arguments(argv, loggers):
     )
 
     parser.add_argument(
-        "--showtree",
-        action='store_const',
-        const=True,
-        default=False,
-        help=argparse.SUPPRESS,
-    )
-
-    parser.add_argument(
-        "--disposition",
-        action='store_const',
-        const=True,
-        default=False,
-        help=argparse.SUPPRESS,
-    )
-
-    parser.add_argument(
         "--simplify",
         "--no-simplify",
         dest="simplify",
@@ -522,8 +534,25 @@ def parse_arguments(argv, loggers):
 
     parser.add_argument(
         "--listfile",
-        default=os.path.join(DATADIR, "listfile.csv"),
-        help="specify listfile to use for fileids (default: %(default)s)",
+        # default=Path.home() / ".wowdump_listfile.csv",
+        type=str,
+        default=None,
+        help=f"specify listfile to use for fileids (default: {DEFAULT_LISTFILE})",
+    )
+
+    parser.add_argument(
+        "--listfile-url",
+        type=str,
+        default="https://wow.tools/casc/listfile/download/csv/unverified",
+        help=argparse.SUPPRESS,
+    )
+
+    parser.add_argument(
+        "--download-listfile",
+        action='store_const',
+        const=True,
+        default=False,
+        help="download a new listfile from wow.tools",
     )
 
     parser.add_argument(
@@ -624,6 +653,13 @@ def parse_arguments(argv, loggers):
     if args.debug:
         args.log_level = 'DEBUG'
 
+    if args.listfile is None:
+        args.listfile = DEFAULT_LISTFILE
+
+        if not os.path.exists(args.listfile):
+            print("WARNING: no listfile -- listfile will be downloaded", file=sys.stderr)
+            args.download_listfile = True
+
     # args.filters = [item for subl in args.filters for item in subl]
     # prep our filters
     for filter in [item for subl in args.filters for item in subl]:
@@ -671,13 +707,6 @@ def walk_file(args, infile: Path, outfile: Path, overwrite: bool):
 
 
 def cmd_pathwalk(args):
-    # FIXME: Should we just blanket-initialize this in main()?
-    # Path(args.listfile).unlink(missing_ok=True)
-    if args.resolve:
-        csvcache.init("listfile", args.listfile)
-    else:
-        csvcache.init("listfile", None)
-
     # FIXME: better error handling (or error handling at all)
     with DataOutput(args.output) as out:
         target = fileparse(args.file)
@@ -711,12 +740,6 @@ def cmd_bulkwalk(args):
     if not indir.exists() or not indir.is_dir():
         print(f"ERROR: doesn't exist or isn't a directory: {indir}")
         return 65  # os.EX_DATAERR
-
-    # Path(args.listfile).unlink(missing_ok=True)
-    if args.resolve:
-        csvcache.init("listfile", args.listfile)
-    else:
-        csvcache.init("listfile", None)
 
     supported = filetypes.get_supported()
 
@@ -796,7 +819,6 @@ def main(argv=None):
     LOGGER_LIST = ["disposition", "simplify", "kttree", "csvcache"]
     args = parse_arguments(argv, loggers=LOGGER_LIST)
 
-
     # Logging setup
     LOG_FORMAT = "[%(filename)s:%(lineno)s:%(funcName)s] (%(name)s) %(levelname)s: %(message)s"
     logging.basicConfig(level=args.log_level, format=LOG_FORMAT)
@@ -806,6 +828,17 @@ def main(argv=None):
             x = logging.getLogger(lg)
             x.setLevel(logging.DEBUG)
 
+    if args.download_listfile:
+        try:
+            download_listfile(args.listfile, args.listfile_url)
+        except ValueError as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            return 69  # os.EX_UNAVAILABLE
+
+    if args.resolve:
+        csvcache.init("listfile", args.listfile)
+    else:
+        csvcache.init("listfile", None)
 
     # Actual commands
     if args.mode in cmds:
