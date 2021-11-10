@@ -1,7 +1,23 @@
+import hashlib
 import inspect
-
 import logging
+import os
+
+from typing import Union
+
 from kaitaistruct import KaitaiStruct
+
+
+# generate the contenthash for a file, which is just an md5sum of the file
+def get_contenthash(filename: Union[str, os.PathLike]):
+    with open(filename, "rb") as f:
+        h = hashlib.md5()
+        chunk = f.read(8192)
+        while chunk:
+            h.update(chunk)
+            chunk = f.read(8192)
+
+    return h.hexdigest()
 
 
 # "kaitai type"

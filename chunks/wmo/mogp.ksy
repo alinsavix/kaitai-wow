@@ -30,6 +30,7 @@ types:
               doc: "Also load for LoD != 0 (_lod* groups)"
             - id: has_doodads
               type: b1  # 0x0800
+              doc: "Has doodads (MODR chunk)"
             - id: liquidsurface
               type: b1  # 0x1000
               doc: "Has water (MLIQ chunk)"
@@ -64,7 +65,7 @@ types:
 
             - id: cverts2
               type: b1  # 0x01000000
-              doc: "Has two MOCV chunks"
+              doc: "Has two MOCV chunks - don't run FixColorVertexAlpha on these!"
             - id: tverts2
               type: b1  # 0x02000000
               doc: "Has two MOTV chunks"
@@ -73,6 +74,7 @@ types:
               doc: "Antiportal; requires intBatchCount == 0, extBatchCount == 0, UNREACHABLE"
             - id: unknown3
               type: b1  # 0x08000000
+              doc: "maybe don't render batches, but still render doodads?"
             - id: unused7
               type: b1  # 0x10000000
             - id: exterior_cull
@@ -82,6 +84,15 @@ types:
               doc: "has three MOTV chunks"
             - id: unknown4
               type: b1  # 0x80000000
+              doc: "unknown, seen in world/wmo/kultiras/human/8hu_warfronts_armory_v2_000.wmo"
+
+
+    mogp_group_flags2:
+        seq:
+            - id: can_cut_terrain
+              type: b1  # 0x01
+            - id: unused1
+              type: b31
 
 
     # FIXME: This will always be the chunk that starts non-root wmo files,
@@ -114,7 +125,7 @@ types:
               type: u2
             - id: ext_batch_count
               type: u2
-            - id: unknown1
+            - id: other_batch_count
               type: u2
               doc: "Possibly padding, possibly data"
             - id: fog_ids
@@ -128,7 +139,7 @@ types:
             - id: foreign_key  # FIXME: still gotta figure this out  # name: wmo_group_id?
               type: u4
             - id: flags2
-              type: u4
+              type: mogp_group_flags2
             - id: unused1
               type: u4
 

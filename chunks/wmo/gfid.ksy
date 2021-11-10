@@ -4,6 +4,6 @@ types:
         doc-ref: https://wowdev.wiki/WMO#GFID_chunk
 
         seq:
-            - id: group_file_data_ids
+            - id: group_fdids
               type: u4
               repeat: eos

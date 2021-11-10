@@ -18,6 +18,7 @@ anim_id_re = r"/chunks/\d+/chunk_data/anim_file_ids/\d+/anim_id$"
 blp_re = r"^/(color_encoding|preferred_format)$"
 interpolation_type_re = r"(interpolation_type|m2track_type)$"
 material_blending_re = r"^/model/materials/\d+/blending_mode$"
+wmo_material_blendering_re = r"^/chunks/\d+/chunk_data/materials/\d+/blend_mode$"
 particle_old_blending_re = r"/model/particle_emitters/\d+/old/(blending|emitter)_type$"
 sequence_id_re = r"/sequences/\d+/id$"
 texture_type_re = r"^/model/textures/\d+/type$"
@@ -29,6 +30,7 @@ simplifiers = [
     (blp_re, simplify_enum),
     (interpolation_type_re, simplify_enum),
     (material_blending_re, simplify_enum),
+    (wmo_material_blendering_re, simplify_enum),
     (particle_old_blending_re, simplify_enum),
     (sequence_id_re, simplify_enum),
     (texture_type_re, simplify_enum),
