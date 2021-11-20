@@ -1,16 +1,49 @@
 import hashlib
 import inspect
 import logging
-import os
-
-from typing import Union
+import sys
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, TextIO, Union, cast
 
 from kaitaistruct import KaitaiStruct
 
+from . import filetypes
+
+
+# a simple class for letting us hand around an open file so we can
+# retarget outputs if/when needed
+class DataOutput(object):
+    fileName: Optional[str] = None
+    fileHandle: TextIO
+    is_stdout: bool
+
+    def __init__(self, fn: Optional[str]):
+        self.fileName = fn
+
+    def __enter__(self):
+        if self.fileName is not None:
+            self.fileHandle = open(self.fileName, "w")
+            self.is_stdout = False
+        else:
+            self.fileHandle = sys.stdout
+            self.is_stdout = True
+
+        return self
+
+    def __exit__(self, _ex_type, _ex_value, _ex_traceback):
+        # only close if not stdout
+        if not self.is_stdout:
+            self.fileHandle.close()
+            return False
+
+    def write(self, outstr: str) -> None:
+        print(outstr, file=self.fileHandle, flush=self.is_stdout)
+
 
 # generate the contenthash for a file, which is just an md5sum of the file
-def get_contenthash(filename: Union[str, os.PathLike]):
-    with open(filename, "rb") as f:
+def get_contenthash(file: Union[str, Path]) -> str:
+    file = Path(file)
+    with file.open("rb") as f:
         h = hashlib.md5()
         chunk = f.read(8192)
         while chunk:
@@ -20,8 +53,19 @@ def get_contenthash(filename: Union[str, os.PathLike]):
     return h.hexdigest()
 
 
+def fileparse(file: Union[str, Path]) -> KaitaiStruct:
+    # FIXME: commented out code is previous error handling, figure out if
+    # we need that still, and how, and where
+    # try:
+    #     target = load_wowfile(file)
+    # except (ValueError, OSError) as e:
+    #     print(f"ERROR: {e}", file=sys.stderr)
+    #     return 65  # os.EX_DATAERR
+    return filetypes.load_wowfile(file)
+
+
 # "kaitai type"
-def ktype(v):
+def ktype(v: object) -> str:
     logger = logging.getLogger()
     if inspect.isclass(v):
         logger.debug("var is type class, skipping")
@@ -53,13 +97,14 @@ def ktype(v):
     return "dict"
 
 
-def kttree(obj, path: str = ""):
-    r = {}
+KTTree = Union[Dict[Union[str, int], Any], List[Any]]
+def kttree(obj: object, path: str = "") -> KTTree:
+    r: Dict[Union[str, int], Any] = {}
     lgkttree = logging.getLogger("kttree")
     lgkttree.debug(f"kttree path: {path}")
     # debug(f"in: path: {path}  type: {type(obj)} {whatis(obj)}")
 
-    value = None
+    value: Union[KTTree, KaitaiStruct, int, float, str, bool]
 
     for k in dir(obj):
         if k[0] == "_":
@@ -88,7 +133,7 @@ def kttree(obj, path: str = ""):
                         value.append(el)
                     else:
                         # disp(f"{path}[{i}]", "array descent")
-                        value.append(kttree(el, f"{path}/{k}[{i}]"))
+                        cast(List[Any], value).append(kttree(el, f"{path}/{k}[{i}]"))
             elif isinstance(v, KaitaiStruct):
                 if k == "data":
                     # disp(f"{path}", "kaitai data descent")
@@ -122,53 +167,53 @@ def kttree(obj, path: str = ""):
     return r
 
 
-def whatis(obj):
-    objis = []
+def whatis(obj: object) -> Set[str]:
+    objis: Set[str] = set()
 
     if inspect.ismodule(obj):
-        objis.append("module")
+        objis.add("module")
     if inspect.isclass(obj):
-        objis.append("class")
+        objis.add("class")
     if inspect.ismethod(obj):
-        objis.append("method")
+        objis.add("method")
     if inspect.isfunction(obj):
-        objis.append("function")
+        objis.add("function")
     if inspect.isgeneratorfunction(obj):
-        objis.append("generatorfunction")
+        objis.add("generatorfunction")
     if inspect.isgenerator(obj):
-        objis.append("generator")
+        objis.add("generator")
     if inspect.iscoroutinefunction(obj):
-        objis.append("coroutinefunction")
+        objis.add("coroutinefunction")
     if inspect.iscoroutine(obj):
-        objis.append("coroutine")
+        objis.add("coroutine")
     if inspect.isawaitable(obj):
-        objis.append("awaitable")
+        objis.add("awaitable")
     if inspect.isasyncgenfunction(obj):
-        objis.append("asyncgenfunction")
+        objis.add("asyncgenfunction")
     if inspect.isasyncgen(obj):
-        objis.append("asyncgen")
+        objis.add("asyncgen")
     if inspect.istraceback(obj):
-        objis.append("traceback")
+        objis.add("traceback")
     if inspect.isframe(obj):
-        objis.append("frame")
+        objis.add("frame")
     if inspect.iscode(obj):
-        objis.append("code")
+        objis.add("code")
     if inspect.isbuiltin(obj):
-        objis.append("builtin")
+        objis.add("builtin")
     if inspect.isroutine(obj):
-        objis.append("routine")
+        objis.add("routine")
     if inspect.isabstract(obj):
-        objis.append("abstract")
+        objis.add("abstract")
     if inspect.ismethoddescriptor(obj):
-        objis.append("methoddescriptor")
+        objis.add("methoddescriptor")
     if inspect.isdatadescriptor(obj):
-        objis.append("datadescriptor")
+        objis.add("datadescriptor")
     if inspect.isgetsetdescriptor(obj):
-        objis.append("getsetdescriptor")
+        objis.add("getsetdescriptor")
     if inspect.ismemberdescriptor(obj):
-        objis.append("memberdescriptor")
+        objis.add("memberdescriptor")
 
     if isinstance(obj, KaitaiStruct):
-        objis.append("kaitaistruct")
+        objis.add("kaitaistruct")
 
     return objis

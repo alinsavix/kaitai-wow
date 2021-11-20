@@ -1,14 +1,19 @@
 # simplify event identifiers in events in m2 files
+import argparse
 import logging
+from typing import Any, List
 
-def simplify_events(d, _parent, _args):
+from . import SimplifierUncompiled
+
+
+def simplify_events(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using events simplifier")
 
     if d in m2_events:
         return f"{d}  # {m2_events[d]}"
     else:
-        return d
+        return str(d)
 
 
 m2_events = {
@@ -149,6 +154,6 @@ m2_events = {
 eventid_re = r"^/model/events/\d+/eventid$"
 
 
-simplifiers = [
+simplifiers: List[SimplifierUncompiled] = [
     (eventid_re, simplify_events),
 ]

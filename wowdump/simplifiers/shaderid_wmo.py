@@ -1,8 +1,13 @@
 # simplifier for shader ids for WMO objects
+import argparse
 import logging
+from typing import Any, List
+
+from . import SimplifierUncompiled
+
 
 # FIXME: deal with out-of-range values
-def simplify_shaderid_wmo(d, _parent, _args):
+def simplify_shaderid_wmo(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using shaderid (wmo) simplifier")
 
@@ -49,6 +54,6 @@ wmo_shader_table = [
 shader_wmo_re = r"^/chunks/\d+/chunk_data/materials/\d+/shader_id$"
 
 
-simplifiers = [
+simplifiers: List[SimplifierUncompiled] = [
     (shader_wmo_re, simplify_shaderid_wmo),
 ]

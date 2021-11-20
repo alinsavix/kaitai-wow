@@ -1,7 +1,12 @@
 # simplifiers for enum values
+import argparse
 import logging
+from typing import Any, List
 
-def simplify_enum(d, _parent, _args):
+from . import SimplifierUncompiled
+
+
+def simplify_enum(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using enum simplifier")
 
@@ -25,7 +30,7 @@ texture_type_re = r"^/model/textures/\d+/type$"
 version_re = r"^/model/version$"
 
 
-simplifiers = [
+simplifiers: List[SimplifierUncompiled] = [
     (anim_id_re, simplify_enum),
     (blp_re, simplify_enum),
     (interpolation_type_re, simplify_enum),

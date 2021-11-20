@@ -1,7 +1,12 @@
 # simplifiers for color values
+import argparse
 import logging
+from typing import Any, List
 
-def simplify_irgb(d, _parent, _args) -> str:
+from . import SimplifierUncompiled
+
+
+def simplify_irgb(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using irgb simplifier")
 
@@ -11,7 +16,7 @@ def simplify_irgb(d, _parent, _args) -> str:
 
     return f"rgb({r}, {g}, {b})  # {r:02x}{g:02x}{b:02x}"
 
-def simplify_irgb_short(d, _parent, _args) -> str:
+def simplify_irgb_short(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using irgb short simplifier")
 
@@ -21,7 +26,7 @@ def simplify_irgb_short(d, _parent, _args) -> str:
 
     return f"#{r:02x}{g:02x}{b:02x}"
 
-def simplify_irgba(d, _parent, _args) -> str:
+def simplify_irgba(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using irgba simplifier")
     r = int(d.r)
@@ -31,7 +36,7 @@ def simplify_irgba(d, _parent, _args) -> str:
 
     return f"rgba({r}, {g}, {b}, {a})  # {r:02x}{g:02x}{b:02x}{a:02x}"
 
-def simplify_irgba_short(d, _parent, _args) -> str:
+def simplify_irgba_short(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using irgba short simplifier")
     r = int(d.r)
@@ -49,7 +54,7 @@ wmomat_vertex_rgba_re = r"/chunks/\d+/chunk_data/vertex_colors/\d+$"
 wmomat_header_rgba_re = r"/chunks/\d+/chunk_data/header_color_replacement$"
 
 
-simplifiers = [
+simplifiers: List[SimplifierUncompiled] = [
     (emitter_rgb_re, simplify_irgb),
     (ambient_rgba_re, simplify_irgba),
     (wmomat_rgba_re, simplify_irgba),

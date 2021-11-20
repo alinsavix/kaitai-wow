@@ -3,15 +3,13 @@
 # make it more general. Doesn't even really cache CSV files at the moment,
 # just the almost-CSV that is the standard WoW tooling listfile
 import csv
-import os
-from pathlib import Path
-from ppretty import ppretty
+import logging
 import sqlite3
 import time
+from pathlib import Path
+from typing import Dict, Optional, Union, cast
 
-from typing import Union, Optional, Dict
-
-import logging
+from ppretty import ppretty
 
 
 # Pass None as file to disable cache
@@ -24,7 +22,7 @@ class ListfileCache(object):
     db: sqlite3.Connection
 
     # FIXME: should much of this be in a separate function?
-    def __init__(self, cachename: str, listfile: Optional[Union[str, os.PathLike]]):
+    def __init__(self, cachename: str, listfile: Optional[Union[str, Path]]):
         log = logging.getLogger("csvcache")
         self.name = cachename
 
@@ -33,6 +31,7 @@ class ListfileCache(object):
             log.debug("not resolving, not initializing cache")
             return
 
+        listfile = Path(listfile)
         self.listfile = Path(listfile)
 
         if not self.listfile.exists():
@@ -69,7 +68,7 @@ class ListfileCache(object):
         return False
 
 
-    def populate(self, force: bool = False):
+    def populate(self, force: bool = False) -> None:
         log = logging.getLogger("csvcache")
 
         if not self.__populate_needed():
@@ -129,7 +128,7 @@ class ListfileCache(object):
             raise e
 
         if res is not None:
-            return res[0]
+            return cast(str, res[0])
 
         # else
         return None
@@ -149,9 +148,9 @@ def get(cachename: str) -> ListfileCache:
     raise ValueError(f"unknown cache: {cachename}")
 
 
-def init(cachename: str, file: Optional[Union[str, os.PathLike]]) -> ListfileCache:
+def init(cachename: str, file: Optional[Union[str, Path]]) -> ListfileCache:
     log = logging.getLogger("csvcache")
-
+    file = Path(file) if file is not None else None
     # If it already exists, call populate() to reload things if it makes sense
     if cachename in caches:
         c = caches[cachename]

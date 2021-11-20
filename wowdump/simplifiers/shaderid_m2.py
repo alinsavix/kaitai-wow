@@ -1,7 +1,12 @@
 # simplifier to simplify shaderids for m2 models
+import argparse
 import logging
+from typing import Any, List
 
-def simplify_shaderid_m2(d, parent, _args):
+from . import SimplifierUncompiled
+
+
+def simplify_shaderid_m2(d: Any, parent: Any, _args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using shaderid (m2) simplifier")
 
@@ -66,7 +71,7 @@ m2_shader_table = (
 )
 
 
-def get_m2_pixel_shader(shaderID, op_count=2):
+def get_m2_pixel_shader(shaderID: int, op_count: int = 2) -> str:
     if shaderID == 0:
         return "WotLK_Runtime_Selector"
 
@@ -114,7 +119,7 @@ def get_m2_pixel_shader(shaderID, op_count=2):
                     return "PS_Combiners_Opaque_Mod"
 
 
-def get_m2_vertex_shader(shader_id, op_count=2):
+def get_m2_vertex_shader(shader_id: int, op_count: int = 2) -> str:
     if shader_id & 0x8000:
         shader_id &= (~0x8000)
         ind = shader_id.bit_length()
@@ -147,6 +152,6 @@ def get_m2_vertex_shader(shader_id, op_count=2):
 shader_m2_re = r"^/skin/batches/\d+/shader_id$"
 
 
-simplifiers = [
+simplifiers: List[SimplifierUncompiled] = [
     (shader_m2_re, simplify_shaderid_m2),
 ]

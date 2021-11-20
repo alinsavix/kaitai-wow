@@ -1,7 +1,12 @@
 # simplifier to display coordinates as (x,y) or similar
+import argparse
 import logging
+from typing import Any, List
 
-def simplify_xyz(d, _parent, args) -> str:
+from . import SimplifierUncompiled
+
+
+def simplify_xyz(d: Any, _parent: Any, args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using xyz simplifier")
 
@@ -11,7 +16,7 @@ def simplify_xyz(d, _parent, args) -> str:
     return f"xyz({x}, {y}, {z})"
 
 
-def simplify_wxyz(d, _parent, args) -> str:
+def simplify_wxyz(d: Any, _parent: Any, args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using wxyz simplifier")
 
@@ -22,7 +27,7 @@ def simplify_wxyz(d, _parent, args) -> str:
     return f"wxyz({w}, {x}, {y}, {z})"
 
 
-def simplify_xy(d, _parent, args) -> str:
+def simplify_xy(d: Any, _parent: Any, args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using xy simplifier")
 
@@ -31,7 +36,7 @@ def simplify_xy(d, _parent, args) -> str:
     return f"xy({x}, {y})"
 
 
-def simplify_nested_xy(d, _parent, _args) -> str:
+def simplify_nested_xy(d: Any, _parent: Any, args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using nested xy simplifier")
 
@@ -75,7 +80,7 @@ nested_xy_re = r"^/model/particle_emitters/\d+/multi_texture_param\d/\d+$"
 
 
 
-simplifiers = [
+simplifiers: List[SimplifierUncompiled] = [
     (emitter_sizes_re, simplify_xy),
     (verts_wmo_textcoords_re, simplify_xy),
     (verts_texcoords_re, simplify_xy),

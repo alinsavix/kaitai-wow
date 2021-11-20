@@ -1,10 +1,13 @@
 # simplifiers for file ids of various types
-from .. import csvcache
-
+import argparse
 import logging
+from typing import Any, List
+
+from .. import csvcache
+from . import SimplifierUncompiled
 
 
-def simplify_fileid(id: int, _parent, args) -> str:
+def simplify_fileid(id: Any, _parent: Any, args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using fileid simplifier")
     logger.debug(f"type: {type(id)}   id: {id}")
@@ -19,7 +22,7 @@ def simplify_fileid(id: int, _parent, args) -> str:
     else:
         return f"{id}  # {c}"
 
-def simplify_fileid_short(id: int, _parent, args) -> str:
+def simplify_fileid_short(id: Any, _parent: Any, args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using fileid short simplifier")
     logger.debug(f"type: {type(id)}   id: {id}")
@@ -40,7 +43,7 @@ fileids_re = r"^/chunks/\d+/chunk_data/([^/]+_)?(file_data_ids|fdids)/\d+$"
 fileid_re = r"/([^/]+_)?(file_data_id|fdid)$"
 mapfileid_re = r"^/chunks/\d+/chunk_data/map_fileids/\d+/[^/]+_(file_data_id|fdid)$"
 
-simplifiers = [
+simplifiers: List[SimplifierUncompiled] = [
     (fileid_re, simplify_fileid),
     (fileids_re, simplify_fileid),
     (mapfileid_re, simplify_fileid),
