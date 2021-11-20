@@ -1,9 +1,14 @@
 # simplify flags
+import argparse
 import logging
+from typing import Any, List
+
 from ..dumputil import kttree
+from . import SimplifierUncompiled
+
 
 # FIXME: Should the output be inside { } or something?
-def simplify_flags(d, _parent, _args):
+def simplify_flags(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
     logger = logging.getLogger("simplify")
     logger.debug("using flags simplifier")
 
@@ -14,7 +19,7 @@ def simplify_flags(d, _parent, _args):
     d = kttree(d)
 
     if not isinstance(d, dict):
-        return d
+        return str(d)
 
     flags = []
     for k, v in d.items():
@@ -30,6 +35,6 @@ def simplify_flags(d, _parent, _args):
 flags_re = r"/(global_)?flags(2)?$"
 
 
-simplifiers = [
+simplifiers: List[SimplifierUncompiled] = [
     (flags_re, simplify_flags),
 ]

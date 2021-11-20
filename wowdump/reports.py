@@ -1,27 +1,27 @@
-from pathlib import Path
+# type: ignore
 import re
-
+from pathlib import Path
 # from kaitaistruct import KaitaiStruct, KaitaiStructError
-from typing import Union, Optional, Iterable, TextIO
-
-# import logging
-# from ppretty import ppretty
+from typing import Optional
 
 # from . import filetypes
 # from . import csvcache
 # from . import reports
 # from .filetypes import load_wowfile, get_supported
-from . import csvcache
-from . import filetypes
-
-from .dumputil import ktype, kttree, whatis, get_contenthash
+from . import csvcache, filetypes
+from .dumputil import get_contenthash
+from .simplifiers.color import simplify_irgba_short
 # from .simplifiers import check_simplify
-from .simplifiers.coordinates import simplify_xy, simplify_xyz, simplify_wxyz
+from .simplifiers.coordinates import simplify_wxyz, simplify_xyz
 from .simplifiers.enum import simplify_enum
-from .simplifiers.flags import simplify_flags
-from .simplifiers.color import simplify_irgb_short, simplify_irgba_short
-from .simplifiers.shaderid_wmo import simplify_shaderid_wmo
 from .simplifiers.fileid import simplify_fileid, simplify_fileid_short
+from .simplifiers.flags import simplify_flags
+from .simplifiers.shaderid_wmo import simplify_shaderid_wmo
+
+# import logging
+# from ppretty import ppretty
+
+
 
 wmo_chunknames = {
     # Root
@@ -129,7 +129,7 @@ def get_wmo_root(file):
     return get_chunkmap(root)
 
 
-def wmo(args, file, out):
+def wmo(args, file, out) -> None:
     args.precision = 4
     csvcache.init("listfile", args.listfile)
 
@@ -180,7 +180,7 @@ def wmo(args, file, out):
 
 
 
-def wmo_root(args, chunkmap, out):
+def wmo_root(args, chunkmap, out) -> None:
     out.write("")
     mohd = chunkmap["MOHD"]
     out.write(f"wmoID: {mohd.foreign_key} (needs db2?)")  # FIXME: probably needs DB2 lookup
@@ -198,6 +198,7 @@ def wmo_root(args, chunkmap, out):
 
 
 from dataclasses import dataclass
+
 
 @dataclass
 class MaterialInfo:

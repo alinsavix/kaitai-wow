@@ -26,3 +26,9 @@ repos:
 #     rev: v1.2.2
 #     hooks:
 #     -   id: python-safety-dependencies-check
+
+-   repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+        - id: isort
+          name: isort (python)

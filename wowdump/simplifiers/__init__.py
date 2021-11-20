@@ -1,11 +1,20 @@
 # Load up a bunch of simplifiers and the regexes that trigger them
 #
 # FIXME: get info about what to simplify from ksy metadata instead
+import argparse
 import re
 from importlib import import_module
+from typing import Any, Callable, Optional, Pattern, Set, Tuple
+
 # import wowdump.simplifiers
 
-simplifiers = set()
+SimplifierFunc = Callable[[Any, Any, argparse.Namespace], Optional[str]]
+
+Simplifier = Tuple[Pattern[str], SimplifierFunc]
+
+SimplifierUncompiled = Tuple[str, SimplifierFunc]
+
+simplifiers: Set[Simplifier] = set()
 
 simplifier_list = frozenset([
     "bones",
@@ -30,7 +39,7 @@ for s in simplifier_list:
 
 # Check to see if a given path has a simplifier, return the appropriate
 # simplifier function if there's a match.
-def check_simplify(path: str):
+def check_simplify(path: str) -> Optional[SimplifierFunc]:
     for r in simplifiers:
         if r[0].search(path):
             return r[1]

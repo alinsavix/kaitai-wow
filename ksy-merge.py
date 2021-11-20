@@ -3,14 +3,16 @@ import argparse
 import os
 import re
 import sys
+from typing import Any, Dict, List, Set, Tuple
+
 import yaml
+
 # from ppretty import ppretty
 
-from typing import Any, Dict, List, Tuple, Set
 
 verbose = 0
 
-def log(text: str):
+def log(text: str) -> None:
     if verbose:
         print(text, file=sys.stderr)
 
@@ -35,8 +37,10 @@ def log(text: str):
 # finds a type: m2array<something>, then create a replacement block. If this
 # returns a list, that list should be substituted in place of the thing that
 # was being iterated, since we need to add things one level 'up'.
+#
+# Updates 'd' in
 type_re = re.compile(r"^m2array<(.*)>$")
-def dict_descent(d: Dict[str, Any], array_parent: bool, top: Dict[str, Any]):
+def dict_descent(d: Dict[str, Any], array_parent: bool, top: Dict[str, Any]) -> Any:
     # if this dict has a 'type' key, we can (potentially) replace it.
     # Otherwise, we need to recurse
     log(f"check: {d}")
@@ -78,11 +82,12 @@ def dict_descent(d: Dict[str, Any], array_parent: bool, top: Dict[str, Any]):
             log(f"list descent to {k}")
             list_descent(v, d, top)
 
-    return
+    return None
 
 
+# updates 'd' in-place
 nested_re = re.compile(r"(.*)_nested$")
-def list_descent(d: List[Any], parent: Any, top: Dict[str, Any]):
+def list_descent(d: List[Any], parent: Any, top: Dict[str, Any]) -> None:
     replacements = 0
     for i, v in enumerate(d):
         if isinstance(v, dict):
@@ -231,9 +236,10 @@ def list_descent(d: List[Any], parent: Any, top: Dict[str, Any]):
     return
 
 
-# deep merge some dicts (in essence merging some yaml)
+# deep merge some dicts (in essence merging some yaml). Updates the
+# y1 argument in-place
 # FIXME: Sanity check what we're doing with arrays
-def merge_dict(y1: Any, y2: Any):
+def merge_dict(y1: Any, y2: Any) -> Any:
     if not isinstance(y1, dict) or not isinstance(y2, dict):
         return y1
 
@@ -249,7 +255,7 @@ def merge_dict(y1: Any, y2: Any):
 # wish I could just do this in the main loop, but apparently os.walk
 # just utterly ignores file arguments, so we have to split it off
 paths_handled: Set[str] = set()
-def merge_file(yaml_data: Dict[str, str], file: str):
+def merge_file(yaml_data: Dict[str, str], file: str) -> None:
     if file in paths_handled:
         log(f"already did '{file}'', skipping")
         return
@@ -278,10 +284,11 @@ def merge_file(yaml_data: Dict[str, str], file: str):
 # have it doing the specific directory named, to get a bit more
 # granularity with our includes.
 #
-# FIXME: Eventually we want to filter this by types that are actually used!
-def recurse_merge(yaml_data: Dict[Any, Any], path: str):
+# Updates yamm_data in-place
+def recurse_merge(yaml_data: Dict[Any, Any], path: str) -> None:
     if os.path.isfile(path):
-        return merge_file(yaml_data, path)
+        merge_file(yaml_data, path)
+        return
 
     # else
     with os.scandir(path) as filepaths:
@@ -303,9 +310,9 @@ def norm_type(t: str) -> str:
     return n
 
 
-def get_used_from_seq(data) -> Tuple[Set[str], Set[str]]:
-    used_types = set()
-    used_enums = set()
+def get_used_from_seq(data: List[Dict[str, Any]]) -> Tuple[Set[str], Set[str]]:
+    used_types: Set[str] = set()
+    used_enums: Set[str] = set()
 
     # seq is always a list
     for f in data:
@@ -329,7 +336,7 @@ def get_used_from_seq(data) -> Tuple[Set[str], Set[str]]:
 
 
 # FIXME: Can we dedupe w/ the above?
-def get_used_from_instances(data) -> Tuple[Set[str], Set[str]]:
+def get_used_from_instances(data: Dict[str, Any]) -> Tuple[Set[str], Set[str]]:
     used_types = set()
     used_enums = set()
 
@@ -353,8 +360,8 @@ def get_used_from_instances(data) -> Tuple[Set[str], Set[str]]:
     return used_types, used_enums
 
 
-def get_used(data) -> Tuple[Set[str], Set[str]]:
-    nulls = (set(), set())
+def get_used(data: Dict[str, Any]) -> Tuple[Set[str], Set[str]]:
+    nulls: Tuple[Set[str], Set[str]] = (set(), set())
     a, aa = get_used_from_seq(data["seq"]) if "seq" in data else nulls
     b, bb = get_used_from_seq(data["params"]) if "params" in data else nulls
     c, cc = get_used_from_instances(data["instances"]) if "instances" in data else nulls
@@ -364,7 +371,7 @@ def get_used(data) -> Tuple[Set[str], Set[str]]:
 
 # Starting from a top level sequence (should have 'seq' or 'instances' keys,
 # and a 'types' key with all the various parts)
-def get_used_recurse(top) -> Tuple[Set[str], Set[str]]:
+def get_used_recurse(top: Dict[str, Any]) -> Tuple[Set[str], Set[str]]:
     # starting point
     used_types, used_enums = get_used(top)
 
@@ -400,7 +407,7 @@ def get_used_recurse(top) -> Tuple[Set[str], Set[str]]:
 
 # VERY simple yaml merge. Everything is a deep merge. Conflicts resolve
 # nondeterministically.
-def parse_arguments():
+def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog='ksy-merge.py',
         description='Merge some yaml files',
@@ -450,7 +457,7 @@ def parse_arguments():
     return parsed_args
 
 
-def main():
+def main() -> int:
     args = parse_arguments()
 
     # need a better way
@@ -488,6 +495,8 @@ def main():
             handled = " \\\n    ".join(paths_handled)
             print(f"{args.deps_target}: \\", file=f)
             print("    " + handled, file=f)
+
+    return 0
 
 
 if __name__ == "__main__":
