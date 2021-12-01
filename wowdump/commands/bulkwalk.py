@@ -10,7 +10,7 @@ from typing import Optional
 
 from kaitaistruct import KaitaiStructError
 
-from .. import csvcache, filetypes
+from .. import filetypes
 from ..dumputil import DataOutput, fileparse, get_contenthash
 from ..filters import check_filtered
 from .pathwalk import pathwalk
@@ -116,12 +116,6 @@ def cmd_bulkwalk(args):
     if not indir.exists() or not indir.is_dir():
         print(f"ERROR: doesn't exist or isn't a directory: {indir}")
         return 65  # os.EX_DATAERR
-
-    # Path(args.listfile).unlink(missing_ok=True)
-    if args.resolve:
-        csvcache.init("listfile", args.listfile)
-    else:
-        csvcache.init("listfile", None)
 
     supported = filetypes.get_supported()
 

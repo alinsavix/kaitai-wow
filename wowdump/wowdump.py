@@ -2,14 +2,16 @@ import argparse
 import logging
 import os
 import sys
-from typing import Callable, Dict, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Sequence, Text, Union
 
-from .commands import (cmd_bulkwalk, cmd_final, cmd_json, cmd_pathwalk,
-                       cmd_raw, cmd_report)
+import requests
+
+from . import csvcache
+from .commands import (WowdumpCommand, cmd_bulkwalk, cmd_final, cmd_json,
+                       cmd_pathwalk, cmd_raw, cmd_report)
 
 # from ppretty import ppretty
-
-
 
 # This script is what's known as "awful". It's brute force. It does
 # everything wrong. It probably doesn't even taste like chocolate.
@@ -20,10 +22,8 @@ from .commands import (cmd_bulkwalk, cmd_final, cmd_json, cmd_pathwalk,
 
 
 # DEFAULT_TARGET = "testfiles/spectraltiger.m2"
-DEFAULT_TARGET = "testfiles/staff_2h_draenorcrafted_d_02_c.m2"
-CASCDIR = None
-DATADIR = os.path.dirname(os.path.realpath(__file__))
-
+DEFAULT_LISTFILE: str = str(Path.home() / ".wowdump_listfile.csv")
+DEFAULT_LISTFILE_URL: str = "https://wow.tools/casc/listfile/download/csv/unverified"
 args: argparse.Namespace
 
 # places to look for file:
@@ -58,11 +58,73 @@ args: argparse.Namespace
 # logger.debug(Lazy(lambda: time.sleep(20)))
 #
 # logger.info(Lazy(lambda: "Stupid log message " + ' '.join([str(i) for i in range(20)])))
+def get_default_listfile() -> str:
+    return DEFAULT_LISTFILE
+
+def set_default_listfile(listfile: str) -> None:
+    global DEFAULT_LISTFILE
+    DEFAULT_LISTFILE = listfile
+
+def download_listfile(dest: Union[str, os.PathLike[str]], url: str) -> None:
+    logger = logging.getLogger()
+
+    dest = Path(dest)
+    tmpfile = dest.with_suffix(".tmp")
+
+    if dest.exists() and not dest.is_file():
+        raise ValueError(f"{dest} exists but isn't a file")
+
+    # for whatever reason, cloudflare blocks this if it's just the normal
+    # python 'requests' user agent
+    headers = {
+        'User-Agent': 'wowdump/1.0',
+    }
+
+    print(f"NOTICE: downloading new listfile to {args.listfile}", file=sys.stderr)
+    logger.debug("requesting new listfile from {url}")
+
+    # FIXME: How in the bloody fuck do you get a useful human-readable
+    # error message out of the requests library? e.g. trying to go to an
+    # invalid hostname will return a generic "ConnectionError" error, even
+    # though more specific data is available. The full exception thrown is:
+    #
+    # HTTPConnectionPool(host='asdf', port=80): Max retries exceeded with
+    # url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection
+    # object at 0x1085c4a60>: Failed to establish a new connection: [Errno 8]
+    # nodename nor servname provided, or not known'))
+    #
+    # it would be really great to be able to provide "nodename nor servname
+    # provided, or not known" to the user, but best I can figure there's no
+    # way to extract that information from the exception short of string
+    # matching. Ugh. Tempted to just use urllib directly.
+    with tmpfile.open(mode="wb") as outfile:
+        try:
+            r = requests.get(url, stream=True, headers=headers)
+        except requests.exceptions.HTTPError as e:
+            raise ValueError(f"HTTP error: {e}")
+        except requests.exceptions.ConnectionError as e:
+            raise ValueError(f"connection error: {e}")
+        except requests.exceptions.Timeout as e:
+            raise ValueError(f"timeout error: {e}")
+        except requests.exceptions.TooManyRedirects as e:
+            raise ValueError(f"too many redirects: {e}")
+        except requests.exceptions.RequestException as e:
+            raise ValueError(f"unknown error: {e}")
+
+        if r.status_code != 200:
+            raise ValueError(
+                f"couldn't download listfile: {r.status_code} {r.reason} (url: {url})")
+        outfile.write(r.content)
+
+    tmpfile.replace(dest)
 
 
 class NegateAction(argparse.Action):
-    def __call__(self, parser, ns, values, option):
-        setattr(ns, self.dest, option[2:4] != 'no')
+    def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace,
+                 values: Union[Text, Sequence[Any], None], option_string: Optional[Text] = "") -> None:
+        assert option_string is not None  # n
+        setattr(namespace, self.dest, option_string[2:4] != 'no')
+
 
 def parse_arguments(argv: List[str], loggers: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -153,22 +215,6 @@ def parse_arguments(argv: List[str], loggers: List[str]) -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "--showtree",
-        action='store_const',
-        const=True,
-        default=False,
-        help=argparse.SUPPRESS,
-    )
-
-    parser.add_argument(
-        "--disposition",
-        action='store_const',
-        const=True,
-        default=False,
-        help=argparse.SUPPRESS,
-    )
-
-    parser.add_argument(
         "--simplify",
         "--no-simplify",
         dest="simplify",
@@ -200,8 +246,27 @@ def parse_arguments(argv: List[str], loggers: List[str]) -> argparse.Namespace:
 
     parser.add_argument(
         "--listfile",
-        default=os.path.join(DATADIR, "listfile.csv"),
-        help="specify listfile to use for fileids (default: %(default)s)",
+        # default=Path.home() / ".wowdump_listfile.csv",
+        type=str,
+        default=None,
+        help=f"specify listfile to use for fileids (default: {DEFAULT_LISTFILE})",
+    )
+
+    parser.add_argument(
+        "--listfile-url",
+        type=str,
+        default=DEFAULT_LISTFILE_URL,
+        help=argparse.SUPPRESS,
+    )
+
+    parser.add_argument(
+        "--download-listfile",
+        "--no-download-listfile",
+        dest="download_listfile",
+        default=None,
+        action=NegateAction,
+        nargs=0,
+        help="download/suppress downloading of a new listfile from wow.tools",
     )
 
     parser.add_argument(
@@ -292,8 +357,8 @@ def parse_arguments(argv: List[str], loggers: List[str]) -> argparse.Namespace:
     parser.add_argument(
         "file",
         action='store',
-        # nargs='+',
-        # default=[],
+        nargs='?',
+        default=None,
         help="input file to be processed",
     )
 
@@ -314,9 +379,8 @@ def parse_arguments(argv: List[str], loggers: List[str]) -> argparse.Namespace:
     return args
 
 
-WowddumpCommand = Callable[[argparse.Namespace], int]
 # FIXME: Make argparse pull from here
-cmds: Dict[str, WowddumpCommand] = {
+cmds: Dict[str, WowdumpCommand] = {
     "pathwalk": cmd_pathwalk,
     "bulkwalk": cmd_bulkwalk,
     "raw": cmd_raw,
@@ -329,8 +393,8 @@ cmds: Dict[str, WowddumpCommand] = {
 def main(argv: Optional[List[str]] = None) -> int:
     # arg parsing
     global args
-    if not argv:
-        argv = sys.argv[1:]
+    # if not argv:
+    #     argv = sys.argv[1:]
 
     LOGGER_LIST = ["disposition", "simplify", "kttree", "csvcache"]
     args = parse_arguments(argv, loggers=LOGGER_LIST)
@@ -344,6 +408,32 @@ def main(argv: Optional[List[str]] = None) -> int:
             x = logging.getLogger(lg)
             x.setLevel(logging.DEBUG)
 
+    if args.listfile is None:
+        args.listfile = DEFAULT_LISTFILE
+
+    if not os.path.exists(args.listfile) and args.listfile == DEFAULT_LISTFILE:
+        if args.download_listfile is None:
+            print("WARNING: listfile does not exist, a new listfile will be downloaded", file=sys.stderr)
+            args.download_listfile = True
+        elif args.download_listfile is False:
+            print("WARNING: listfile does not exist, fdid name resolution disabled", file=sys.stderr)
+            args.download_listfile = False
+            args.resolve = False
+
+    if args.download_listfile:
+        try:
+            download_listfile(args.listfile, args.listfile_url)
+        except ValueError as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            return 69  # os.EX_UNAVAILABLE
+
+    if args.resolve:
+        csvcache.init("listfile", args.listfile)
+    else:
+        csvcache.init("listfile", None)
+
+    if args.file is None:
+        return 0
 
     # Actual commands
     if args.mode in cmds:
