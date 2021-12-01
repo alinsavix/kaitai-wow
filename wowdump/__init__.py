@@ -1,2 +1,3 @@
 # flake8: noqa
-from .wowdump import main
+# FIXME: the listfile stuff here is painful
+from .wowdump import get_default_listfile, main, set_default_listfile

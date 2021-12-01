@@ -28,6 +28,7 @@ class ListfileCache(object):
 
         if listfile is None:
             self.nocache = True
+            self.listfile = None
             log.debug("not resolving, not initializing cache")
             return
 
@@ -73,6 +74,7 @@ class ListfileCache(object):
 
         if not self.__populate_needed():
             if not force:
+                # print(self.cachefile)
                 self.db = sqlite3.connect(self.cachefile)
                 return
 
@@ -154,12 +156,15 @@ def init(cachename: str, file: Optional[Union[str, Path]]) -> ListfileCache:
     # If it already exists, call populate() to reload things if it makes sense
     if cachename in caches:
         c = caches[cachename]
+        # import sys
+        # print(ppretty(c), file=sys.stderr)
 
         if c.nocache and file is None:
             log.debug(f"reinitializing nocache cache {cachename}, doing nothing")
             return c
 
-        if getattr(c, "listfile", None) == file:
+        lfile = getattr(c, "listfile", None)
+        if not c.nocache and lfile is not None and lfile == file:
             log.debug(f"reinitializing existing cache {cachename} from {file}")
             c.populate()
             return c
