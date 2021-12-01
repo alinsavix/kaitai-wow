@@ -126,7 +126,7 @@ class NegateAction(argparse.Action):
         setattr(namespace, self.dest, option_string[2:4] != 'no')
 
 
-def parse_arguments(argv: List[str], loggers: List[str]) -> argparse.Namespace:
+def parse_arguments(argv: Optional[List[str]], loggers: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="wowdump",
         description="A tool for dumping the information out of WoW files",

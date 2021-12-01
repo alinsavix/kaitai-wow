@@ -106,9 +106,10 @@ def test_download_force_flag(tmp_path, mocked_responses, capsys, caplog, extra):
     ])
     assert ret == 0, f"wowdump exited with non-zero exit code ({ret})"
 
-    assert ("csvcache", logging.WARNING,
-            str(listfile) + " does not exist, not resolving fileids") in caplog.record_tuples
-
+    # assert ("csvcache", logging.WARNING,
+    #         str(listfile) + " does not exist, not resolving fileids") in caplog.record_tuples
+    captured = capsys.readouterr()
+    assert "WARNING: listfile does not exist, fdid name resolution disabled" in captured.err
     assert not listfile.exists(), "downloaded listfile when we shouldn't have"
 
 
