@@ -392,11 +392,13 @@
 /chunks/0/chunk_data/chunks/5/chunk_data/batches/21/unknown1/9 = 0
 /chunks/0/chunk_data/chunks/5/chunk_size = 528
 /chunks/0/chunk_data/chunks/5/chunk_type = MOBA
-/chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/field2 = 0
-/chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/field6 = 63855
+/chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/count = 63855
 /chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/flags = use_material_id_large
 /chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/material_id = 0
 /chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/material_id_large = 5
+/chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/max_index = 15437
+/chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/min_index = 0
+/chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/start_index = 0
 /chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/unknown1/0 = 0
 /chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/unknown1/1 = 0
 /chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/unknown1/2 = 0
@@ -407,10 +409,6 @@
 /chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/unknown1/7 = 0
 /chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/unknown1/8 = 0
 /chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/unknown1/9 = 0
-/chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/unknown2/0 = 0
-/chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/unknown2/1 = 0
-/chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/unknown2/2 = 77
-/chunks/0/chunk_data/chunks/6/chunk_data/shadow_batches/0/unknown2/3 = 60
 /chunks/0/chunk_data/chunks/6/chunk_size = 24
 /chunks/0/chunk_data/chunks/6/chunk_type = MOBS
 /chunks/0/chunk_data/chunks/7/chunk_data/doodad_refs/0 = 0

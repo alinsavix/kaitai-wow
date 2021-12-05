@@ -391,8 +391,8 @@ def wmo_nonroot(args, mogp, chunkmap, root, out):
     out.write(f"Fog IDs: {fogs}    groupLiquid: {mogp.group_liquid} (??)")
 
 
-    wmo_report_batches(args, materials, chunkmap["MOBA"], out)
-    wmo_report_shadow_batches(args, materials, chunkmap["MOBS"], out)
+    wmo_report_batches(args, materials, "Batch", chunkmap["MOBA"].batches, out)
+    wmo_report_batches(args, materials, "Shadow Batch", chunkmap["MOBS"].shadow_batches, out)
     # wmo_report_doodads(args, chunkmap["MODR"], out)
     # wmo_report_bsp()    # FIXME: do we need this? Maybe?
 
@@ -413,10 +413,10 @@ def wmo_nonroot(args, mogp, chunkmap, root, out):
     # wmo_report_doodad_sets(args, chunkmap["MODS"], chunkmap["MODI"], chunkmap["MODD"], out)
 
 
-def wmo_report_batches(args, mats, moba, out):
+def wmo_report_batches(args, mats, type, batches, out):
     out.write("")
-    out.write("Batch Information:")
-    for i, bat in enumerate(moba.batches):
+    out.write(f"{type} Information:")
+    for i, bat in enumerate(batches):
         # out.write(f"  {i}    {mat}")
         # from MOMT in root
         if bat.flags.use_material_id_large:
@@ -433,23 +433,6 @@ def wmo_report_batches(args, mats, moba, out):
         vert_chunks = bat.max_index - bat.min_index + 1
         out.write(
             f"    first face: {bat.start_index}    vert chunks: {vert_chunks}    vert chunk start: {bat.min_index}    tris: {tri_count}")
-        wmo_print_material_info(mats, material_id, out, "  ")
-
-
-def wmo_report_shadow_batches(args, mats, mobs, out):
-    out.write("")
-    out.write("Shadow Batch Information:")
-
-    for i, bat in enumerate(mobs.shadow_batches):
-        # out.write(f"  {i}    {mat}")
-        # from MOMT in root
-        if bat.flags.use_material_id_large:
-            material_id = bat.material_id_large
-        else:
-            material_id = bat.material_id
-        out.write(f"  SHADOW BATCH index {i}     material id: {material_id}")
-        flags = simplify_flags(bat.flags, None, args)
-        out.write(f"    flags: {flags}")
         wmo_print_material_info(mats, material_id, out, "  ")
 
 
