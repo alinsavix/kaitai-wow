@@ -17,7 +17,7 @@ from ppretty import ppretty
 class ListfileCache(object):
     name: str
     nocache: bool
-    listfile: Path
+    listfile: Optional[Path]
     cachefile: Path
     db: sqlite3.Connection
 
@@ -60,6 +60,10 @@ class ListfileCache(object):
             log.debug(f"{self.cachefile} doesn't exist, population needed")
             return True
 
+        if self.listfile is None:
+            log.warning(f"__populate_needed called when self.listfile is None")
+            return False
+
         if self.listfile.stat().st_mtime <= self.cachefile.stat().st_mtime:
             log.debug(f"{self.cachefile} exists and is up to date, population not needed")
             return False
@@ -71,6 +75,9 @@ class ListfileCache(object):
 
     def populate(self, force: bool = False) -> None:
         log = logging.getLogger("csvcache")
+
+        assert self.listfile is not None
+        assert self.cachefile is not None
 
         if not self.__populate_needed():
             if not force:

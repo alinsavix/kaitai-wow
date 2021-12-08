@@ -4,7 +4,7 @@
 import argparse
 import re
 from importlib import import_module
-from typing import Any, Callable, Optional, Pattern, Set, Tuple
+from typing import Any, Callable, Optional, Pattern, Set, Tuple, cast
 
 # import wowdump.simplifiers
 
@@ -33,8 +33,8 @@ for s in simplifier_list:
     # We need to specify ourselves as package= for relative imports to work
     ss = import_module("." + s, package="wowdump.simplifiers")
     for sss in ss.simplifiers:  # type: ignore
-        compiled_re = re.compile(sss[0], re.VERBOSE)
-        simplifiers.add((compiled_re, sss[1]))
+        compiled_re = re.compile(cast(str, sss[0]), re.VERBOSE)
+        simplifiers.add((compiled_re, cast(SimplifierFunc, sss[1])))
 
 
 # Check to see if a given path has a simplifier, return the appropriate

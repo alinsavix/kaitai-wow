@@ -3,7 +3,9 @@ import inspect
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, TextIO, Union, cast
+from types import TracebackType
+from typing import (Any, Dict, List, Optional, Set, TextIO, Type, Union,
+                    overload)
 
 from kaitaistruct import KaitaiStruct
 
@@ -20,7 +22,7 @@ class DataOutput(object):
     def __init__(self, fn: Optional[str]):
         self.fileName = fn
 
-    def __enter__(self):
+    def __enter__(self) -> "DataOutput":
         if self.fileName is not None:
             self.fileHandle = open(self.fileName, "w")
             self.is_stdout = False
@@ -30,11 +32,28 @@ class DataOutput(object):
 
         return self
 
-    def __exit__(self, _ex_type, _ex_value, _ex_traceback):
+    @overload
+    def __exit__(self, exc_type: None, exc_val: None, exc_tb: None) -> None:
+        ...
+
+    @overload
+    def __exit__(
+        self,
+        exc_type: type[BaseException],
+        exc_val: BaseException,
+        exc_tb: TracebackType,
+    ) -> None:
+        ...
+
+    def __exit__(
+        self,
+        exc_type: Union[Type[BaseException], None],
+        exc_val: Union[BaseException, None],
+        exc_tb: Union[TracebackType, None]
+    ) -> None:
         # only close if not stdout
         if not self.is_stdout:
             self.fileHandle.close()
-            return False
 
     def write(self, outstr: str) -> None:
         print(outstr, file=self.fileHandle, flush=self.is_stdout)
@@ -104,7 +123,7 @@ def kttree(obj: object, path: str = "") -> KTTree:
     lgkttree.debug(f"kttree path: {path}")
     # debug(f"in: path: {path}  type: {type(obj)} {whatis(obj)}")
 
-    value: Union[KTTree, KaitaiStruct, int, float, str, bool]
+    value: Union[KTTree, KaitaiStruct, int, float, str, bool, None] = None
 
     for k in dir(obj):
         if k[0] == "_":
@@ -133,7 +152,7 @@ def kttree(obj: object, path: str = "") -> KTTree:
                         value.append(el)
                     else:
                         # disp(f"{path}[{i}]", "array descent")
-                        cast(List[Any], value).append(kttree(el, f"{path}/{k}[{i}]"))
+                        value.append(kttree(el, f"{path}/{k}[{i}]"))
             elif isinstance(v, KaitaiStruct):
                 if k == "data":
                     # disp(f"{path}", "kaitai data descent")

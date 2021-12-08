@@ -53,7 +53,7 @@ def pathwalk(args: argparse.Namespace, obj: KaitaiStruct, path: str) -> Iterable
 
         # if we have ofs_xxx or num_xxx, and *also* just have xxx,
         # we don't need the offset/size anymore
-        if args.hide_unneeded and isinstance(k, str) and (k.startswith("ofs_") or k.startswith("num_")):
+        if args.hide_unneeded and (k.startswith("ofs_") or k.startswith("num_")):
             m2a_suffix = k[len("ofs_"):]
             if m2a_suffix in obj_keys:
                 continue
@@ -195,7 +195,7 @@ def cacheattrs(obj: object) -> List[str]:
     if t in attrcache:
         return attrcache[t]
 
-    cacheentry = []
+    cacheentry: List[str] = []
 
     obj_keys = dir(obj)
 

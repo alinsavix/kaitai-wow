@@ -6,7 +6,7 @@ import queue
 import sys
 import traceback
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from kaitaistruct import KaitaiStructError
 
@@ -24,7 +24,7 @@ class WalkTask(object):
         self.outfile = outfile
         self.overwrite = overwrite
 
-    def __call__(self):
+    def __call__(self) -> Union[str, None]:
         self.args.resolve = False
         try:
             walk_file(self.args, self.infile, self.outfile, self.overwrite)
@@ -39,7 +39,7 @@ class WalkTask(object):
             tb = traceback.format_exc()
             return f"unknown: {self.infile} - {tb}"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.infile)
 
 
@@ -53,8 +53,9 @@ class WalkWorker(mp.Process):
         self.result_queue = result_queue
         self.timeout = timeout
 
-    def run(self):
+    def run(self) -> None:
         proc_name = self.name
+        next_task = None
 
         while True:
             try:
@@ -99,7 +100,7 @@ def walk_file(args: argparse.Namespace, infile: Path, outfile: Path, overwrite: 
 
 
 # FIXME: How do we deal with errors and such?
-def cmd_bulkwalk(args):
+def cmd_bulkwalk(args: argparse.Namespace) -> int:
     logger = logging.getLogger("bulkwalk")
 
     if not args.output:
@@ -126,12 +127,12 @@ def cmd_bulkwalk(args):
     num_workers = mp.cpu_count() * 1
 
     print(f"Creating {num_workers} workers...", file=sys.stderr)
-    workers = [WalkWorker(tasks, results) for i in range(num_workers)]
+    workers = [WalkWorker(tasks, results) for _ in range(num_workers)]
 
     for w in workers:
         w.start()
 
-    for dirpath, _dirs, files in os.walk(indir):
+    for dirpath, _, files in os.walk(indir):
         dp = Path(dirpath)
         outsubpath = dp.relative_to(indir)
 
@@ -161,7 +162,7 @@ def cmd_bulkwalk(args):
             tasks.put(WalkTask(args, inpath, outpath, args.bulk_overwrite))
 
     # Tell each consumer to die, since we're out of stuff
-    for i in range(num_workers):
+    for _ in range(num_workers):
         tasks.put(None)
 
     # wait for them all to finish
