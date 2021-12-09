@@ -61,7 +61,7 @@ class ListfileCache(object):
             return True
 
         if self.listfile is None:
-            log.warning(f"__populate_needed called when self.listfile is None")
+            log.warning("__populate_needed called when self.listfile is None")
             return False
 
         if self.listfile.stat().st_mtime <= self.cachefile.stat().st_mtime:

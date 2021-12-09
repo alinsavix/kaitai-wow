@@ -4,7 +4,7 @@
 #
 # FIXME: can we do better?
 cat <<EOF
-import os
+# type: ignore
 from pathlib import Path
 from typing import Set, Union
 

@@ -1,4 +1,5 @@
 # type: ignore
+import argparse
 import re
 from pathlib import Path
 # from kaitaistruct import KaitaiStruct, KaitaiStructError
@@ -9,7 +10,7 @@ from typing import Optional
 # from . import reports
 # from .filetypes import load_wowfile, get_supported
 from . import csvcache, filetypes
-from .dumputil import get_contenthash
+from .dumputil import DataOutput, get_contenthash
 from .simplifiers.color import simplify_irgba_short
 # from .simplifiers import check_simplify
 from .simplifiers.coordinates import simplify_wxyz, simplify_xyz
@@ -129,7 +130,7 @@ def get_wmo_root(file):
     return get_chunkmap(root)
 
 
-def wmo(args, file, out) -> None:
+def wmo(args: argparse.Namespace, file: str, out: DataOutput) -> None:
     args.precision = 4
     csvcache.init("listfile", args.listfile)
 
@@ -176,8 +177,6 @@ def wmo(args, file, out) -> None:
     else:
         root = get_wmo_root(file)
         wmo_nonroot(args, mogp, chunkmap, root, out)
-
-
 
 
 def wmo_root(args, chunkmap, out) -> None:
