@@ -1,9 +1,9 @@
 # simplifiers for color values
 import argparse
 import logging
-from typing import Any, List
+from typing import Any, Dict
 
-from . import SimplifierUncompiled
+from . import SimplifierFunc
 
 
 def simplify_irgb(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
@@ -47,17 +47,9 @@ def simplify_irgba_short(d: Any, _parent: Any, _args: argparse.Namespace) -> str
     return f"#{r:02x}{g:02x}{b:02x}{a:02x}"
 
 
-emitter_rgb_re = r"^/model/particle_emitters/\d+/old/p/colors/values/values/\d+$"
-ambient_rgba_re = r"^/chunks/\d+/chunk_data/amb_color$"
-wmomat_rgba_re = r"^/chunks/\d+/chunk_data/materials/\d+/(diff_color|sidn_color|frame_sidn_color)$"
-wmomat_vertex_rgba_re = r"/chunks/\d+/chunk_data/vertex_colors/\d+$"
-wmomat_header_rgba_re = r"/chunks/\d+/chunk_data/header_color_replacement$"
-
-
-simplifiers: List[SimplifierUncompiled] = [
-    (emitter_rgb_re, simplify_irgb),
-    (ambient_rgba_re, simplify_irgba),
-    (wmomat_rgba_re, simplify_irgba),
-    (wmomat_vertex_rgba_re, simplify_irgba),
-    (wmomat_header_rgba_re, simplify_irgba),
-]
+named_simplifiers: Dict[str, SimplifierFunc] = {
+    "simplify_irgb": simplify_irgb,
+    "simplify_irgb_short": simplify_irgb_short,
+    "simplify_irgba": simplify_irgba,
+    "simplify_irgba_short": simplify_irgba_short,
+}

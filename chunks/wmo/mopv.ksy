@@ -7,3 +7,4 @@ types:
             - id: portal_vertexes
               type: c3vector
               repeat: eos
+              simplifier_each: simplify_xyz

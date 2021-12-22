@@ -1,5 +1,6 @@
 types:
     m2compquat:
+        simplifier: simplify_wxyz
         seq:
             - id: x
               type: s2

@@ -114,6 +114,7 @@ types:
               type: b1  # 0x0100
             - id: unused1
               type: b23  # 0x0100 to 0x80000000
+              simplifier: simplify_remove
 
 
     chunk_momt:
@@ -132,9 +133,11 @@ types:
             - id: shader_id
               type: u4
               enum: momt_shaders
+              simplifier: simplify_shaderid_wmo
             - id: blend_mode
               type: u4
               enum: momt_blend_modes
+              simplifier: simplify_enum
             - id: texture1_fdid
               type: u4
             - id: sidn_color
@@ -161,3 +164,4 @@ types:
               type: u4
               repeat: expr
               repeat-expr: 4
+              simplifier: simplify_remove

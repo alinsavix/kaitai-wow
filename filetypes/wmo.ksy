@@ -37,6 +37,7 @@ types:
               type: str
               size: 4
               encoding: UTF-8
+              simplifier: simplify_remove
             - id: chunk_size
               type: u4
             - id: chunk_data

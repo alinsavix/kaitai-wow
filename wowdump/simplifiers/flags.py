@@ -1,10 +1,10 @@
 # simplify flags
 import argparse
 import logging
-from typing import Any, List
+from typing import Any, List, Dict
 
 from ..dumputil import kttree
-from . import SimplifierUncompiled
+from . import SimplifierUncompiled, SimplifierFunc
 
 
 # FIXME: Should the output be inside { } or something?
@@ -38,3 +38,7 @@ flags_re = r"/(global_)?flags(2)?$"
 simplifiers: List[SimplifierUncompiled] = [
     (flags_re, simplify_flags),
 ]
+
+named_simplifiers: Dict[str, SimplifierFunc] = {
+    "simplify_flags": simplify_flags,
+}

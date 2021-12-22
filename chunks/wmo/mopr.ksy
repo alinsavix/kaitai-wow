@@ -18,3 +18,4 @@ types:
               type: s2
             - id: unused1  # "filler"
               type: u2
+              simplifier: simplify_remove

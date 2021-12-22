@@ -142,7 +142,7 @@ types:
               type: mogp_group_flags2
             - id: unused1
               type: u4
-
+              simplifier: simplify_remove
             # This will use the chunk definition from the wmo filetype
             - id: chunks
               type: wmo_chunk

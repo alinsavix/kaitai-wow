@@ -6,6 +6,7 @@ types:
               size: 4
               encoding: ASCII
               doc: "usually a 3 character string prefixed with $"
+              simplifier: simplify_events
             - id: data
               type: u4
               doc: "passed when event is fired"

@@ -20,6 +20,7 @@ types:
             - id: type
               type: u1
               enum: wmo_light_types
+              simplifier: simplify_enum
             - id: use_attenuation
               type: u1
             - id: unknown1

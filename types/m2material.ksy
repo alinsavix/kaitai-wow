@@ -47,3 +47,4 @@ types:
             - id: blending_mode
               type: u2
               enum: m2material_blendmodes
+              simplifier: simplify_enum

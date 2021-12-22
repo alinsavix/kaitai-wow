@@ -22,6 +22,7 @@ types:
             - id: flags
               type: u2
               enum: bspnode_flags
+              simplifier: simplify_enum
             - id: neg_child
               type: s2
               doc: "index of bsp child node (right in this array)"

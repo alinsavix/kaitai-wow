@@ -1,12 +1,12 @@
 # Load up a bunch of simplifiers and the regexes that trigger them
-#
-# FIXME: get info about what to simplify from ksy metadata instead
+
 import argparse
 import re
 from importlib import import_module
-from typing import Any, Callable, Optional, Pattern, Set, Tuple, cast
+from typing import (Any, Callable, Dict, List, Optional, Pattern, Set, Tuple,
+                    Type, cast)
 
-# import wowdump.simplifiers
+from ..ksymeta import getmeta
 
 SimplifierFunc = Callable[[Any, Any, argparse.Namespace], Optional[str]]
 
@@ -15,6 +15,8 @@ Simplifier = Tuple[Pattern[str], SimplifierFunc]
 SimplifierUncompiled = Tuple[str, SimplifierFunc]
 
 simplifiers: Set[Simplifier] = set()
+
+simplifier_funcs: Dict[str, SimplifierFunc] = {}
 
 simplifier_list = frozenset([
     "bones",
@@ -29,22 +31,74 @@ simplifier_list = frozenset([
     "shaderid_wmo",
 ])
 
-for s in simplifier_list:
-    # We need to specify ourselves as package= for relative imports to work
-    ss = import_module("." + s, package="wowdump.simplifiers")
-    for sss in ss.simplifiers:  # type: ignore
-        compiled_re = re.compile(cast(str, sss[0]), re.VERBOSE)
-        simplifiers.add((compiled_re, cast(SimplifierFunc, sss[1])))
+
+def init_simplify() -> None:
+    global simplifiers
+    simplifiers = set()
+
+    global simplifier_funcs
+    simplifier_funcs = {}
+
+    for s in simplifier_list:
+        # We need to specify ourselves as package= for relative imports to work
+        ss = import_module("." + s, package="wowdump.simplifiers")
+        sl: List[SimplifierUncompiled] = getattr(ss, "simplifiers", [])
+        for sss in sl:
+            compiled_re = re.compile(sss[0], re.VERBOSE)
+            simplifiers.add((compiled_re, sss[1]))
+
+        sd: Dict[str, SimplifierFunc] = getattr(ss, "named_simplifiers", {})
+        for funcname, func in sd.items():  # type: ignore
+            simplifier_funcs[funcname] = func
 
 
 # Check to see if a given path has a simplifier, return the appropriate
 # simplifier function if there's a match.
-def check_simplify(path: str) -> Optional[SimplifierFunc]:
+#
+# FIXME: needs a bit of debugging
+def check_simplify(
+        path: str, filetype: str, dataname: str,
+        datatype: Optional[type] = None,
+        parenttype: Optional[type] = None
+) -> Tuple[Optional[SimplifierFunc], bool]:
+    if filetype and datatype:
+        type = datatype.__name__.lower()
+        parent = parenttype.__name__.lower() if parenttype else None
+
+        meta = getmeta(filetype, type)
+        if meta:
+            if "simplifier" in meta:
+                s = meta["simplifier"]
+                if s in simplifier_funcs:
+                    return simplifier_funcs[s], False
+
+            if "simplifier_each" in meta:
+                s = meta["simplifier_each"]
+                if s in simplifier_funcs:
+                    return simplifier_funcs[s], True
+
+        if parent:
+            meta = getmeta(filetype, f"{parent}.{dataname}")
+            if meta:
+                if "simplifier" in meta:
+                    s = meta["simplifier"]
+                    if s in simplifier_funcs:
+                        return simplifier_funcs[s], False
+
+                if "simplifier_each" in meta:
+                    s = meta["simplifier_each"]
+                    if s in simplifier_funcs:
+                        return simplifier_funcs[s], True
+
     for r in simplifiers:
         if r[0].search(path):
-            return r[1]
+            return r[1], False
 
-    return None
+    return None, False
+
+
+if len(simplifiers) == 0 and len(simplifier_funcs) == 0:
+    init_simplify()
 
 
 # Notes from the original implementation:

@@ -7,3 +7,4 @@ types:
             - id: group_fdids
               type: u4
               repeat: eos
+              simplifier_each: simplify_fileid

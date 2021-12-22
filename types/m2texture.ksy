@@ -85,6 +85,7 @@ types:
             - id: type
               type: u4
               enum: m2texture_types
+              simplifier: simplify_enum
               doc-ref: https://wowdev.wiki/M2#Texture_Types
               doc: |
                   Texture type is 0 for regular textures, nonzero for skinned textures (filename not referenced in the M2 file!) For instance, in the NightElfFemale model, her eye glow is a type 0 texture and has a file name, the other 3 textures have types of 1, 2 and 6. The texture filenames for these come from client database files:

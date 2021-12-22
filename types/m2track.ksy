@@ -47,10 +47,12 @@ types:
             - id: m2track_type
               type: s4
               enum: m2track_types
+              simplifier: simplify_enum
         seq:
             - id: interpolation_type
               type: u2
               enum: m2track_interpolation_types
+              simplifier: simplify_enum
             - id: global_sequence
               type: s2
             - id: timestamps
@@ -76,6 +78,7 @@ types:
             - id: interpolation_type
               type: u2
               enum: m2track_interpolation_types
+              simplifier: simplify_enum
             - id: global_sequence
               type: s2
             - id: timestamps

@@ -20,7 +20,6 @@ seq:
 types:
     chunk_skin:
         seq:
-
             - id: vertices
               type: m2array<u2>
               doc: "Indexes into global (presumably 'global for this model') vertex list"
@@ -33,6 +32,7 @@ types:
             - id: bones
               type: m2array<ubyte4>
               doc: "Indexes into global (presumably 'global for this model') bone list. Standard 4-bone rig."
+              simplifier: simplify_fourbone_m2arr
             - id: submeshes
               type: m2array<m2skinsection>
               doc: "Submeshes (subsets of full model)"

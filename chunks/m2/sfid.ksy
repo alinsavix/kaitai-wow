@@ -18,9 +18,12 @@ types:
               type: u4
               repeat: expr
               repeat-expr: _root.model.num_skin_profiles
+              simplifier_each: simplify_fileid
+
 
             # Doesn't seem to be a way to calculate how many of these there
             # are, so just run to end of chunk.
             - id: lod__skin_file_data_ids
               type: u4
               repeat: eos
+              simplifier_each: simplify_fileid
