@@ -20,18 +20,18 @@ types:
             - id: unreachable
               type: b1  # 0x80
 
-            - id: show_exterior_skybox
+            - id: exterior_skybox
               type: b1  # 0x0100
             - id: has_lights
               type: b1  # 0x0200
               doc: "has MOLR chunk"
-            - id: l_o_d
+            - id: has_lod
               type: b1  # 0x0400
               doc: "Also load for LoD != 0 (_lod* groups)"
             - id: has_doodads
               type: b1  # 0x0800
               doc: "Has doodads (MODR chunk)"
-            - id: liquidsurface
+            - id: has_water
               type: b1  # 0x1000
               doc: "Has water (MLIQ chunk)"
             - id: interior
@@ -42,7 +42,7 @@ types:
             - id: unused4
               type: b1  # 0x8000
 
-            - id: alwaysdraw
+            - id: always_draw
               type: b1  # 0x00010000
               doc: "wowdev.wiki: clear 0x08 after CMapObjGroup::Create() in MOGP and MOGI"
             - id: has_mori
@@ -51,38 +51,38 @@ types:
             - id: show_skybox
               type: b1  # 0x00040000
               doc: "Automatically unset if MOSB not present"
-            - id: water_is_ocean
+            - id: has_ocean
               type: b1  # 0x00080000
               doc: "LiquidType related, see MLIQ"
             - id: unknown1
               type: b1  # 0x00100000
-            - id: is_mount_allowed  # FIXME: should this be "mount_is_allowed"?
+            - id: mount_allowed
               type: b1  # 0x00200000
             - id: unused5
               type: b1  # 0x00400000
             - id: unused6
               type: b1  # 0x00800000
 
-            - id: cverts2
+            - id: has_vc2
               type: b1  # 0x01000000
               doc: "Has two MOCV chunks - don't run FixColorVertexAlpha on these!"
-            - id: tverts2
+            - id: has_uv2
               type: b1  # 0x02000000
               doc: "Has two MOTV chunks"
             - id: antiportal
               type: b1  # 0x04000000
               doc: "Antiportal; requires intBatchCount == 0, extBatchCount == 0, UNREACHABLE"
-            - id: unknown3
+            - id: unknown2
               type: b1  # 0x08000000
               doc: "maybe don't render batches, but still render doodads?"
             - id: unused7
               type: b1  # 0x10000000
             - id: exterior_cull
               type: b1  # 0x20000000
-            - id: tverts3
+            - id: has_uv3
               type: b1  # 0x40000000
-              doc: "has three MOTV chunks"
-            - id: unknown4
+              doc: "has third MOTV chunk"
+            - id: unknown3
               type: b1  # 0x80000000
               doc: "unknown, seen in world/wmo/kultiras/human/8hu_warfronts_armory_v2_000.wmo"
 

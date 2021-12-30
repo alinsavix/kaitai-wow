@@ -384,7 +384,7 @@ def wmo_nonroot(args, mogp, chunkmap, root, out):
     b_extern = mogp.ext_batch_count
     b_other = mogp.other_batch_count
     out.write(
-        f"Batch coutns:  {b_trans} trans    {b_intern} internal    {b_extern} external    {b_other} other")
+        f"Batch counts:  {b_trans} trans    {b_intern} internal    {b_extern} external    {b_other} other")
 
     fogs = ",".join([str(f) for f in mogp.fog_ids])
     out.write(f"Fog IDs: {fogs}    groupLiquid: {mogp.group_liquid} (??)")

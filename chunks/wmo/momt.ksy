@@ -92,10 +92,10 @@ types:
             - id: unfogged
               type: b1  # 0x02
               doc: "disable fog shading (rarely used)"
-            - id: unculled
+            - id: two_sided
               type: b1  # 0x04
               doc: "two sided"
-            - id: extlight
+            - id: ext_light
               type: b1  # 0x08
               doc: "darkened (internal faces of windows are flagged)"
             - id: sidn
@@ -110,7 +110,7 @@ types:
             - id: clamp_t
               type: b1  # 0x80
               doc: "texture clamp T"
-            - id: flag_0x100
+            - id: unknown1
               type: b1  # 0x0100
             - id: unused1
               type: b23  # 0x0100 to 0x80000000
