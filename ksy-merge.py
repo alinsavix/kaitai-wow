@@ -3,6 +3,7 @@ import argparse
 import os
 import re
 import sys
+from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple
 
 import yaml
@@ -15,6 +16,10 @@ verbose = 0
 def log(text: str) -> None:
     if verbose:
         print(text, file=sys.stderr)
+
+
+def normalize_type(t: str) -> str:
+    return re.sub(r"_", "", t.lower())
 
 
 # We'll find things like:   id: name, type m2array<type>
@@ -131,12 +136,12 @@ def list_descent(d: List[Any], parent: Any, top: Dict[str, Any]) -> None:
                 # true if there's not already a conditional. This could
                 # probably be improved on!
                 if "if" in r["orig"]:
-                    conditional = r["orig"]["if"]
+                    conditional: str = r["orig"]["if"]
                 else:
-                    conditional = True
+                    conditional: str = "true"
 
-                name = r["name"]
-                type = r["type"]
+                name: str = r["name"]
+                type: str = r["type"]
                 m2arr_meta = [
                     {
                         "id": f"num_{name}",
@@ -337,8 +342,8 @@ def get_used_from_seq(data: List[Dict[str, Any]]) -> Tuple[Set[str], Set[str]]:
 
 # FIXME: Can we dedupe w/ the above?
 def get_used_from_instances(data: Dict[str, Any]) -> Tuple[Set[str], Set[str]]:
-    used_types = set()
-    used_enums = set()
+    used_types: Set[str] = set()
+    used_enums: Set[str] = set()
 
     for _, f in data.items():
         if "enum" in f:
@@ -381,7 +386,7 @@ def get_used_recurse(top: Dict[str, Any]) -> Tuple[Set[str], Set[str]]:
         return used_types, used_enums
 
     # and everything used by the starting pint is new, of course
-    new_types = set()
+    new_types: Set[str] = set()
     new_types.update(used_types)
 
     # convenient shortcut to all available types
@@ -389,7 +394,7 @@ def get_used_recurse(top: Dict[str, Any]) -> Tuple[Set[str], Set[str]]:
 
     # keep digging out new types until we run out of new types
     while len(new_types) > 0:
-        new_new_types = set()
+        new_new_types: Set[str] = set()
         for t in new_types:
             if t in typemap:
                 nt, ne = get_used(typemap[t])
@@ -403,6 +408,87 @@ def get_used_recurse(top: Dict[str, Any]) -> Tuple[Set[str], Set[str]]:
         used_types.update(new_types)
 
     return used_types, used_enums
+
+
+# look through all our types, find metadata (right now, just simplifiers)
+# FIXME: massive deduplication needed. Do better, bitch, do better.
+def gen_metadata(args: argparse.Namespace, data: Dict[str, Any]) -> Dict[str, Any]:
+    metadata: Dict[str, Any] = {}
+
+    if "seq" in data:
+        maintype = Path(args.files[0]).stem
+
+        for field in data["seq"]:
+            if "simplifier" in field:
+                id = field["id"]
+                id = f"{normalize_type(maintype)}.{id}"
+
+                if id not in metadata:
+                    metadata[id] = {}
+                metadata[id]["simplifier"] = field["simplifier"]
+                del field["simplifier"]
+
+            if "simplifier_each" in field:
+                id = field["id"]
+                id = f"{normalize_type(maintype)}.{id}"
+
+                if id not in metadata:
+                    metadata[id] = {}
+                metadata[id]["simplifier_each"] = field["simplifier_each"]
+                del field["simplifier_each"]
+
+    if "types" in data:
+        for k, type in data["types"].items():
+            k = normalize_type(k)
+            # print(k, type, file=sys.stderr)
+            if "simplifier" in type:
+                if k not in metadata:
+                    metadata[k] = {}
+                metadata[k]["simplifier"] = type["simplifier"]
+                del type["simplifier"]
+
+            # look through fields of types, for simplifiers that are
+            # based on primitive types
+            if "seq" in type:
+                for field in type["seq"]:
+                    if "simplifier" in field:
+                        id = field["id"]
+                        id = f"{k}.{id}"
+
+                        if id not in metadata:
+                            metadata[id] = {}
+                        metadata[id]["simplifier"] = field["simplifier"]
+                        del field["simplifier"]
+
+                    if "simplifier_each" in field:
+                        id = field["id"]
+                        id = f"{k}.{id}"
+
+                        if id not in metadata:
+                            metadata[id] = {}
+                        metadata[id]["simplifier_each"] = field["simplifier_each"]
+                        del field["simplifier_each"]
+
+            if "params" in type:
+                for field in type["params"]:
+                    if "simplifier" in field:
+                        id = field["id"]
+                        id = f"{k}.{id}"
+
+                        if id not in metadata:
+                            metadata[id] = {}
+                        metadata[id]["simplifier"] = field["simplifier"]
+                        del field["simplifier"]
+
+                    if "simplifier_each" in field:
+                        id = field["id"]
+                        id = f"{k}.{id}"
+
+                        if id not in metadata:
+                            metadata[id] = {}
+                        metadata[id]["simplifier_each"] = field["simplifier_each"]
+                        del field["simplifier_each"]
+    return metadata
 
 
 # VERY simple yaml merge. Everything is a deep merge. Conflicts resolve
@@ -440,6 +526,13 @@ def parse_arguments() -> argparse.Namespace:
         help="only generate dependencies, don't output merged file",
     )
 
+    parser.add_argument(
+        "--metadata-file",
+        type=str,
+        default=None,
+
+        help="file to output metadata information to",
+    )
 
     parser.add_argument(
         "files",
@@ -457,6 +550,7 @@ def parse_arguments() -> argparse.Namespace:
     return parsed_args
 
 
+
 def main() -> int:
     args = parse_arguments()
 
@@ -471,6 +565,7 @@ def main() -> int:
 
     dict_descent(data, False, data)
 
+    # filter out the data types that aren't used
     if "types" in data:
         used_types, used_enums = get_used_recurse(data)
         to_delete = data["types"].keys() - used_types
@@ -482,6 +577,12 @@ def main() -> int:
             for d in to_delete:
                 # print(f"not needed enum: {d}")
                 del data["enums"][d]
+
+    # generate metadata
+    if args.metadata_file is not None:
+        metadata = gen_metadata(args, data)
+        with open(args.metadata_file, "w") as f:
+            f.write(yaml.dump(metadata))
 
     # The kaitai IDE can't cope with yaml multiline strings, so width=9999
     # will stop it from wrapping those lines when processing long heredocs

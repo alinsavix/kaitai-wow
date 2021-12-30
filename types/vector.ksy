@@ -1,5 +1,6 @@
 types:
     c2vector:
+        simplifier: simplify_xy
         seq:
             - id: x
               type: f4
@@ -14,6 +15,7 @@ types:
               type: s4
 
     c3vector:
+        simplifier: simplify_xyz
         seq:
             - id: x
               type: f4
@@ -32,6 +34,7 @@ types:
               type: s4
 
     c4vector:
+        simplifier: simplify_wxyz
         seq:
             - id: x
               type: f4

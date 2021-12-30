@@ -1,10 +1,10 @@
 # simplifiers for file ids of various types
 import argparse
 import logging
-from typing import Any, List
+from typing import Any, Dict, List
 
 from .. import csvcache
-from . import SimplifierUncompiled
+from . import SimplifierFunc
 
 
 def simplify_fileid(id: Any, _parent: Any, args: argparse.Namespace) -> str:
@@ -39,12 +39,6 @@ def simplify_fileid_short(id: Any, _parent: Any, args: argparse.Namespace) -> st
         return f"{id}  # {last}"
 
 
-fileids_re = r"^/chunks/\d+/chunk_data/([^/]+_)?(file_data_ids|fdids)/\d+$"
-fileid_re = r"/([^/]+_)?(file_data_id|fdid)$"
-mapfileid_re = r"^/chunks/\d+/chunk_data/map_fileids/\d+/[^/]+_(file_data_id|fdid)$"
-
-simplifiers: List[SimplifierUncompiled] = [
-    (fileid_re, simplify_fileid),
-    (fileids_re, simplify_fileid),
-    (mapfileid_re, simplify_fileid),
-]
+named_simplifiers: Dict[str, SimplifierFunc] = {
+    "simplify_fileid": simplify_fileid,
+}

@@ -19,3 +19,4 @@ types:
               type: u4
             - id: unused1
               type: u4
+              simplifier: simplify_remove

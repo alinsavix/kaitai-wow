@@ -7,10 +7,12 @@ types:
               type: u1
               repeat: expr
               repeat-expr: 4
+              simplifier: simplify_fourbone
             - id: bone_indices
               type: u1
               repeat: expr
               repeat-expr: 4
+              simplifier: simplify_fourbone
             - id: normal
               type: c3vector
             - id: tex_coords

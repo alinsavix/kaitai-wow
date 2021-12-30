@@ -1,9 +1,9 @@
 # simplifiers for enum values
 import argparse
 import logging
-from typing import Any, List
+from typing import Any, Dict
 
-from . import SimplifierUncompiled
+from . import SimplifierFunc
 
 
 def simplify_enum(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
@@ -19,25 +19,6 @@ def simplify_enum(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
     return f"{d.value}  # {d.name}"
 
 
-anim_id_re = r"/chunks/\d+/chunk_data/anim_file_ids/\d+/anim_id$"
-blp_re = r"^/(color_encoding|preferred_format)$"
-interpolation_type_re = r"(interpolation_type|m2track_type)$"
-material_blending_re = r"^/model/materials/\d+/blending_mode$"
-wmo_material_blendering_re = r"^/chunks/\d+/chunk_data/materials/\d+/blend_mode$"
-particle_old_blending_re = r"/model/particle_emitters/\d+/old/(blending|emitter)_type$"
-sequence_id_re = r"/sequences/\d+/id$"
-texture_type_re = r"^/model/textures/\d+/type$"
-version_re = r"^/model/version$"
-
-
-simplifiers: List[SimplifierUncompiled] = [
-    (anim_id_re, simplify_enum),
-    (blp_re, simplify_enum),
-    (interpolation_type_re, simplify_enum),
-    (material_blending_re, simplify_enum),
-    (wmo_material_blendering_re, simplify_enum),
-    (particle_old_blending_re, simplify_enum),
-    (sequence_id_re, simplify_enum),
-    (texture_type_re, simplify_enum),
-    (version_re, simplify_enum),
-]
+named_simplifiers: Dict[str, SimplifierFunc] = {
+    "simplify_enum": simplify_enum,
+}

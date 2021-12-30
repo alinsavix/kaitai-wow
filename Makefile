@@ -25,12 +25,15 @@ $(foreach file,$(DEPSFILES),$(eval -include $(file)))
 KSY_OUTDIR ?= $(OUTDIR)/ksy
 KSY_TARGETS = $(addprefix $(KSY_OUTDIR)/, $(addsuffix .ksy, $(FILETYPES)))
 
-ksy: $(KSY_TARGETS)
+METADATA_OUTDIR ?= $(OUTDIR)/metadata
+METADATA_TARGETS = $(addprefix $(METADATA_OUTDIR)/, $(addsuffix .yaml, $(FILETYPES)))
+
+ksy: $(KSY_TARGETS) $(METADATA_TARGETS)
 
 .PRECIOUS: $(KSY_OUTDIR)/%.ksy
-$(KSY_OUTDIR)/%.ksy:
-	@mkdir -p $(KSY_OUTDIR)
-	$(KSY_MERGE) --deps-file $(DEPS_DIR)/$(@F).d --deps-target $(KSY_OUTDIR)/$(@F) filetypes/$(@F) >$@.tmp && mv $@.tmp $@
+$(KSY_OUTDIR)/%.ksy $(METADATA_OUTDIR)/%.yaml:
+	@mkdir -p $(KSY_OUTDIR) $(METADATA_OUTDIR)
+	$(KSY_MERGE) --deps-file $(DEPS_DIR)/$(*F).ksy.d --deps-target $(KSY_OUTDIR)/$(*F).ksy --metadata-file $(METADATA_OUTDIR)/$(*F).yaml filetypes/$(*F).ksy >$@.tmp && mv $@.tmp $@
 
 
 #
@@ -51,7 +54,8 @@ $(PYTHON_OUTDIR)/%.py: $(KSY_OUTDIR)/%.ksy
 #
 WOWDUMP_OUTDIR = wowdump/filetypes
 WOWDUMP_FILETYPE_TARGETS = $(addprefix $(WOWDUMP_OUTDIR)/, $(addsuffix .py, $(FILETYPES)))
-WOWDUMP_TARGETS = $(WOWDUMP_OUTDIR)/__init__.py $(WOWDUMP_FILETYPE_TARGETS)
+WOWDUMP_FILEMETA_TARGETS = $(addprefix $(WOWDUMP_OUTDIR)/, $(addsuffix .yaml, $(FILETYPES)))
+WOWDUMP_TARGETS = $(WOWDUMP_OUTDIR)/__init__.py $(WOWDUMP_FILETYPE_TARGETS) $(WOWDUMP_FILEMETA_TARGETS)
 
 wowdump: $(WOWDUMP_TARGETS)
 
@@ -63,6 +67,11 @@ $(WOWDUMP_OUTDIR)/__init__.py: $(WOWDUMP_FILETYPE_TARGETS) gen_wowdump_filetypes
 $(WOWDUMP_OUTDIR)/%.py: $(PYTHON_OUTDIR)/%.py
 	@mkdir -p $(WOWDUMP_OUTDIR)
 	cp "$<" "$@"
+
+$(WOWDUMP_OUTDIR)/%.yaml: $(METADATA_OUTDIR)/%.yaml
+	@mkdir -p $(WOWDUMP_OUTDIR)
+	cp "$<" "$@"
+
 
 #
 # svg

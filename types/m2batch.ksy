@@ -40,6 +40,7 @@ types:
               type: s1
             - id: shader_id
               type: u2
+              simplifier: simplify_shaderid_m2
             - id: skin_section_index
               type: u2
               doc: "Duplicate entry of a submesh (?)"

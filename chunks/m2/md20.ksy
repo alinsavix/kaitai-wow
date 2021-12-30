@@ -81,6 +81,7 @@ types:
             - id: version
               type: u4
               enum: wow_versions
+              simplifier: simplify_enum
             - id: name
               type: m2array<str>
               doc: "should be globally unique"

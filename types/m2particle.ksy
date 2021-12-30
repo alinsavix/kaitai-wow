@@ -151,10 +151,12 @@ types:
               type: vector_2fp_6_9
               repeat: expr
               repeat-expr: 2
+              simplifier_each: simplify_nested_xy
             - id: multi_texture_param1
               type: vector_2fp_6_9
               repeat: expr
               repeat-expr: 2
+              simplifier_each: simplify_nested_xy
 
 
     # This struct is based off of a number of different sources, some intuition,
@@ -196,9 +198,11 @@ types:
             - id: blending_type
               type: u1
               enum: blendmodes
+              simplifier: simplify_enum
             - id: emitter_type
               type: u1
               enum: emitter_types
+              simplifier: simplify_enum
             - id: particle_color_index
               type: u2
 

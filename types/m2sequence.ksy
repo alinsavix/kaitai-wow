@@ -49,6 +49,7 @@ types:
             - id: id
               type: u2
               enum: anim_names
+              simplifier: simplify_enum
             - id: variation_index
               type: u2
             - id: duration

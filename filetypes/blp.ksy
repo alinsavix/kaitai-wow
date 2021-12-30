@@ -60,11 +60,13 @@ seq:
     - id: color_encoding
       type: u1
       enum: blp_color_encodings
+      simplifier: simplify_enum
     - id: alpha_channel_bit_depth
       type: u1
     - id: preferred_format
       type: u1
       enum: blp_pixel_format
+      simplifier: simplify_enum
     - id: mipmap_level
       type: b4
     - id: flag_unknown

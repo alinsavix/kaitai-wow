@@ -30,6 +30,7 @@ types:
               type: f4
 
     cargb:
+        simplifier: simplify_irgba
         seq:
             - id: r
               type: u1
@@ -41,6 +42,7 @@ types:
               type: u1
 
     cimvector:
+        simplifier: simplify_irgba
         seq:
             - id: b
               type: u1
@@ -92,6 +94,7 @@ types:
     # RGB values expressed in floating point, as used by particle structs
     # FIXME: This naming is absolutely awful
     frgb:
+        simplifier: simplify_irgb
         seq:
             - id: r
               type: f4

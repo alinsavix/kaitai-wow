@@ -1,9 +1,9 @@
 # simplifiers for bone-related things (when we have them)
 import argparse
 import logging
-from typing import Any, List
+from typing import Any, Dict, List
 
-from . import SimplifierUncompiled
+from . import SimplifierFunc, SimplifierUncompiled
 
 
 def simplify_fourbone(d: Any, _parent: Any, _args: argparse.Namespace) -> str:
@@ -17,10 +17,15 @@ def simplify_fourbone_m2arr(d: Any, _parent: Any, _args: argparse.Namespace) -> 
     return f"[ {d.value[0]}, {d.value[1]}, {d.value[2]}, {d.value[3]} ]"
 
 
-fourbone_re = r"^/model/vertices/\d+/(bone_indices|bone_weights)$"
 fourbone_skin_re = r"^/skin/bones/\d+$"
 
+# FIXME: need this for /skin/bones for now, until we figure out how to
+# actually manage that better
 simplifiers: List[SimplifierUncompiled] = [
-    (fourbone_re, simplify_fourbone),
     (fourbone_skin_re, simplify_fourbone_m2arr)
 ]
+
+named_simplifiers: Dict[str, SimplifierFunc] = {
+    "simplify_fourbone": simplify_fourbone,
+    "simplify_fourbone_m2arr": simplify_fourbone_m2arr,
+}

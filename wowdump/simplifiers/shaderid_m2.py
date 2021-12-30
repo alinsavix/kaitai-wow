@@ -1,9 +1,9 @@
 # simplifier to simplify shaderids for m2 models
 import argparse
 import logging
-from typing import Any, List
+from typing import Any, Dict
 
-from . import SimplifierUncompiled
+from . import SimplifierFunc
 
 
 def simplify_shaderid_m2(d: Any, parent: Any, _args: argparse.Namespace) -> str:
@@ -149,9 +149,6 @@ def get_m2_vertex_shader(shader_id: int, op_count: int = 2) -> str:
                         return "VS_Diffuse_T1_T1"
 
 
-shader_m2_re = r"^/skin/batches/\d+/shader_id$"
-
-
-simplifiers: List[SimplifierUncompiled] = [
-    (shader_m2_re, simplify_shaderid_m2),
-]
+named_simplifiers: Dict[str, SimplifierFunc] = {
+    "simplify_shaderid_m2": simplify_shaderid_m2,
+}

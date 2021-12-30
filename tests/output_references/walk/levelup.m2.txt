@@ -102,9 +102,7 @@
 /model/colors/0/color/values/offset = 8096
 /model/colors/0/color/values/values/0/num = 1
 /model/colors/0/color/values/values/0/offset = 16016
-/model/colors/0/color/values/values/0/values/0/x = 0.8941177129745483
-/model/colors/0/color/values/values/0/values/0/y = 0.7568628191947937
-/model/colors/0/color/values/values/0/values/0/z = 0.0
+/model/colors/0/color/values/values/0/values/0 = xyz(0.894118, 0.756863, 0.0)
 /model/events/0/bone = 21
 /model/events/0/data = 888
 /model/events/0/enabled/global_sequence = -1

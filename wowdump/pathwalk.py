@@ -14,7 +14,7 @@ from .simplifiers import check_simplify
 # pathwalk is used by more than just the 'pathwalk' command, and it's  fairly
 # big and complicated, so it gets its own file
 
-def pathwalk(args: argparse.Namespace, obj: KaitaiStruct, path: str) -> Iterable[str]:
+def pathwalk(args: argparse.Namespace, obj: KaitaiStruct, path: str, filetype: str) -> Iterable[str]:
     lgsimplify = logging.getLogger("simplify")
     lgdisp = logging.getLogger("disposition")
 
@@ -60,19 +60,24 @@ def pathwalk(args: argparse.Namespace, obj: KaitaiStruct, path: str) -> Iterable
 
         # FIXME: Where is the best place for simplifiers? Here?
         lgsimplify.debug(f"checking simplifier for {workpath}")
-        s = check_simplify(workpath) if args.simplify else None
-        if s:
+        if args.simplify:
+            s, each = check_simplify(workpath, filetype, k, type(v), type(obj))
+        else:
+            s, each = None, False
+
+        if s and not each:
             lgsimplify.debug(f"using simplifier for {workpath}")
 
             # if getting simplified, it's a "final" path, so check filtering
             if check_filtered(args, workpath):
                 continue
 
-            # FIXME: this feels sloppy
-            if kt == "base" or kt == "list":
-                simplified = s(v, obj, args)
-            else:
-                simplified = s(v, obj, args)
+            # FIXME: what was this for?
+            # if kt == "base" or kt == "list":
+            #     simplified = s(v, obj, args)
+            # else:
+            #     simplified = s(v, obj, args)
+            simplified = s(v, obj, args)
             if simplified is not None:
                 yield f"{workpath} = {simplified}"
 
@@ -86,7 +91,17 @@ def pathwalk(args: argparse.Namespace, obj: KaitaiStruct, path: str) -> Iterable
             # everything in an array shoooould have the same contents, so no
             # benefit to checking for a simplifier match for each, just check
             # for the first element and keep it
-            s = check_simplify(f"{workpath}/0") if args.simplify else None
+
+            # s = check_simplify(
+            #     f"{workpath}/0", filetype, type(v[0])) if args.simplify and len(v) > 0 else None
+
+            # If our simplifier isn't an 'each' type, don't try it on
+            # every element of an array
+            if not each:
+                if len(v) > 0 and args.simplify:
+                    s, _ = check_simplify(f"{workpath}/0", filetype, k, type(v[0]))
+                else:
+                    s, _ = None, False
 
             for i, el in enumerate(v):
                 arraypath = f"{workpath}/{i}"
@@ -147,17 +162,17 @@ def pathwalk(args: argparse.Namespace, obj: KaitaiStruct, path: str) -> Iterable
                     yield f"{arraypath} = {el}"
                 else:
                     lgdisp.debug(f"{arraypath} --> array descent")
-                    yield from pathwalk(args, el, arraypath)
+                    yield from pathwalk(args, el, arraypath, filetype)
 
         elif kt == "kaitai":
             # FIXME: I think we're supposed to do one of these without the {k}
             if k == "data":
                 lgdisp.debug(f"{workpath} --> kaitai data descent")
-                yield from pathwalk(args, v, workpath)
+                yield from pathwalk(args, v, workpath, filetype)
             else:
                 lgdisp.debug(f"{workpath} --> kaitai descent type {type(k)}")
                 # debug(f"recursing kaitai value, type: {type(k)}")
-                yield from pathwalk(args, v, workpath)
+                yield from pathwalk(args, v, workpath, filetype)
 
         elif kt == "base":
             # we're at a final path, check filtering
@@ -172,7 +187,7 @@ def pathwalk(args: argparse.Namespace, obj: KaitaiStruct, path: str) -> Iterable
 
         else:
             lgdisp.debug(f"{workpath} --> descend (type {type(v)}")
-            yield from pathwalk(args, v, workpath)
+            yield from pathwalk(args, v, workpath, filetype)
 
 
 # When dealing with big files with a lot of fields, we end up spending a
