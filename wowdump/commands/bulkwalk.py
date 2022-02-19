@@ -90,12 +90,13 @@ def walk_file(args: argparse.Namespace, infile: Path, outfile: Path, overwrite: 
         print(f"processing: {infile}", file=sys.stderr)
 
     target = fileparse(infile)
+    filetype = Path(infile).suffix.lstrip('.')
     with DataOutput(str(outfile)) as out:
         if not check_filtered(args, "/contenthash"):
             h = get_contenthash(infile)
             out.write(f"/contenthash = {h}")
 
-        for line in pathwalk(args, target, ""):
+        for line in pathwalk(args, target, "", filetype):
             out.write(line)
 
 
