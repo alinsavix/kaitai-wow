@@ -390,8 +390,12 @@ def wmo_nonroot(args, mogp, chunkmap, root, out):
     out.write(f"Fog IDs: {fogs}    groupLiquid: {mogp.group_liquid} (??)")
 
 
-    wmo_report_batches(args, materials, "Batch", chunkmap["MOBA"].batches, out)
-    wmo_report_batches(args, materials, "Shadow Batch", chunkmap["MOBS"].shadow_batches, out)
+    if "MOBA" in chunkmap:
+        wmo_report_batches(args, materials, "Batch", chunkmap["MOBA"].batches, out)
+
+    if "MOBS" in chunkmap:
+        wmo_report_batches(args, materials, "Shadow Batch",
+                           chunkmap["MOBS"].shadow_batches, out)
     # wmo_report_doodads(args, chunkmap["MODR"], out)
     # wmo_report_bsp()    # FIXME: do we need this? Maybe?
 
