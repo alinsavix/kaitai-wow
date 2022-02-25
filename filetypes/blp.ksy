@@ -93,6 +93,7 @@ seq:
 
 types:
     blp_pal_pixel:
+        simplifier: simplify_irgb
         seq:
             - id: b
               type: u1
@@ -101,6 +102,5 @@ types:
             - id: r
               type: u1
 
-            # FIXME: We don't have to actually assign to a variable here, right?
-            - id: pad
+            - id: unused
               type: u1
