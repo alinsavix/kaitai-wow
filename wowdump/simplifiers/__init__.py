@@ -3,8 +3,7 @@
 import argparse
 import re
 from importlib import import_module
-from typing import (Any, Callable, Dict, List, Optional, Pattern, Set, Tuple,
-                    Type, cast)
+from typing import Any, Callable, Dict, List, Optional, Pattern, Set, Tuple
 
 from ..ksymeta import getmeta
 

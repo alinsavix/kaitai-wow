@@ -968,7 +968,7 @@
 /chunks/5/chunk_data/portal_info/12/start_vertex = 48
 /chunks/5/chunk_data/portal_info/13/count = 4
 /chunks/5/chunk_data/portal_info/13/plane/distance = -134.25186157226562
-/chunks/5/chunk_data/portal_info/13/plane/normal = xyz(-0.991446, 0.130515, 4e-06)
+/chunks/5/chunk_data/portal_info/13/plane/normal = xyz(-0.991446, 0.130515, 0.000004)
 /chunks/5/chunk_data/portal_info/13/start_vertex = 52
 /chunks/5/chunk_data/portal_info/14/count = 4
 /chunks/5/chunk_data/portal_info/14/plane/distance = -84.21391296386719
@@ -1797,7 +1797,7 @@
 /chunks/10/chunk_data/doodad_defs/77/orientation/x = 0.0
 /chunks/10/chunk_data/doodad_defs/77/orientation/y = -0.0
 /chunks/10/chunk_data/doodad_defs/77/orientation/z = 0.25881901383399963
-/chunks/10/chunk_data/doodad_defs/77/position = xyz(-3e-06, 3e-06, 296.098114)
+/chunks/10/chunk_data/doodad_defs/77/position = xyz(-0.000003, 0.000003, 296.098114)
 /chunks/10/chunk_data/doodad_defs/77/scale = 0.8245043158531189
 /chunks/10/chunk_data/doodad_defs/78/color = rgba(164, 106, 133, 255)  # a46a85ff
 /chunks/10/chunk_data/doodad_defs/78/flags = none

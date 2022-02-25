@@ -296,7 +296,7 @@
 /model/particle_emitters/0/old/p/unknown_reference/offset = 0
 /model/particle_emitters/0/old/particle_color_index = 11
 /model/particle_emitters/0/old/particle_id = -1
-/model/particle_emitters/0/old/position = xyz(0.467286, -0.001146, 7e-05)
+/model/particle_emitters/0/old/position = xyz(0.467286, -0.001146, 0.00007)
 /model/particle_emitters/0/old/recursion_model_filename = 
 /model/particle_emitters/0/old/speed_variation/global_sequence = -1
 /model/particle_emitters/0/old/speed_variation/interpolation_type = 0  # interpolate_const
@@ -700,7 +700,7 @@
 /model/particle_emitters/2/old/p/unknown_reference/offset = 0
 /model/particle_emitters/2/old/particle_color_index = 11
 /model/particle_emitters/2/old/particle_id = -1
-/model/particle_emitters/2/old/position = xyz(0.58943, -0.001146, 4.4e-05)
+/model/particle_emitters/2/old/position = xyz(0.58943, -0.001146, 0.000044)
 /model/particle_emitters/2/old/recursion_model_filename = 
 /model/particle_emitters/2/old/speed_variation/global_sequence = -1
 /model/particle_emitters/2/old/speed_variation/interpolation_type = 0  # interpolate_const
@@ -1488,7 +1488,7 @@
 /model/particle_emitters/6/old/p/unknown_reference/offset = 0
 /model/particle_emitters/6/old/particle_color_index = 11
 /model/particle_emitters/6/old/particle_id = -1
-/model/particle_emitters/6/old/position = xyz(1.043056, -0.000928, -4.8e-05)
+/model/particle_emitters/6/old/position = xyz(1.043056, -0.000928, -0.000048)
 /model/particle_emitters/6/old/recursion_model_filename = 
 /model/particle_emitters/6/old/speed_variation/global_sequence = -1
 /model/particle_emitters/6/old/speed_variation/interpolation_type = 0  # interpolate_const

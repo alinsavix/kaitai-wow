@@ -2,11 +2,20 @@ types:
     m2compquat:
         simplifier: simplify_wxyz
         seq:
-            - id: x
+            - id: raw_x
               type: s2
-            - id: y
+            - id: raw_y
               type: s2
-            - id: z
+            - id: raw_z
               type: s2
-            - id: w
+            - id: raw_w
               type: s2
+        instances:
+            x:
+                value: '(raw_x < 0 ? raw_x + 32768 : raw_x - 32767) / 32767.0'
+            y:
+                value: '(raw_y < 0 ? raw_y + 32768 : raw_y - 32767) / 32767.0'
+            z:
+                value: '(raw_z < 0 ? raw_z + 32768 : raw_z - 32767) / 32767.0'
+            w:
+                value: '(raw_w < 0 ? raw_w + 32768 : raw_w - 32767) / 32767.0'

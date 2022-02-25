@@ -396,7 +396,7 @@
 /skin/submeshes/5/index_start = 32484
 /skin/submeshes/5/level = 0
 /skin/submeshes/5/skin_section_id = 105
-/skin/submeshes/5/sort_center_position = xyz(-0.139451, -9e-06, 2.087363)
+/skin/submeshes/5/sort_center_position = xyz(-0.139451, -0.000009, 2.087363)
 /skin/submeshes/5/sort_radius = 0.2556731104850769
 /skin/submeshes/5/vertex_count = 646
 /skin/submeshes/5/vertex_start = 8812
@@ -448,7 +448,7 @@
 /skin/submeshes/9/index_start = 40392
 /skin/submeshes/9/level = 0
 /skin/submeshes/9/skin_section_id = 109
-/skin/submeshes/9/sort_center_position = xyz(-0.070163, 2e-06, 2.081494)
+/skin/submeshes/9/sort_center_position = xyz(-0.070163, 0.000002, 2.081494)
 /skin/submeshes/9/sort_radius = 0.2520216405391693
 /skin/submeshes/9/vertex_count = 732
 /skin/submeshes/9/vertex_start = 11399
