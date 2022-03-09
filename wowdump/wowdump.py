@@ -23,7 +23,7 @@ from .commands import (WowdumpCommand, cmd_bulkwalk, cmd_final, cmd_json,
 
 # DEFAULT_TARGET = "testfiles/spectraltiger.m2"
 DEFAULT_LISTFILE: str = str(Path.home() / ".wowdump_listfile.csv")
-DEFAULT_LISTFILE_URL: str = "https://wow.tools/casc/listfile/download/csv/unverified"
+DEFAULT_LISTFILE_URL: str = "https://github.com/wowdev/wow-listfile/raw/master/community-listfile.csv"
 args: argparse.Namespace
 
 # places to look for file:

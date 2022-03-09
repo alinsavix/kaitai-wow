@@ -8,7 +8,7 @@ import pytest
 import responses
 
 # FIXME: Not sure why I can't pull this in from main wowdump
-DEFAULT_LISTFILE_URL: str = "https://wow.tools/casc/listfile/download/csv/unverified"
+DEFAULT_LISTFILE_URL: str = "https://github.com/wowdev/wow-listfile/raw/master/community-listfile.csv"
 
 @pytest.fixture
 def mocked_responses():
