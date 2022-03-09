@@ -16,6 +16,7 @@ repos:
         -   id: check-json
         -   id: check-toml
         -   id: check-yaml
+            files: '\.(yml|yaml|ksy)$'
 
 -   repo: https://github.com/codingjoe/relint
     rev: 1.2.1
