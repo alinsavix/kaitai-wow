@@ -154,12 +154,16 @@ lint:
 
 # Just python packaging, for right now, at least.
 .PHONY: dist
-dist:
+dist: wowdump
+	@if ! $(PIP_BIN) show 'build' >/dev/null 2>&1; then \
+		echo "ERROR: python 'build' package is required (hint: $(PIP_BIN) install build)";  \
+		exit 1; \
+	fi
 	$(PYTHON_BIN) -m build
 
 
 .PHONY: install
-install:
+install: wowdump
 	$(PIP_BIN) install .
 
 
