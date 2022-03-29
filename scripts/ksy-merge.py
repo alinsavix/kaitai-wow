@@ -260,7 +260,7 @@ def merge_dict(y1: Any, y2: Any) -> Any:
 # wish I could just do this in the main loop, but apparently os.walk
 # just utterly ignores file arguments, so we have to split it off
 paths_handled: Set[str] = set()
-def merge_file(yaml_data: Dict[str, str], file: str) -> None:
+def merge_file(yaml_data: Dict[str, str], incl_dir: str, file: str) -> None:
     if file in paths_handled:
         log(f"already did '{file}'', skipping")
         return
@@ -277,7 +277,7 @@ def merge_file(yaml_data: Dict[str, str], file: str) -> None:
         if data and "meta" in data and "include" in data["meta"]:
             for incl in data["meta"]["include"]:
                 log(f"processing include '{incl}' from '{file}'")
-                recurse_merge(yaml_data, incl)
+                recurse_merge(yaml_data, incl_dir, os.path.join(incl_dir, incl))
 
             del data["meta"]["include"]
 
@@ -290,9 +290,9 @@ def merge_file(yaml_data: Dict[str, str], file: str) -> None:
 # granularity with our includes.
 #
 # Updates yamm_data in-place
-def recurse_merge(yaml_data: Dict[Any, Any], path: str) -> None:
+def recurse_merge(yaml_data: Dict[Any, Any], incl_dir: str, path: str) -> None:
     if os.path.isfile(path):
-        merge_file(yaml_data, path)
+        merge_file(yaml_data, incl_dir, path)
         return
 
     # else
@@ -300,7 +300,7 @@ def recurse_merge(yaml_data: Dict[Any, Any], path: str) -> None:
         for fp in filepaths:
             if not fp.is_file():
                 continue
-            merge_file(yaml_data, os.path.join(path, fp.name))
+            merge_file(yaml_data, incl_dir, os.path.join(path, fp.name))
 
 
 # We get 'data' after everything has basically been flattened. The places
@@ -535,6 +535,14 @@ def parse_arguments() -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "--ksy-dir",
+        type=str,
+        default="ksy",
+
+        help="directory to use as top of ksy includes",
+    )
+
+    parser.add_argument(
         "files",
         help="specify files or directories to process",
         metavar="files",
@@ -561,7 +569,7 @@ def main() -> int:
     # start with nothing, then add everything
     data: Dict[Any, Any] = {}
     for f in args.files:
-        recurse_merge(data, f)
+        recurse_merge(data, args.ksy_dir, f)
 
     dict_descent(data, False, data)
 

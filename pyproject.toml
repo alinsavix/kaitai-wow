@@ -151,6 +151,12 @@ known_blender_other = [
 
 
 [tool.pytest.ini_options]
+required_plugins = [
+    "pytest-html >=3.1",
+    "pytest-cov >=2.12",
+    "pytest-order >=1.0",
+]
+
 log_cli = false
 addopts = [
     "--tb=short",
@@ -168,10 +174,8 @@ norecursedirs = [ "*" ]
 python_files = [ "test_*.py", "check_*.py", "example_*.py" ]
 testpaths = [ "tests" ]
 
-required_plugins = [
-    "pytest-html >=3.1",
-    "pytest-cov >=2.12",
-    "pytest-order >=1.0",
+filterwarnings = [
+    'ignore:The pytest_cmdline_preparse hook is deprecated:DeprecationWarning',
 ]
 
 

@@ -1,13 +1,14 @@
 # This makefile probably requires GNU make. Sorry.
 OUTDIR=outputs
-
+KSY_DIR=ksy
 PYTHON_BIN ?= python3
 PIP_BIN ?= pip3
 BASH ?= bash
 KSY_COMPILER ?= kaitai-struct-compiler
-KSY_MERGE=$(PYTHON_BIN) ./ksy-merge.py
+KSY_MERGE=$(PYTHON_BIN) scripts/ksy-merge.py
 
-FILETYPES = $(basename $(notdir $(wildcard filetypes/*.ksy)))
+FILETYPES = $(basename $(notdir $(wildcard $(KSY_DIR)/filetypes/*.ksy)))
+KSY_SUBDIRS=chunks enums filetypes types
 
 
 all: ksy python wowdump
@@ -33,7 +34,7 @@ ksy: $(KSY_TARGETS) $(METADATA_TARGETS)
 .PRECIOUS: $(KSY_OUTDIR)/%.ksy
 $(KSY_OUTDIR)/%.ksy $(METADATA_OUTDIR)/%.yaml:
 	@mkdir -p $(KSY_OUTDIR) $(METADATA_OUTDIR)
-	$(KSY_MERGE) --deps-file $(DEPS_DIR)/$(*F).ksy.d --deps-target $(KSY_OUTDIR)/$(*F).ksy --metadata-file $(METADATA_OUTDIR)/$(*F).yaml filetypes/$(*F).ksy >$@.tmp && mv $@.tmp $@
+	$(KSY_MERGE) --deps-file $(DEPS_DIR)/$(*F).ksy.d --deps-target $(KSY_OUTDIR)/$(*F).ksy --metadata-file $(METADATA_OUTDIR)/$(*F).yaml $(KSY_DIR)/filetypes/$(*F).ksy >$@.tmp && mv $@.tmp $@
 
 
 #
@@ -59,9 +60,9 @@ WOWDUMP_TARGETS = $(WOWDUMP_OUTDIR)/__init__.py $(WOWDUMP_FILETYPE_TARGETS) $(WO
 
 wowdump: $(WOWDUMP_TARGETS)
 
-$(WOWDUMP_OUTDIR)/__init__.py: $(WOWDUMP_FILETYPE_TARGETS) gen_wowdump_filetypes.sh
+$(WOWDUMP_OUTDIR)/__init__.py: $(WOWDUMP_FILETYPE_TARGETS) scripts/gen_wowdump_filetypes.sh
 	@mkdir -p $(WOWDUMP_OUTDIR)
-	bash gen_wowdump_filetypes.sh $(FILETYPES) >"$@"
+	bash scripts/gen_wowdump_filetypes.sh $(FILETYPES) >"$@"
 
 
 $(WOWDUMP_OUTDIR)/%.py: $(PYTHON_OUTDIR)/%.py
@@ -132,7 +133,7 @@ all_langs: ksy
 .PHONY: depend
 depend:
 	@for type in $(FILETYPES); do \
-		$(KSY_MERGE) --deps-only --deps-file "$(DEPS_DIR)/$${type}.ksy.d" --deps-target "$(KSY_OUTDIR)/$${type}.ksy" "filetypes/$${type}.ksy"; \
+		$(KSY_MERGE) --deps-only --deps-file "$(DEPS_DIR)/$${type}.ksy.d" --deps-target "$(KSY_OUTDIR)/$${type}.ksy" "$(KSY_DIR)/filetypes/$${type}.ksy"; \
 	done
 
 
@@ -149,7 +150,7 @@ benchmark: wowdump
 
 .PHONY: lint
 lint:
-	yamllint --config-file .yamllint.yaml chunks enums filetypes types
+	yamllint --config-file $(KSY_DIR)/.yamllint.yaml $(addprefix $(KSY_DIR)/, $(KSY_SUBDIRS))
 
 
 # Just python packaging, for right now, at least.
