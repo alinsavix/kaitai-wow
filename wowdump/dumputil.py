@@ -9,7 +9,7 @@ from typing import (Any, Dict, List, Optional, Set, TextIO, Type, Union,
 
 from kaitaistruct import KaitaiStruct
 
-from . import filetypes
+from .filetypes import load_wowfile
 
 
 # a simple class for letting us hand around an open file so we can
@@ -80,7 +80,7 @@ def fileparse(file: Union[str, Path]) -> KaitaiStruct:
     # except (ValueError, OSError) as e:
     #     print(f"ERROR: {e}", file=sys.stderr)
     #     return 65  # os.EX_DATAERR
-    return filetypes.load_wowfile(file)
+    return load_wowfile(file)
 
 
 # "kaitai type"

@@ -5,10 +5,6 @@ from typing import Any, Dict, Optional
 
 import yaml
 
-# class KsyMetaType:
-#     type: str
-#     simplifier: Optional[str] = None
-
 __meta: Dict[str, Dict[str, Any]] = {}
 
 # meta (at the moment) is stored as yaml in the 'filetypes' directory.
@@ -36,6 +32,7 @@ def getmeta(filetype: str, datatype: str) -> Optional[Dict[str, Any]]:
         __meta[filetype] = __loadmeta(filetype)
 
     if datatype in __meta[filetype]:
-        return __meta[filetype][datatype]
+        m: Dict[str, Any] = __meta[filetype][datatype]
+        return m
 
     return None

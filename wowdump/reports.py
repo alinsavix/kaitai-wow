@@ -11,6 +11,7 @@ from typing import Optional
 # from .filetypes import load_wowfile, get_supported
 from . import csvcache, filetypes
 from .dumputil import DataOutput, get_contenthash
+# FIXME: can we use the normal simply APIs here?
 from .simplifiers.color import simplify_irgba_short
 # from .simplifiers import check_simplify
 from .simplifiers.coordinates import simplify_wxyz, simplify_xyz

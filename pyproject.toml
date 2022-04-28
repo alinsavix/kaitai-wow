@@ -5,13 +5,21 @@ requires = [
 
     # this will validate our project classifiers
     "trove-classifiers",
+
+    # for wrangling version number
+    "setuptools_scm[toml]>=6.4.0",
 ]
 build-backend = "setuptools.build_meta"
 
 
+[tool.setuptools_scm]
+write_to = "wowdump/_version.py"
+
+
 [project]
 name = "wowdump"
-version = "0.0.1"
+dynamic = [ "version" ]
+
 authors = [ { name = "TDV Alinsa", email = "alinsa-github@lupine.org" } ]
 description = "Read World of Warcraft data formats"
 classifiers = [
@@ -32,6 +40,16 @@ dependencies = [
     "PyYAML>=5.3",
 ]
 
+[project.optional-dependencies]
+tests = [
+    'pytest>=7.0',
+    'pytest-cov',
+    'pytest-html',
+    'pytest-order',
+    'pytest-benchmark[histogram]>=3.2.1',
+    'responses',
+]
+
 [project.readme]
 file = "README.md"
 content-type = "text/markdown"
@@ -42,6 +60,7 @@ Homepage = "https://github.com/alinsavix/kaitai-wow"
 
 [project.scripts]
 wowdump = "wowdump:main"
+
 
 [tool.setuptools]
 package-dir = { "" = "." }
@@ -65,6 +84,7 @@ namespaces = true
 [tool.setuptools.package-data]
 "wowdump.filetypes" = [ "*.yaml" ]
 
+
 [tool.mypy]
 python_version = 3.9
 
@@ -74,6 +94,7 @@ exclude = "^(wowdump/filetypes/|tests/|conftest\\.py|outputs/|typings/|out/|wowd
 # follow_imports = "silent"
 # ignore_missing_imports = true
 namespace_packages = true
+warn_unused_configs = true
 
 strict_optional = true
 disallow_subclassing_any = false
@@ -87,6 +108,12 @@ no_implicit_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
 warn_return_any = true
+warn_unreachable = true
+warn_no_return = true
+
+[[tool.mypy.overrides]]
+module = [ "kaitaistruct.*" ]
+ignore_missing_imports = true
 
 
 [tool.isort]
@@ -173,12 +200,16 @@ python_files = [ "test_*.py", "check_*.py", "example_*.py" ]
 testpaths = [ "tests" ]
 
 filterwarnings = [
+    # hopefully the pytest folks will give us a better way to do this at
+    # some point so we don't have to use `pytest_cmdline_preparse` at all
     'ignore:The pytest_cmdline_preparse hook is deprecated:DeprecationWarning',
 ]
 
 
 # tox doesn't quite support native pyproject.toml, but at least lets us
-# store the ini-type config here
+# store the ini-type config here. This config probably doesn't work right
+# now, though -- tox hasn't been a high priority for us, but keeping the
+# config here as a starting point.
 [tool.tox]
 
 legacy_tox_ini = """

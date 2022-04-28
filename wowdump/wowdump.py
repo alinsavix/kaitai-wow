@@ -436,14 +436,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 0
 
     # Actual commands
-    if args.mode in cmds:
-        # FIXME: should we just be using exceptions for all our exit paths?
-        return cmds[args.mode](args)
-    else:
+    if args.mode not in cmds:
         print(f"ERROR: unknown mode {args.mode} (this shouldn't happen)")
         return 70  # os.EX_SOFTWARE
 
-    return 0  # os.EX_OK
+    # FIXME: should we just be using exceptions for all our exit paths?
+    return cmds[args.mode](args)
 
 
 if __name__ == "__main__":

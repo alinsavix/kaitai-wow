@@ -47,7 +47,7 @@ def init_simplify() -> None:
             simplifiers.add((compiled_re, sss[1]))
 
         sd: Dict[str, SimplifierFunc] = getattr(ss, "named_simplifiers", {})
-        for funcname, func in sd.items():  # type: ignore
+        for funcname, func in sd.items():
             simplifier_funcs[funcname] = func
 
 

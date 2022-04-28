@@ -104,6 +104,8 @@ tests/report.html
 
 !.notempty
 
+wowdump/_version.py
+
 .coverage
 .vscode/
 .tox
